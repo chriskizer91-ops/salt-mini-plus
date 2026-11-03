@@ -1,0 +1,47 @@
+{
+ "car": "pickup",
+ "game": {
+  "triangles": 54356,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 545652,
+  "triangles_bay": 31712,
+  "by_piece": {
+   "body": 286211,
+   "lamp_head": 7710,
+   "lamp_tail": 5004,
+   "lamp_amber": 2964,
+   "lamp_reverse": 1140,
+   "under": 3912,
+   "hide": 42,
+   "hood": 9373,
+   "bay": 31712,
+   "wheel_fr": 54152,
+   "brake_fr": 3172,
+   "wheel_fl": 54152,
+   "brake_fl": 3172,
+   "wheel_rr": 54152,
+   "brake_rr": 3172,
+   "wheel_rl": 54152,
+   "brake_rl": 3172
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 95,
+  "draws_glb_traffic": 93,
+  "texture_mb": 0,
+  "glb_mb": 16.8,
+  "data_mb": 11.2
+ },
+ "baked": {
+  "triangles": 53950,
+  "draws_game": 7,
+  "draws_glb": 14,
+  "texture_mb_low": 24.0,
+  "texture_mb_medium": 96.0,
+  "glb_mb": 3.9,
+  "data_mb": 3.3
+ }
+}
