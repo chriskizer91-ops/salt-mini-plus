@@ -6,7 +6,9 @@
 set -e
 cd "$(dirname "$0")"
 M=../models/src
-npx esbuild src/main.js --bundle --minify --format=iife --target=es2020 --outfile=/tmp/smp-viewer-bundle.js --log-level=warning
+# (the bundle goes to a scratch file of its own, so two builds at once in two copies of the repo don't share one)
+B=$(mktemp /tmp/smp-viewer-bundle.XXXXXX.js)
+npx esbuild src/main.js --bundle --minify --format=iife --target=es2020 --outfile=$B --log-level=warning
 {
   cat shell/head.html
   printf '<script>\n'
@@ -14,7 +16,8 @@ npx esbuild src/main.js --bundle --minify --format=iife --target=es2020 --outfil
   for d in $M/cars/*/; do [ -d "$d" ] && for f in "$d"*.js; do cat "$f"; printf '\n;\n'; done; done
   for f in ../models/*/*_baked_data.js; do [ -f "$f" ] && { cat "$f"; printf '\n;\n'; }; done
   printf '</script>\n<script>\n'
-  cat /tmp/smp-viewer-bundle.js
+  cat $B
   printf '\n</script>\n</body></html>\n'
 } > viewer.html
+rm -f $B
 echo "viewer.html: $(wc -c < viewer.html) bytes"

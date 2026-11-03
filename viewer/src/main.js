@@ -14,7 +14,10 @@ import {makeMats} from './mats.js';
 const K=window.KIT,MAT=K.MAT,SM=K.SM,Q=new URLSearchParams(location.search),$=id=>document.getElementById(id);
 const SHOTS=!!Q.get('shots');
 /* the traffic's cars, in the order Salt Mini Plus has them; a car shows here once its Studio detail is made */
-const ALL=[['stock','SUV'],['pickup','Pickup'],['hatch','Hatch'],['wagon','Wagon'],['ev','EV'],['trail','Trail'],['coupe','Coupe'],['muscle','Muscle']];
+const ALL=[['stock','SUV'],['pickup','Pickup'],['hatch','Hatch'],['wagon','Wagon'],['ev','EV'],['trail','Trail'],['coupe','Coupe'],['muscle','Muscle'],
+  /* (the game's other builds, and its two cars that traffic doesn't have: Studio and the game's own only) */
+  ['sleeper','SUV Sleeper',1],['crawler','SUV Rock & Mud',1],['race','SUV Race',1],['coupeGT','Coupe GT',1],['hatchB','Hatch Group B',1],
+  ['wedge','Wedge',1],['wedgeNR','Wedge Night Runner',1],['hyper','Hypercar',1],['hyperTrack','Hypercar Track',1]];
 const READY=ALL.filter(([id])=>id==='stock'||K.HD_CARS[id]);
 /* the traffic's paints (cargames rlcwo2rnf-traffic/src/60_traffic.js TRF_PAINT) */
 const TRF_PAINT=['#e9e9e6','#1c1d20','#a2a6aa','#5d6268','#1f3658','#7b1c21','#b42020','#cbb68c','#2e4a3a','#d8d4c6','#3c6fa9','#c46a1c','#f2f2ef','#2b2d31','#8a8f94','#16213a'];
@@ -155,7 +158,8 @@ async function show(id,v,keepView){
   hoodA=hoodT=hoodT;hoodStep();applyPaint();applyLights();
   if(!keepView||!same)setView(Q.get('view')||'front34');
   for(const b of document.querySelectorAll('#vers button'))b.classList.toggle('on',b.dataset.v===ver);$('carb').textContent=ALL.find(x=>x[0]===id)[1];
-  for(const b of document.querySelectorAll('#vers button'))b.disabled=b.dataset.v==='baked'&&!(window.BAKED_CARS&&window.BAKED_CARS[id]);
+  /* (a car with no baked version shows no Baked button at all) */
+  for(const b of document.querySelectorAll('#vers button'))b.hidden=b.dataset.v==='baked'&&!(window.BAKED_CARS&&window.BAKED_CARS[id]);
   hud();$('loading').hidden=true;}
 function applyPaint(){if(!cur)return;const h=paint||cur.b.paint;PAINT_U.value.set(h);
   cur.root.traverse(m=>{if(m.isMesh&&m.userData.mat===MAT.PAINT&&m.material.color)m.material.color.set(h);});
@@ -194,7 +198,9 @@ addEventListener('resize',resize);
    phone they are in More) ---------- */
 function closePops(except){for(const id of ['cars','paints','more'])if(id!==except)$(id).hidden=true;for(const b of ['carb','paintb','moreb'])$(b).classList.remove('on');}
 function pop(id,btn){const open=$(id).hidden;closePops(id);$(id).hidden=!open;$(btn).classList.toggle('on',open);}
-for(const [id,name] of READY){const b=document.createElement('button');b.textContent=name;b.onclick=()=>{closePops();show(id,ver==='baked'&&!(window.BAKED_CARS&&window.BAKED_CARS[id])?'studio':ver);};$('cars').appendChild(b);}
+/* (the traffic's cars first, then the other builds under a small heading of their own) */
+let headed=false;for(const [id,name,other] of READY){if(other&&!headed){headed=true;const h=document.createElement('div');h.className='grp';h.textContent='Other builds';$('cars').appendChild(h);}
+  const b=document.createElement('button');b.textContent=name;b.onclick=()=>{closePops();show(id,ver==='baked'&&!(window.BAKED_CARS&&window.BAKED_CARS[id])?'studio':ver);};$('cars').appendChild(b);}
 $('carb').onclick=()=>pop('cars','carb');$('paintb').onclick=()=>pop('paints','paintb');$('moreb').onclick=()=>pop('more','moreb');
 document.querySelectorAll('#vers button').forEach(b=>b.onclick=()=>{closePops();show(carId,b.dataset.v,true);});
 $('hood').onclick=()=>{hoodT=hoodT<.5?1:0;$('hood').classList.toggle('on',hoodT>.5);};

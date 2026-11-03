@@ -1,6 +1,7 @@
 """A car's pictures and numbers, from what make_car.sh has made in its work folder:
    - models/<car>/docs/*.webp: each picture as WebP (exact: the colour kept under any clear alpha); the side by side
-     of the game's own, the Studio and the baked car; the Cycles render; the .glb check.
+     of the game's own, the Studio and the baked car (the first two, for a car made without a baked version); the
+     Cycles render; the .glb check.
    - models/<car>/numbers.json: triangles, draws and texture memory for each version, the files' sizes.
    usage: python3 models/tools/docs.py <car> <work-dir> [folder: models/<folder>, the car's id by default]"""
 import sys, os, json, glob, struct
@@ -15,9 +16,12 @@ SH = os.path.join(X, 'shots')
 for f in sorted(glob.glob(os.path.join(SH, CAR + '_studio_*.png'))):
     v = os.path.basename(f)[len(CAR + '_studio_'):-4]; webp(Image.open(f).convert('RGB'), v)
 # ---------- the three side by side ----------
-ims = [Image.open(os.path.join(SH, '%s_%s_front34.png' % (CAR, v))).convert('RGB') for v in ('game', 'studio', 'baked')]
+# (a car made Studio-only, STUDIO_ONLY=1 in make_car.sh, has no baked version: two side by side)
+glbB = os.path.join(M, NAME + '_baked.glb'); BAKED = os.path.exists(glbB) and os.path.exists(os.path.join(SH, '%s_baked_front34.png' % CAR))
+VS = ('game', 'studio', 'baked') if BAKED else ('game', 'studio')
+ims = [Image.open(os.path.join(SH, '%s_%s_front34.png' % (CAR, v))).convert('RGB') for v in VS]
 W, H = ims[0].size; cw = int(W * .84); x0 = int(W * .12); y0, y1 = int(H * .14), int(H * .9)
-sbs = Image.new('RGB', (cw * 3, y1 - y0), (230, 229, 226)); d = ImageDraw.Draw(sbs)
+sbs = Image.new('RGB', (cw * len(VS), y1 - y0), (230, 229, 226)); d = ImageDraw.Draw(sbs)
 for i, (im, t) in enumerate(zip(ims, ('Game\'s own', 'Studio', 'Baked'))):
     sbs.paste(im.crop((x0, y0, x0 + cw, y1)), (i * cw, 0)); d.text((i * cw + 28, 26), t, fill=(40, 40, 40), font=F(30))
 webp(sbs, 'compare')
@@ -32,8 +36,8 @@ def glb_prims(p, skip=()):
         if 'mesh' in nd and nd.get('name') not in skip:
             for pr in J['meshes'][nd['mesh']]['primitives']: n += 1; t += J['accessors'][pr['indices']]['count'] // 3
     return n, t
-glbS = os.path.join(M, NAME + '_studio.glb'); glbB = os.path.join(M, NAME + '_baked.glb')
-gS, gB = glb_prims(glbS, ('bay',)), glb_prims(glbB, ('bay', 'hood_pad'))
+glbS = os.path.join(M, NAME + '_studio.glb')
+gS, gB = glb_prims(glbS, ('bay',)), (glb_prims(glbB, ('bay', 'hood_pad')) if BAKED else None)
 gSt = glb_prims(glbS, ('bay', 'under', 'hide'))
 # (four wheels, and any spares the game hangs on the car: the 4x4's on its door)
 nsp = len((bk.get('D') or {}).get('spares') or [])
@@ -45,6 +49,6 @@ N = {'car': CAR,
      'studio': {'triangles': shut, 'triangles_bay': T.get('bay', 0), 'by_piece': T, 'draws_game': 13, 'draws_game_traffic': 11, 'draws_glb': gS[0], 'draws_glb_traffic': gSt[0],
                 'texture_mb': 0, 'glb_mb': mb(glbS), 'data_mb': mb(os.path.join(M, NAME + '_studio_data.js'))},
      'baked': {'triangles': gB[1], 'draws_game': 7, 'draws_glb': gB[0], 'texture_mb_low': tex(1024, 1536), 'texture_mb_medium': tex(2048, 3072),
-               'glb_mb': mb(glbB), 'data_mb': mb(os.path.join(M, NAME + '_baked_data.js'))}}
+               'glb_mb': mb(glbB), 'data_mb': mb(os.path.join(M, NAME + '_baked_data.js'))} if BAKED else None}
 json.dump(N, open(os.path.join(M, 'numbers.json'), 'w'), indent=1)
 print(json.dumps(N, indent=1))

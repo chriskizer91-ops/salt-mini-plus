@@ -24,6 +24,15 @@ Each car comes three ways:
 | [Trail (4x4)](models/trail/) | Done | 492,105 (+27,684 engine bay) | 50,181 | 50,799 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Trail (4x4)](models/trail/docs/front34.webp) |
 | [Coupe](models/coupe/) | Done | 480,718 (+31,334 engine bay) | 50,361 | 50,475 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Coupe](models/coupe/docs/front34.webp) |
 | [Muscle](models/muscle/) | Done | 420,615 (+30,160 engine bay) | 58,121 | 58,395 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Muscle](models/muscle/docs/front34.webp) |
+| SUV Sleeper | To do | | | | | |
+| SUV Rock & Mud | To do | | | | | |
+| SUV Race | To do | | | | | |
+| Coupe GT | To do | | | | | |
+| Hatch Group B | To do | | | | | |
+| Wedge | To do | | | | | |
+| Wedge Night Runner | To do | | | | | |
+| Hypercar | To do | | | | | |
+| Hypercar Track | To do | | | | | |
 <!-- /TABLE -->
 
 "Studio triangles" is the whole car as you see it with the hood shut: body, cabin, lamps, the four wheels and their
@@ -142,8 +151,9 @@ The method is SUV Studio's (cargames, branch `suv-studio/hd-truck`).
 
 1. **The game's own builders.** `models/src/game/` holds copies of the game's builders, unchanged. These are
    `21_suv` (every car's body), `22_faces`, `23_parts`, `24_4x4` to `29_hatch`, `30_wheels`, `31_engine_bay`,
-   `32_builds`, `34_ev` and `37_newbuilds`, from `rlcwo2rnf-traffic/src`. They're joined by SUV Studio's
-   `00_prelude` and `36_stubs`, which holds empty stand-ins for the physics tables `37_newbuilds` writes into. So
+   `32_builds`, `34_ev`, `35_wedge`, `36_hyper` and `37_newbuilds`, from `rlcwo2rnf-traffic/src`. They're joined
+   by SUV Studio's `00_prelude` and `36_stubs`, which holds empty stand-ins for the physics tables `37_newbuilds`
+   writes into, and the game's pixel font (`10_core`) that a race build's numbers are drawn in. So
    each car's shape, wheelbase, track, ride height and wheel positions are exactly the game's. Only the body's
    stations are four times closer together.
 2. **The Studio kit.** `models/src/hd/` has the Studio SUV's own files (`70_geo` to `76_trim`, `89_hd`, `90_kit`).
