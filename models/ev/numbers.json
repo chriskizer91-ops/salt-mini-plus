@@ -1,0 +1,46 @@
+{
+ "car": "ev",
+ "game": {
+  "triangles": 55432,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 498744,
+  "triangles_bay": 23526,
+  "by_piece": {
+   "body": 235350,
+   "lamp_head": 4912,
+   "lamp_tail": 10538,
+   "lamp_reverse": 600,
+   "under": 4498,
+   "hide": 130,
+   "hood": 11892,
+   "bay": 23526,
+   "wheel_fr": 54310,
+   "brake_fr": 3396,
+   "wheel_fl": 54310,
+   "brake_fl": 3396,
+   "wheel_rr": 54310,
+   "brake_rr": 3396,
+   "wheel_rl": 54310,
+   "brake_rl": 3396
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 89,
+  "draws_glb_traffic": 87,
+  "texture_mb": 0,
+  "glb_mb": 16.4,
+  "data_mb": 9.8
+ },
+ "baked": {
+  "triangles": 55314,
+  "draws_game": 7,
+  "draws_glb": 13,
+  "texture_mb_low": 24.0,
+  "texture_mb_medium": 96.0,
+  "glb_mb": 3.2,
+  "data_mb": 2.8
+ }
+}

@@ -20,7 +20,7 @@ Each car comes three ways:
 | [Pickup](models/pickup/) | Done | 545,652 (+31,712 engine bay) | 53,950 | 54,356 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Pickup](models/pickup/docs/front34.webp) |
 | [Hatch](models/hatch/) | Done | 430,908 (+31,178 engine bay) | 46,655 | 46,833 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Hatch](models/hatch/docs/front34.webp) |
 | [Wagon](models/wagon/) | Done | 532,457 (+33,666 engine bay) | 52,006 | 52,334 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Wagon](models/wagon/docs/front34.webp) |
-| EV | To do | | | | | |
+| [EV](models/ev/) | Done | 498,744 (+23,526 engine bay) | 55,314 | 55,432 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![EV](models/ev/docs/front34.webp) |
 | Trail (4x4) | To do | | | | | |
 | Coupe | To do | | | | | |
 | Muscle | To do | | | | | |
@@ -121,6 +121,8 @@ So the game's shader needs nothing new for it.
   any pixel that still met a surface from behind (`models/tools/bake.py`). A little soft grey shading is left on
   the rear flares, where the game's flare sits a few centimetres off the Studio one. The Studio Hatch doesn't have
   this.
+- **Baked EV's engine bay:** the baked cars keep the game's own engine bay, and the game has no electric one: it
+  draws a stand-in engine under the EV's bonnet. The Studio EV has its front trunk and the motor's inverter.
 - **Hatch Studio triangle count:** lower than the SUV's because the car is much smaller (3.6 m against 4.9 m, on
   15-inch wheels). Every part on the SUV's list is there at the SUV's level: each wheel is 51,000 triangles against
   the SUV's 47,700, the cabin 64,000 against 54,000, and the engine bay 31,000 against the SUV's game bay of 3,000.
@@ -143,7 +145,7 @@ The method is SUV Studio's (cargames, branch `suv-studio/hd-truck`).
    - `78_run`: tyres, rims and brakes built the SUV's way
    - `79_bits`: underside, wipers, lamps, bumpers
    - `79_cabin`: a cabin generator, each car saying what its cabin has
-   - `79_bay`: the engine bay
+   - `79_bay`: the engine bay, or an electric car's front trunk
 3. **Each car's own detail.** This is in `models/src/cars/<car>/`, one file a part: the wheel, face, tail, cabin,
    bolt-ons and engine bay. Each car leaves off the game's decals and boxes that it builds again in 3D.
 4. **Blender** (the `bpy` module, no window) does three jobs from what `models/tools/export_parts.js` writes out:

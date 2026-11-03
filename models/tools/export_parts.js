@@ -29,13 +29,13 @@ let fileN=0;const tris={};
 const node=(name,parent,t=[0,0,0],extra={})=>{man.nodes.push({name,parent,t,...extra});};
 /* triangles from builders' arrays into a piece, split by material; xf(p) moves a point into the piece's frame, mir
    mirrors it across z (the left wheels: their own mirrored copy, so no node is scaled by -1) */
-function put(srcs,name,{xf=null,mir=false,keep=null}={}){const by=new Map();
+function put(srcs,name,{xf=null,mir=false,keep=null,rot=null}={}){const by=new Map();
   for(const src of srcs){if(!src||!src.p)continue;const P=src.p,N=src.n,C=src.c,M=src.m;
     for(let t=0;t<P.length/9;t++){const m=M[t*3]|0;if(keep&&!keep(m,[(P[t*9]+P[t*9+3]+P[t*9+6])/3,(P[t*9+1]+P[t*9+4]+P[t*9+7])/3,(P[t*9+2]+P[t*9+5]+P[t*9+8])/3]))continue;let a=by.get(m);if(!a)by.set(m,a=[]);a.push(src,t);}}
   for(const [m,lst] of by){const n=lst.length/2,pp=new Float32Array(n*9),nn=new Float32Array(n*9),cc=new Float32Array(n*12);
     for(let i=0;i<n;i++){const src=lst[i*2],t=lst[i*2+1],ord=mir?[0,2,1]:[0,1,2];
       for(let v=0;v<3;v++){const s=ord[v];let p=[src.p[t*9+s*3],src.p[t*9+s*3+1],src.p[t*9+s*3+2]],q=[src.n[t*9+s*3],src.n[t*9+s*3+1],src.n[t*9+s*3+2]];
-        if(mir){p[2]=-p[2];q[2]=-q[2];}if(xf)p=xf(p);for(let k=0;k<3;k++){pp[i*9+v*3+k]=p[k];nn[i*9+v*3+k]=q[k];}for(let k=0;k<4;k++)cc[i*12+v*4+k]=src.c[t*12+s*4+k];}}
+        if(mir){p[2]=-p[2];q[2]=-q[2];}if(rot){p=rot(p);q=rot(q);}if(xf)p=xf(p);for(let k=0;k<3;k++){pp[i*9+v*3+k]=p[k];nn[i*9+v*3+k]=q[k];}for(let k=0;k<4;k++)cc[i*12+v*4+k]=src.c[t*12+s*4+k];}}
     const f='p'+(fileN++);fs.writeFileSync(path.join(S,f+'.bin'),Buffer.concat([pp,nn,cc].map(a=>Buffer.from(a.buffer))));
     man.pieces.push({file:f,node:name,mat:m,tris:n});tris[name]=(tris[name]||0)+n;}}
 /* the body and everything fixed to it, the lamps apart */
@@ -52,6 +52,10 @@ if(T.bay){node('bay','car');put([T.bay.bay,T.bay.engine],'bay');}
   for(const [front,s,tag] of [[1,1,'fr'],[1,-1,'fl'],[0,1,'rr'],[0,-1,'rl']]){const x=front?fx:fx-wb*Math.cos(D.pitch),tw=(front?look.track:look.trackR||look.track)/2,y=front?look.tyre.R:D.Rr;
     node('steer_'+tag,'car',[x,y,s*tw],{steers:!!front});node('wheel_'+tag,'steer_'+tag,[0,0,0],{spins:true});put([front?T.wheel:T.wheelR],'wheel_'+tag,{mir:s<0});
     const br=front?T.brake:T.brakeR;if(br){node('brake_'+tag,'steer_'+tag);put([br],'brake_'+tag,{mir:s<0});}}}
+/* (Salt Mini Plus) the spares (the 4x4's, on its door): the Studio wheel again, where the game puts its own, fixed to
+   the car; one hung on the back faces backward (as the viewer turns it) */
+for(const [i,sp] of (D.spares||[]).entries()){node('spare_'+i,'car',sp.p,{spare:sp.face||'side'});
+  put([T.wheel],'spare_'+i,{rot:sp.face==='back'?(v=>[-v[2],v[1],v[0]]):null,mir:sp.face!=='back'&&sp.p[2]<0});}
 man.tris=tris;man.total=Object.values(tris).reduce((a,v)=>a+v,0);
 man.D={L:D.L,uC:D.uC,uFa:D.uFa,uRa:D.uRa,Hr:D.Hr,R:look.tyre.R,track:look.track,hinge:D.hood.hinge,belt:[D.belt(D.G.cowl+.5),D.belt(D.G.pillars[0][0])],cowl:D.G.cowl,rf:D.G.rf,pil:D.G.pillars.map(p=>p[0])};
 fs.writeFileSync(path.join(S,'manifest.json'),JSON.stringify(man,null,1));

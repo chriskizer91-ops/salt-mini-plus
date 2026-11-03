@@ -139,6 +139,12 @@ wP, wN, wU, _, _ = raw('wheel', True); nd = {n['name']: n for n in man['nodes']}
 for tag in ('fr', 'fl', 'rr', 'rl'):
     s = nd['steer_' + tag]; st = empty('steer_' + tag, car, s['t']); st['steers'] = s.get('steers', False)
     w = mesh('wheel_' + tag, wP, wN, wU, [M_WHEEL], np.zeros(len(wP) // 3, np.int32), mir=tag.endswith('l')); w.parent = st; w['spins'] = True
+# (Salt Mini Plus) the spares, where the game puts them: the game's own wheel, turned to face backward on a door
+for n_ in man['nodes']:
+    if not n_['name'].startswith('spare_'): continue
+    Pq, Nq = wP.copy(), wN.copy()
+    if n_.get('spare') == 'back': Pq = np.c_[-Pq[:, 2], Pq[:, 1], Pq[:, 0]].astype(np.float32); Nq = np.c_[-Nq[:, 2], Nq[:, 1], Nq[:, 0]].astype(np.float32)
+    so = mesh(n_['name'], Pq, Nq, wU, [M_WHEEL], np.zeros(len(wP) // 3, np.int32), mir=n_.get('spare') != 'back' and n_['t'][2] < 0); so.parent = car; so.location = g2b(n_['t'])
 bpy.ops.export_scene.gltf(filepath=OUT, export_format='GLB', export_yup=True, export_extras=True, export_apply=False, export_normals=True, export_tangents=False,
                           export_image_format='WEBP', export_materials='EXPORT')
 # ---------- the pictures again, encoded here: WebP keeping the colour under a clear alpha (exact) ----------

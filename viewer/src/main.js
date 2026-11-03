@@ -106,6 +106,7 @@ async function build(id,v){const k=id+'/'+v;if(CACHE[k])return CACHE[k];
     const tx=await bakedTextures(id);K.setHD(false);T=K.studioBuild(id,1);D=T.D;b=T.b;
     root.userData.body=bakedGroup(B.parts.body,tx);root.userData.hood=bakedGroup(B.parts.hood,tx);root.userData.hide=bakedGroup(B.parts.hide,tx);
     const w=bakedGroup(B.parts.wheel,tx);placeWheels(root,D,b,w,w,null,null);
+    for(const sp of D.spares||[]){const c=w.clone();c.position.set(sp.p[0],sp.p[1],sp.p[2]);if(sp.face==='back')c.rotation.y=-Math.PI/2;else if(sp.p[2]<0)c.scale.z=-1;root.add(c);}
   }else{
     K.setHD(v==='studio');T=K.studioBuild(id,v==='studio'?.25:1);D=T.D;b=T.b;
     /* everything fixed to the body, merged a material: the shell, and the Studio's parts (src/hd, src/cars) */

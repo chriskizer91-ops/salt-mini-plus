@@ -12,7 +12,9 @@ function hdArches(out,car){
     let drop=false;
     for(const ua of [D.uFa,D.uRa]){const Ar=ua===D.uRa?D.archB:A;if(Math.abs(u-ua)<Ar.a+.03&&y>Ar.cy-.075&&(m===MAT.METAL&&z<D.plan(u)*1.01)&&y<Ar.cy+Ar.b+.06){drop=true;break;}}
     /* the game's flare: a triangle standing off the body side (a corner more than 4 mm out) round an arch */
-    if(!drop&&y>D.arch.cy-.06){for(const ua of [D.uFa,D.uRa]){const Ar=ua===D.uRa?D.archB:A;if(Math.abs(u-ua)>Ar.a+(D.look.flares?D.look.flares.w:0)+.05)continue;
+    /* (Salt Mini Plus: only on a build that has flares: a car without them, its fenders swelling round the arches,
+       would lose its own skin) */
+    if(!drop&&D.look.flares&&y>D.arch.cy-.06){for(const ua of [D.uFa,D.uRa]){const Ar=ua===D.uRa?D.archB:A;if(Math.abs(u-ua)>Ar.a+(D.look.flares?D.look.flares.w:0)+.05)continue;
       let off=-1;for(let k=0;k<3;k++){const vu=D.uC-p[o+k*3],vy=p[o+k*3+1],vz=Math.abs(p[o+k*3+2]);off=Math.max(off,vz-K.sideZ(vu,Math.min(vy,D.belt(vu)-.02)));}
       if(off>.004&&off<.06){drop=true;break;}}}
     if(!drop)keep.push(t);}
