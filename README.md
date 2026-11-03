@@ -27,8 +27,8 @@ Each car comes three ways:
 <!-- /TABLE -->
 
 "Studio triangles" is the whole car as you see it with the hood shut: body, cabin, lamps, the four wheels and their
-brakes, and the Trail's spare on its door. The engine bay is counted separately because it's only drawn with the hood up. The baked pictures' memory
-includes their mipmaps.
+brakes, and the Trail's spare on its door. The engine bay is counted separately because it's only drawn with the hood
+up. The baked pictures' memory includes their mipmaps.
 
 ## The viewer
 
@@ -83,6 +83,7 @@ seconds the first time you pick each one. The baked cars are unpacked from their
   - The left wheels are their own mirrored copies, so no node is scaled by −1.
 
   The baked car's wheel is the game's own, with its brake in it.
+- **`spare_0`** (the Trail's): the wheel again where the game hangs its spare, on the door, fixed to the car.
 
 Axes are the game's: x forward, y up, z right, metres, the ground at y = 0.
 
@@ -118,17 +119,22 @@ So the game's shader needs nothing new for it.
 
 - **Baked Hatch flares:** the speckled, chrome-looking smear is fixed. Some Studio parts were built facing inward on
   one side of the car, and the bake read them from behind. The bake now turns those parts round first, then mends
-  any pixel that still met a surface from behind (`models/tools/bake.py`). A little soft grey shading is left on
-  the rear flares, where the game's flare sits a few centimetres off the Studio one. The Studio Hatch doesn't have
-  this.
+  any pixel that still met a surface from behind (`models/tools/bake.py`); every car is baked this way. A little
+  soft grey shading is left on the rear flares, where the game's flare sits a few centimetres off the Studio one.
+  The Studio Hatch doesn't have this.
+- **Baked edges round deep openings:** where the Studio car has a deep recess and the game's face is flat, as round
+  the Muscle's grille and the Trail's lamps, the baked picture comes out a little ragged at the edges. It reads
+  fine at traffic distance; close up, the Studio car is the one to look at.
 - **Baked EV's engine bay:** the baked cars keep the game's own engine bay, and the game has no electric one: it
   draws a stand-in engine under the EV's bonnet. The Studio EV has its front trunk and the motor's inverter.
 - **Liveries:** none of the three versions shows the game's paint liveries, such as the Muscle's two white stripes.
   The game draws them in its paint shader, which picks the second colour by where each point is on the body
   (`13_lit`). The viewer's paint doesn't do that yet, and neither do the .glb files.
-- **Hatch Studio triangle count:** lower than the SUV's because the car is much smaller (3.6 m against 4.9 m, on
-  15-inch wheels). Every part on the SUV's list is there at the SUV's level: each wheel is 51,000 triangles against
-  the SUV's 47,700, the cabin 64,000 against 54,000, and the engine bay 31,000 against the SUV's game bay of 3,000.
+- **Hatch and Muscle Studio triangle counts:** lower than the SUV's because the cars are smaller and on 15-inch
+  wheels. Every part on the SUV's list is there at the SUV's level. The Hatch's wheel is 51,000 triangles against
+  the SUV's 47,700, its cabin 64,000 against 54,000, its engine bay 31,000 against the SUV's game bay of 3,000. The
+  Muscle's wheel is 43,000: its tyre's tread is built block by block at the same block size as the SUV's, and a
+  smaller tyre has fewer blocks.
 
 ## How the models are made
 

@@ -17,7 +17,7 @@ function trTail(out,car){
         hdPart(o,mb=>{for(let y=.945;y<1.03;y+=.014)hdCyl(mb,hdS('R',s*.65,Y(y),-.04),hdS('R',s*.78,Y(y),-.04),.0022,.0022,6,HC.REFLC,false);},30);
         for(const [z,y] of [[.715,.99],[.715,.9]]){hdRevAt(o,'R',hdS('R',s*z,Y(y),-.05),[[.03,.012],[.026,.005],[.015,.001],[0,0]],HC.REFLC,28);hdPart(o,mb=>{ball(mb,hdS('R',s*z,Y(y),-.038),.0075,14,HC.BULB);},50);}}});}
   /* ---------- the door: its shut line, hinges and handle ---------- */
-  {const P=hdResample(RR2(-.6,.6,Y(.78),Y(1.25),.03),.008);hdTrim(out,'R',P,.006,.0012,HC.GB,true,50,-.0008);}
+  {const P=hdResample(RR2(-.6,.6,Y(.78),Y(1.25),.03),.008);hdTrim(out,'R',P,.006,.0012,HC.GB,true,50,.0012);}
   for(const y of [.86,1.17])hdPart(out,mb=>{const a=hdS('R',.6,Y(y),.0);hdRBox(mb,[a[0]-.006,a[1],.6],[.008,.03,.03],.006,S,2);hdCyl(mb,[a[0]-.016,a[1]-.04,.625],[a[0]-.016,a[1]+.04,.625],.013,.013,16,S);
     for(const k of [-1,1])hdCyl(mb,[a[0]-.016,a[1]+k*.04,.625],[a[0]-.016,a[1]+k*.046,.625],.009,.009,12,HC.BOLT);},40);
   {const H0=RR2(-.565,-.435,Y(1.098),Y(1.137),.01);for(const c of cuts)hdCut(c,'R',H0,.03);hdRecess(out,'R',H0,.02,.92,HC.GB,()=>HC.GB,3);
