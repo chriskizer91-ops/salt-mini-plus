@@ -1,0 +1,47 @@
+{
+ "car": "wagon",
+ "game": {
+  "triangles": 52334,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 532457,
+  "triangles_bay": 33666,
+  "by_piece": {
+   "body": 263626,
+   "lamp_head": 9274,
+   "lamp_tail": 16862,
+   "lamp_amber": 3687,
+   "lamp_reverse": 1628,
+   "under": 4064,
+   "hide": 88,
+   "hood": 7620,
+   "bay": 33666,
+   "wheel_fr": 53230,
+   "brake_fr": 3172,
+   "wheel_fl": 53230,
+   "brake_fl": 3172,
+   "wheel_rr": 53230,
+   "brake_rr": 3172,
+   "wheel_rl": 53230,
+   "brake_rl": 3172
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 84,
+  "draws_glb_traffic": 82,
+  "texture_mb": 0,
+  "glb_mb": 17.3,
+  "data_mb": 10.6
+ },
+ "baked": {
+  "triangles": 52006,
+  "draws_game": 7,
+  "draws_glb": 14,
+  "texture_mb_low": 24.0,
+  "texture_mb_medium": 96.0,
+  "glb_mb": 3.2,
+  "data_mb": 2.8
+ }
+}

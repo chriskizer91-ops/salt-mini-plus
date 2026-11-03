@@ -23,14 +23,4 @@ function pkSteps(out,car){
       hdRBox(mb,[X(u),y-.024,s*(z-.02)],[.03,.004,.05],.003,HC.CAST,2);for(const du of [-.018,.018])hdCyl(mb,[X(u+du),yr+.004,s*zi],[X(u+du),yr-.012,s*zi],.007,.007,6,HC.BOLT);},40);
   }
 }
-function pkFuel(out,car){
-  const K=HDK,D=K.D,f=D.B.fuel;if(!f||D.look.noFuel)return;const yf=D.belt(f+.08),y0=yf-.25,y1=yf-.1;
-  /* the game's outline and door, painted on the right rear quarter */
-  hdDrop(car.body,(c,m)=>{const u=D.uC-c[0];return c[2]>0&&(m===MAT.SHUT||m===MAT.PAINT)&&u>f-.01&&u<f+.19&&c[1]>y0-.01&&c[1]<y1+.01&&hdOff(c)>.0025;});
-  const P=RR2(f,f+.18,y0,y1,.03);hdCutSide(car.body,1,P,.012);
-  const Pr=hdResample(P,.006),c=hdCen(Pr),Pi=Pr.map(([u,y])=>[c[0]+(u-c[0])*.97,c[1]+(y-c[1])*.955]);
-  hdPart(out,mb=>{const F=Pr.map(([u,y])=>hdSS(1,u,y,-.0005)),B=Pr.map(([u,y])=>hdSS(1,c[0]+(u-c[0])*.985,c[1]+(y-c[1])*.975,-.012));hdLoft(mb,[F,B],HC.GB,true);hdCap(mb,B,HC.GB,false);},30);
-  hdPart(out,mb=>{const R=[1,.8,.55,.3].map(k=>Pi.map(([u,y])=>hdSS(1,c[0]+(u-c[0])*k,c[1]+(y-c[1])*k,-.0012)));const C=hdSS(1,c[0],c[1],-.0012);
-    for(let i=0;i<R.length-1;i++)hdLoft(mb,[R[i],R[i+1]],SV([1,1,1],MAT.PAINT),true,true);hdCap(mb,R[R.length-1],SV([1,1,1],MAT.PAINT),true);
-    const E=Pi.map(([u,y])=>hdSS(1,u,y,-.006));hdLoft(mb,[E,R[0]],SV([1,1,1],MAT.PAINT),true,true);},40);
-}
+function pkFuel(out,car){hdFuel(out,car);}

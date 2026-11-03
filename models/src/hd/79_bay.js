@@ -27,7 +27,10 @@ function hdBayGen(car,o){
   const yC=Math.max(yFloor+.12,Math.min(D.arch.cy+.2,hm-topCore-.03));
   const EM=trans?M4.basis([X(uc),yC,.06],[0,0,1],[0,1,0],[-1,0,0]):M4.basis([X(uc),yC,0],[1,0,0],[0,1,0],[0,0,1]);
   const Ew=p=>M4.xform(EM,p);
-  const P=(f,deg=32)=>hdPart(st,f,deg),Q=(f,deg=32)=>hdPart(en,f,deg,null,EM);
+  /* (Salt Mini Plus: an electric car's layout 'EV' has no engine: nothing is drawn where it would be, no hoses run to it
+     and nothing breathes; a front trunk stands in its place, the motor's inverter under it) */
+  const EV=E.layout==='EV';
+  const P=(f,deg=32)=>hdPart(st,f,deg),Q=(f,deg=32)=>EV?null:hdPart(en,f,deg,null,EM);
   /* ---------- the inner fenders: aprons from the tub up to a rolled flange, the tubs round the tyres ---------- */
   const N=40,ytub=u=>{const a=archY(D,u);return a>0?Math.min(edge(u)-.03,a+.045):-1;};
   for(const s of [1,-1]){
@@ -72,7 +75,7 @@ function hdBayGen(car,o){
         for(let q=0;q<7;q++){const a=q/7*TAU,c2=Math.cos(a),s2=Math.sin(a);const M=[c2,s2];
           mb.quad([f[0],f[1]+c2*.07,s2*.07],[f[0]+.03,f[1]+Math.cos(a+.35)*.07,Math.sin(a+.35)*.07],[f[0]+.02,f[1]+Math.cos(a+.25)*R*.85,Math.sin(a+.25)*R*.85],[f[0]-.01,f[1]+Math.cos(a-.1)*R*.85,Math.sin(a-.1)*R*.85],DARK[0],0,DARK[2]);}});}}
   /* the hoses: top to the thermostat, bottom to the water pump, each with its clamps */
-  {const c=Ew([hx+.02,.26,0]),w=Ew([hx+.03,.12,-.05]),yu=Math.min(yrT-.04,c[1]+.04);
+  if(!EV){const c=Ew([hx+.02,.26,0]),w=Ew([hx+.03,.12,-.05]),yu=Math.min(yrT-.04,c[1]+.04);
     P(mb=>{const top=[[X(uF+.08),yrT-.04,zr*.6],[X(uF+.18),yu,zr*.6],[c[0]+.1,yu,zr*.35],c],bot=[[X(uF+.08),yrB+.05,-zr*.6],[X(uF+.18),yrB+.05,-zr*.6],[w[0]+.1,yrB+.05,-zr*.35],w];
       hdTube(mb,top,.022,12,HOSE,false,true);hdTube(mb,bot,.024,12,HOSE,false,true);
       for(const pth of [top,bot])for(const p of [pth[0],pth[pth.length-1]]){const q=V3.lerp(p,pth[pth[0]===p?1:pth.length-2],.15);hdCyl(mb,V3.add(q,[.006,0,0]),V3.add(q,[-.006,0,0]),.027,.027,14,HC.BOLT);}});}
@@ -138,13 +141,18 @@ function hdBayGen(car,o){
     Q(mb=>{hdCyl(mb,[-.1,.42,.15],[-.1,.45,.15],.022,.024,18,SMC('#d6b21a',SM.PLASTIC));const lp=[];for(let k=0;k<=12;k++){const a=k/12*TAU;lp.push([hx-.12+Math.cos(a)*.016,.43+Math.sin(a)*.016,-.2]);}hdTube(mb,lp,.004,6,SMC('#d6b21a',SM.PLASTIC),true,false);
       hdCyl(mb,[hx-.12,.41,-.2],[hx-.12,.1,-.22],.005,.005,6,ALU);});
   }else{
-    /* an inline four: the block, the head, the cam cover (bolted, ribbed), the plug leads to the distributor */
+    /* an inline four (or five): the block, the head, the cam cover (bolted, ribbed), the plug leads to the distributor
+       (or a coil on each plug) */
     Q(mb=>{hdRBox(mb,[0,.1,0],[hx,.16,.15],.02,BLK,3);hdRBox(mb,[0,.31,0],[hx-.02,.05,.14],.012,HEAD,3);
       rbox(mb,[0,.39,0],[1,0,0],[0,1,0],[0,0,1],[hx-.04,.048,.118],COV,.28,20,8);
       for(let k=0;k<4;k++)obox(mb,[-.06+k*.04,.437,0],[1,0,0],[0,1,0],[0,0,1],[.004,.006,.09],COV);
       for(let k=0;k<6;k++)for(const e of [-1,1])hdCyl(mb,[-hx+.06+k*(len-.12)/5,.36,e*.12],[-hx+.06+k*(len-.12)/5,.37,e*.12],.007,.007,6,HC.BOLT);
-      const dist=[-hx-.05,.36,-.06];hdCyl(mb,[dist[0]+.06,dist[1],dist[2]],dist,.04,.035,20,DARK);hdCyl(mb,dist,[dist[0]-.03,dist[1],dist[2]],.045,.04,20,SMC('#2b2b2d',SM.PLASTIC));
-      for(let k=0;k<np;k++){const p=[xs(k),.44,.02],q=[dist[0]-.03,dist[1]+.01+Math.cos(k)*.02,dist[2]+Math.sin(k)*.02];hdTube(mb,[p,[p[0],.5,.03],[(p[0]+q[0])/2,.5,.0],q],.0055,6,SMC(E.leads||'#1a1a1a',SM.HOSE),false,false);hdCyl(mb,[p[0],.44,.02],[p[0],.47,.02],.012,.011,10,BLKP);}
+      if(E.coils){
+        /* (Salt Mini Plus: a later engine's coil on each plug, in a row down the cam cover, their loom along the top) */
+        for(let k=0;k<np;k++){const x=xs(k);hdRBox(mb,[x,.465,.02],[.026,.03,.038],.008,BLKP,3);hdCyl(mb,[x,.495,.042],[x,.505,.06],.007,.007,8,SMC('#3a3a3c',SM.PLASTIC));}
+        hdTube(mb,[[-hx+.02,.5,.07],[hx-.02,.5,.07],[hx+.04,.46,.09]],.009,8,SMC('#141414',SM.HOSE),false,true);}
+      else{const dist=[-hx-.05,.36,-.06];hdCyl(mb,[dist[0]+.06,dist[1],dist[2]],dist,.04,.035,20,DARK);hdCyl(mb,dist,[dist[0]-.03,dist[1],dist[2]],.045,.04,20,SMC('#2b2b2d',SM.PLASTIC));
+      for(let k=0;k<np;k++){const p=[xs(k),.44,.02],q=[dist[0]-.03,dist[1]+.01+Math.cos(k)*.02,dist[2]+Math.sin(k)*.02];hdTube(mb,[p,[p[0],.5,.03],[(p[0]+q[0])/2,.5,.0],q],.0055,6,SMC(E.leads||'#1a1a1a',SM.HOSE),false,false);hdCyl(mb,[p[0],.44,.02],[p[0],.47,.02],.012,.011,10,BLKP);}}
       /* the intake runners on the front side, the throttle body */
       hdRBox(mb,[0,.31,-.33],[hx-.04,.06,.05],.03,ALU,4);for(let k=0;k<np;k++)hdTube(mb,[[xs(k),.33,-.13],[xs(k),.38,-.22],[xs(k),.33,-.29]],.022,12,ALU,false,true);
       hdCyl(mb,[hx-.06,.31,-.33],[hx+.05,.31,-.33],.042,.042,20,ALU);
@@ -158,8 +166,26 @@ function hdBayGen(car,o){
         /* the wastegate's actuator, its rod */
         hdCyl(mb,[cc[0]+.02,cc[1]+.09,cc[2]-.04],[cc[0]+.06,cc[1]+.09,cc[2]-.04],.028,.028,18,ALU);hdCyl(mb,[cc[0]+.02,cc[1]+.09,cc[2]-.04],[c[0]+.02,c[1]+.04,c[2]-.05],.003,.003,6,ALU);},30);}
   }
+  /* ---------- an electric car's front trunk ---------- */
+  if(EV){const TUB=SMC('#1b1b1d',SM.PLASTIC),u0=uF+.36,u1=uR-.32,uc2=(u0+u1)/2,zt=Math.min(.5,zin-.1),yTop=u=>edge(u)-.075,yBot=Math.max(yFloor+.25,D.arch.cy+.12);
+    const ring=(t,grow=0)=>hdRRect((u1-u0)/2*(1-.08*t)+grow,zt*(1-.08*t)+grow,.07*(1-.3*t)+grow,6).map(([a,b])=>{const u=uc2+a;return [X(u),yTop(u)+(yBot-yTop(u))*t,b];});
+    /* the tub, moulded in one: walls drawing in a little to a flat floor */
+    hdPart(en,mb=>{const R=[0,.12,.4,.75,.93,1].map(t=>ring(t));hdLoft(mb,R,TUB,true,true);hdCap(mb,R[5],TUB,false);},35);
+    /* its rim, a flange out to the aprons, and the seal round it */
+    hdPart(en,mb=>{hdLoft(mb,[ring(0,.035),ring(0)],TUB,true,true);},35);
+    hdPart(en,mb=>{const r=ring(0,.02).map(v=>[v[0],v[1]+.006,v[2]]);r.push(r[0]);hdTube(mb,r,.007,8,SV([.015,.015,.016],MAT.RUBBER),false,false);},40);
+    /* four tie-down loops in its corners, a ribbed mat on its floor */
+    for(const [a,b] of [[1,1],[1,-1],[-1,1],[-1,-1]]){const u=uc2+a*((u1-u0)/2-.09),z=b*(zt-.09),y=yBot+.004,P0=[X(u),y,z];
+      hdPart(en,mb=>{const pts=[];for(let k=0;k<=10;k++){const t=k/10*PI;pts.push([P0[0]+Math.cos(t)*.018*a,y+Math.sin(t)*.022,z]);}hdTube(mb,pts,.0035,8,MM.CHROME,false,true);hdRBox(mb,[P0[0],y,z],[.026,.004,.012],.003,HC.CAST,1);},40);}
+    hdPart(en,mb=>{for(let z=-zt+.08;z<=zt-.08+1e-6;z+=.04)hdRBox(mb,[X(uc2),yBot+.003,z],[(u1-u0)/2-.06,.003,.008],.003,SMC('#141415',SM.RUBBER),1);},30);
+    /* under it, the front motor's inverter in its cast case, the orange high-voltage cables back along the aprons */
+    const xi=X(D.uFa),yi=Math.max(yFloor+.08,yBot-.12);
+    hdPart(en,mb=>{hdRBox(mb,[xi,yi,0],[.13,.06,.24],.025,ALU,4);for(let k=-4;k<=4;k++)hdRBox(mb,[xi+.131,yi,k*.05],[.004,.045,.01],.003,ALU,1);
+      hdCyl(mb,[xi,yi-.06,0],[xi,yi-.14,0],.12,.12,32,ALU);},35);
+    for(const s2 of [1,-1])hdPart(en,mb=>{const ORA=SMC('#e8761e',SM.HOSE),z0=s2*.2,pts=[[xi-.13,yi+.03,z0],[xi-.2,yi+.08,s2*(zt+.06)],[X(u1-.05),yTop(u1)-.12,s2*(zt+.07)],[X(uR-.06),edge(uR)-.2,s2*(zt+.02)]];
+      hdTube(mb,pts,.013,10,ORA,false,true);hdTube(mb,pts.map(v=>[v[0],v[1]-.028,v[2]]),.01,10,ORA,false,true);},40);}
   /* ---------- breathing: an airbox and its tube to the throttle body, or a turbo's pipes and the intercooler ---------- */
-  {const tb=Ew(I.tb),zA=hz(uF+.25)-.22,box=[X(uF+.25),edge(uF+.25)-.17,-zA];
+  if(!EV){const tb=Ew(I.tb),zA=hz(uF+.25)-.22,box=[X(uF+.25),edge(uF+.25)-.17,-zA];
     if(E.turbo&&I.turbo){const c=Ew(I.turbo.c),cc=Ew([I.turbo.c[0]+.14,I.turbo.c[1],I.turbo.c[2]]),zic=zr+.05,yic=yrB+.02,xic=X(uF-.035);
       P(mb=>{hdRBox(mb,[xic,yic,0],[.025,.07,zic+.02],.006,SMC('#2a2b2d',SM.ENGINE),2);for(let y=yic-.06;y<yic+.06;y+=.01)hdRBox(mb,[xic+.026,y,0],[.002,.002,zic],.001,SMC('#3a3b3d',SM.ENGINE),1);
         for(const s of [1,-1])hdRBox(mb,[xic,yic,s*(zic+.04)],[.03,.08,.02],.008,ALU,2);});

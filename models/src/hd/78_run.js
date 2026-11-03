@@ -132,3 +132,23 @@ function hdBrake(spin,fixed,w,o={}){
       hdPart(fixed,mb=>{hdRBox(mb,[c2*ro*.91,s2*ro*.91,zc-.012],[.016,.016,.018*k],.005,HC.CAST,2);},40);}
     const am=(ca0+ca1)/2,c=Math.cos(am),s=Math.sin(am);hdPart(fixed,mb=>{hdCyl(mb,[c*ro*1.12,s*ro*1.12,zc-.05*k],[c*ro*1.22,s*ro*1.22,zc-.055*k],.004,.004,10,HC.BOLT);},40);}
 }
+/* (Salt Mini Plus: first the Wagon's, cars/wagon/81_wheel) a wheel's dished face with windows: from rIn to rOut at height zAt(r), n windows between r0 and r1, each frac of its
+   sector wide (centred on phase + k/n turns), walls thick deep round each window; na steps a sector, nr across */
+function hdDiscWin(mb,o){
+  const {rIn,rOut,zAt,m,n,r0,r1,frac,phase=0,thick=.004,na=12,nr=10}=o,A=n*na,R=[];
+  for(let j=0;j<=nr;j++)R.push(rIn+(rOut-rIn)*j/nr);
+  /* (the window's edges on the radial grid: the rings at r0 and r1 are added, so the walls meet the face) */
+  for(const r of [r0,r1])if(!R.some(v=>Math.abs(v-r)<1e-5))R.push(r);R.sort((a,b)=>a-b);
+  const win=(a,r)=>{if(r<r0-1e-6||r>r1+1e-6)return false;let f=((a/TAU-phase)*n)%1;if(f<0)f+=1;return f>(.5-frac/2)+1e-6&&f<(.5+frac/2)-1e-6;};
+  const P=(a,r,dz=0)=>[Math.cos(a)*r,Math.sin(a)*r,zAt(r)-dz];
+  /* angles: each sector split so the windows' sides fall on grid lines */
+  const ang=[];for(let k=0;k<n;k++){const s0=(phase+k/n)*TAU,w0=(.5-frac/2)/n*TAU,w1=(.5+frac/2)/n*TAU;
+    const cuts=[0,w0,w1,TAU/n];for(let q=0;q<3;q++){const a=cuts[q],b=cuts[q+1],m2=Math.max(2,Math.round(na*(b-a)/(TAU/n)));for(let i=0;i<m2;i++)ang.push(s0+a+(b-a)*i/m2);}}
+  ang.push(ang[0]+TAU);
+  for(let i=0;i<ang.length-1;i++)for(let j=0;j<R.length-1;j++){const a=ang[i],b=ang[i+1],ra=R[j],rb=R[j+1];
+    if(win((a+b)/2,(ra+rb)/2))continue;mb.quad(P(a,ra),P(b,ra),P(b,rb),P(a,rb),m[0],m[1],m[2]);}
+  /* each window's wall: its outline on the same grid lines as the face (so the edges meet), taken back by thick */
+  const Rw=R.filter(r=>r>=r0-1e-6&&r<=r1+1e-6);
+  for(let k=0;k<n;k++){const a0=(phase+k/n+(.5-frac/2)/n)*TAU,a1=(phase+k/n+(.5+frac/2)/n)*TAU,Aw=ang.filter(a=>a>=a0-1e-6&&a<=a1+1e-6),line=[];
+    for(const a of Aw)line.push([a,r0]);for(const r of Rw.slice(1))line.push([a1,r]);for(const a of Aw.slice(0,-1).reverse())line.push([a,r1]);for(const r of Rw.slice(1,-1).reverse())line.push([a0,r]);
+    hdLoft(mb,[line.map(([a,r])=>P(a,r)),line.map(([a,r])=>P(a,r,thick))],m,true);}}

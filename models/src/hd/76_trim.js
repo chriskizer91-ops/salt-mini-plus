@@ -65,8 +65,8 @@ function hdHandles(out,car){
 function hdRails(out,car){
   const K=HDK,D=K.D,X=K.X,lk=D.look;if(!lk.roof||lk.roof==='none'||!D.B.rails)return;
   const [u0,u1,zr]=D.B.rails,ry=u=>K.topY(u,zr)+.058;
-  /* the game's rails, feet and bars */
-  hdDrop(car.body,(c,m,cl)=>{const u=D.uC-c[0];return m===MAT.METAL&&Math.abs(cl-MM.BLACK[0][0])<1e-6&&u>u0-.08&&u<u1+.08&&c[1]>K.topY(u,Math.min(Math.abs(c[2]),zr))+.004;});
+  /* the game's rails, feet and bars (Salt Mini Plus: told by the build's own rail colour, black unless it says) */
+  const RC=(lk.railCol||MM.BLACK)[0][0];hdDrop(car.body,(c,m,cl)=>{const u=D.uC-c[0];return m===MAT.METAL&&Math.abs(cl-RC)<1e-6&&u>u0-.08&&u<u1+.08&&c[1]>K.topY(u,Math.min(Math.abs(c[2]),zr))+.004;});
   const RM=lk.railCol||SV([.03,.03,.033],SM.GLOSSBLK);
   for(const s of [1,-1]){
     /* the rail: a rounded section swept along, dipping into a foot at each end and resting on one in the middle */

@@ -19,7 +19,7 @@ Each car comes three ways:
 | [SUV](models/suv/) | Done | 484,359 (+3,000 engine bay) | 51,408 | 51,586 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![SUV](models/suv/docs/front34.webp) |
 | [Pickup](models/pickup/) | Done | 545,652 (+31,712 engine bay) | 53,950 | 54,356 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Pickup](models/pickup/docs/front34.webp) |
 | [Hatch](models/hatch/) | Done | 430,908 (+31,178 engine bay) | 46,655 | 46,833 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Hatch](models/hatch/docs/front34.webp) |
-| Wagon | To do | | | | | |
+| [Wagon](models/wagon/) | Done | 532,457 (+33,666 engine bay) | 52,006 | 52,334 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Wagon](models/wagon/docs/front34.webp) |
 | EV | To do | | | | | |
 | Trail (4x4) | To do | | | | | |
 | Coupe | To do | | | | | |
@@ -135,9 +135,10 @@ The method is SUV Studio's (cargames, branch `suv-studio/hd-truck`).
    `00_prelude` and `36_stubs`, which holds empty stand-ins for the physics tables `37_newbuilds` writes into. So
    each car's shape, wheelbase, track, ride height and wheel positions are exactly the game's. Only the body's
    stations are four times closer together.
-2. **The Studio kit.** `models/src/hd/` has the Studio SUV's own files, unchanged (`70_geo` to `76_trim`, `89_hd`,
-   `90_kit`). The SUV builds from them byte for byte as it does in SUV Studio, and that's checked by comparing
-   every array. Added alongside them:
+2. **The Studio kit.** `models/src/hd/` has the Studio SUV's own files (`70_geo` to `76_trim`, `89_hd`, `90_kit`).
+   They're changed only where another car needs something the SUV doesn't use, such as mirror caps and handles in
+   other colours, or roof rails in silver. The SUV builds from them byte for byte as it does in SUV Studio, and
+   that's checked by comparing every array after each change. Added alongside them:
    - `77_kit`: the new cars' materials
    - `78_run`: tyres, rims and brakes built the SUV's way
    - `79_bits`: underside, wipers, lamps, bumpers
