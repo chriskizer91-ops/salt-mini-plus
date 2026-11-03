@@ -17,6 +17,12 @@ K.setHD(true);const T=K.studioBuild(id,.25),b=T.b,D=T.D,look=b.look;
 const S=path.join(outDir,'studio');fs.mkdirSync(S,{recursive:true});
 const LAMP={head:[SM.LAMPH,SM.LENSH,MAT.HEAD,MAT.LED,MAT.HALO],tail:[SM.REDL,MAT.TAIL],amber:[SM.AMBERL,MAT.AMBER],reverse:[SM.LENSR,MAT.REV]};
 const lampOf={};for(const [k,ids] of Object.entries(LAMP))for(const i of ids)lampOf[i]='lamp_'+k;
+/* which lamp a triangle is part of: by its material; the SUV Studio's truck (its own model, kept as it was) has one clear
+   lens for its headlamps, fog lamps, reversing windows and plate lamps, and its red for the tail lamps and the bumper's
+   reflectors, so there it is told by where the triangle is too */
+const lampAt=(m,c)=>{if(id!=='stock')return lampOf[m]||null;
+  if(m===SM.LENS)return c[0]>1.5&&c[1]>.4?'lamp_head':c[0]<-2&&c[1]>.95&&Math.abs(c[2])>.4?'lamp_reverse':null;
+  if(m===SM.REDL)return c[1]>.9?'lamp_tail':null;return lampOf[m]||null;};
 const man={id,build:{paint:b.paint,paint2:b.paint2,rim:b.rim,cal:b.cal,clad:b.clad},MAT,SM,nodes:[],pieces:[]};
 let fileN=0;const tris={};
 /* a node: a name, where it is in its parent, what it hangs from */
@@ -25,7 +31,7 @@ const node=(name,parent,t=[0,0,0],extra={})=>{man.nodes.push({name,parent,t,...e
    mirrors it across z (the left wheels: their own mirrored copy, so no node is scaled by -1) */
 function put(srcs,name,{xf=null,mir=false,keep=null}={}){const by=new Map();
   for(const src of srcs){if(!src||!src.p)continue;const P=src.p,N=src.n,C=src.c,M=src.m;
-    for(let t=0;t<P.length/9;t++){const m=M[t*3]|0;if(keep&&!keep(m))continue;let a=by.get(m);if(!a)by.set(m,a=[]);a.push(src,t);}}
+    for(let t=0;t<P.length/9;t++){const m=M[t*3]|0;if(keep&&!keep(m,[(P[t*9]+P[t*9+3]+P[t*9+6])/3,(P[t*9+1]+P[t*9+4]+P[t*9+7])/3,(P[t*9+2]+P[t*9+5]+P[t*9+8])/3]))continue;let a=by.get(m);if(!a)by.set(m,a=[]);a.push(src,t);}}
   for(const [m,lst] of by){const n=lst.length/2,pp=new Float32Array(n*9),nn=new Float32Array(n*9),cc=new Float32Array(n*12);
     for(let i=0;i<n;i++){const src=lst[i*2],t=lst[i*2+1],ord=mir?[0,2,1]:[0,1,2];
       for(let v=0;v<3;v++){const s=ord[v];let p=[src.p[t*9+s*3],src.p[t*9+s*3+1],src.p[t*9+s*3+2]],q=[src.n[t*9+s*3],src.n[t*9+s*3+1],src.n[t*9+s*3+2]];
@@ -34,8 +40,8 @@ function put(srcs,name,{xf=null,mir=false,keep=null}={}){const by=new Map();
     man.pieces.push({file:f,node:name,mat:m,tris:n});tris[name]=(tris[name]||0)+n;}}
 /* the body and everything fixed to it, the lamps apart */
 const fixed=[T.body,...Object.entries(T.hd||{}).filter(([k,v])=>v&&v.p&&k!=='hood').map(([k,v])=>v)];
-node('car',null);node('body','car');put(fixed,'body',{keep:m=>!lampOf[m]});
-for(const k of Object.keys(LAMP)){node('lamp_'+k,'car',[0,0,0],{lamp:k});put(fixed,'lamp_'+k,{keep:m=>lampOf[m]==='lamp_'+k});}
+node('car',null);node('body','car');put(fixed,'body',{keep:(m,c)=>!lampAt(m,c)});
+for(const k of Object.keys(LAMP)){node('lamp_'+k,'car',[0,0,0],{lamp:k});put(fixed,'lamp_'+k,{keep:(m,c)=>lampAt(m,c)==='lamp_'+k});}
 if(T.under){node('under','car');put([T.under],'under');}
 node('hide','car');put([T.hide],'hide');
 /* the hood about its hinge (it opens by turning about z there); the pad under it lifts with it */

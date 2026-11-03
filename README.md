@@ -18,7 +18,7 @@ Each car comes three ways:
 | --- | --- | --- | --- | --- | --- | --- |
 | SUV | To do | | | | | |
 | [Pickup](models/pickup/) | Done | 545,652 (+31,712 engine bay) | 53,950 | 54,356 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Pickup](models/pickup/docs/front34.webp) |
-| Hatch | To do | | | | | |
+| [Hatch](models/hatch/) | Done | 430,908 (+31,178 engine bay) | 46,655 | 46,833 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Hatch](models/hatch/docs/front34.webp) |
 | Wagon | To do | | | | | |
 | EV | To do | | | | | |
 | Trail (4x4) | To do | | | | | |
