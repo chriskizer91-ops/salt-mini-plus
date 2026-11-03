@@ -23,7 +23,7 @@ Each car comes three ways:
 | [EV](models/ev/) | Done | 498,744 (+23,526 engine bay) | 55,314 | 55,432 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![EV](models/ev/docs/front34.webp) |
 | [Trail (4x4)](models/trail/) | Done | 492,105 (+27,684 engine bay) | 50,181 | 50,799 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Trail (4x4)](models/trail/docs/front34.webp) |
 | [Coupe](models/coupe/) | Done | 480,718 (+31,334 engine bay) | 50,361 | 50,475 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Coupe](models/coupe/docs/front34.webp) |
-| Muscle | To do | | | | | |
+| [Muscle](models/muscle/) | Done | 420,615 (+30,160 engine bay) | 58,121 | 58,395 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Muscle](models/muscle/docs/front34.webp) |
 <!-- /TABLE -->
 
 "Studio triangles" is the whole car as you see it with the hood shut: body, cabin, lamps, the four wheels and their
