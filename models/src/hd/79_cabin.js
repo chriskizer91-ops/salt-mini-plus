@@ -126,8 +126,9 @@ function hdCabinGen(out,car,o){
     for(const hz of hs){hdPart(out,mb=>{hdRBox(mb,[-.05,.75,hz],[.05,.095,head===1?.13:.12],.04,SEAT,4);},40,null,Mb);
       hdPart(out,mb=>{for(const s2 of [1,-1])hdCyl(mb,[-.05,.62,hz+s2*.07],[-.05,.68,hz+s2*.07],.006,.006,8,MM.CHROME);},40,null,Mb);}};
   for(const s of [1,-1])seat([X(o.seatF),yF+o.seatY,s*(o.seatZ||.38)],o.seatW||.5,.3,1,o.bolster||1);
-  /* (the rear seat's height: o.seatYR, under a low roof; otherwise a little below the front's) */
-  if(o.rear==='bench')seat([X(o.seatR),yF+(o.seatYR!=null?o.seatYR:o.seatY-.03),0],o.rearW||1.42,.2,3,0);
+  /* (the rear seat's height: o.seatYR, under a low roof; otherwise a little below the front's. o.rearHead 0: a bench
+     without headrests) */
+  if(o.rear==='bench')seat([X(o.seatR),yF+(o.seatYR!=null?o.seatYR:o.seatY-.03),0],o.rearW||1.42,.2,o.rearHead!=null?o.rearHead:3,0);
   else if(o.rear==='two')for(const s of [1,-1])seat([X(o.seatR),yF+o.seatY-.05,s*.33],.48,.22,1,1);
   /* the belts: webbing down from each pillar's top past the seat */
   for(const s of [1,-1])for(const u of o.doors===4?[pil[0],pil[1]]:[o.beltU||pil[0]])hdPart(out,mb=>{const zt=secKeys(D,u).P[10][0]-.05,yt2=K.topY(u,zt)-.12;

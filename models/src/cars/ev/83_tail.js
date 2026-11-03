@@ -5,7 +5,8 @@
      glowing along it, its ends wrapping round the corners (each end its own cavity, meeting the bar's).
    - The plate in a shallow recess.
    - The diffuser: the black valance across the bottom, the reversing lamps set in it, small red reflectors at its
-     ends; the floor under the tail sweeping up to it, five fins standing down from it.
+     ends; the floor under the tail sweeping up to it, five fins standing down from it (79_parts hdDiffuser, shared
+     with the Coupe).
    ===================================================================================== */
 function evTail(out,car){
   const K=HDK,D=K.D,dy=K.dy,Y=y=>y+dy,cuts=[car.body],X=K.X,GUIDE=SV([1,1,1],MAT.TAIL);
@@ -23,19 +24,5 @@ function evTail(out,car){
     hdPart(out,mb=>{const F=P.map(([z,y])=>hdS('R',z,y,-.012)),B=P.map(([z,y])=>hdS('R',z,y,-.0155));hdCap(mb,F,SV([1,1,1],MAT.PLATE),false);hdLoft(mb,[F,B],SV([1,1,1],MAT.PLATE),true);},20);
     hdPart(out,mb=>{const r=hdResample(RR2(-.173,.173,Y(.607),Y(.713),.006),.01).map(([z,y])=>hdS('R',z,y,-.0115));r.push(r[0]);hdTube(mb,r,.0016,6,SV([.05,.07,.18],MAT.COL),false,false);},40);
     for(const z of [-.12,.12])hdPart(out,mb=>{hdRBox(mb,hdS('R',z,Y(.742),-.004),[.004,.004,.02],.003,HC.LENS,2);},40);}
-  evDiffuser(out,car);
-}
-function evDiffuser(out,car){
-  const K=HDK,D=K.D,X=K.X,x=X(D.L),y0=D.sill(D.L),PL=HC.PLASTIC;
-  /* the valance across the tail's foot, in gloss black, its corners rounded */
-  hdPart(out,mb=>{hdRBox(mb,[x-.006,y0+.03,0],[.012,.06,.78],.01,HC.GB,3);},35);
-  /* the floor under the tail, sweeping up to it */
-  {const ax=V3.norm([1,-.18,0]),ay=V3.norm([.18,1,0]);hdPart(out,mb=>{hdRBox(mb,[0,0,0],[.16,.006,.76],.004,PL,2);},30,null,M4.basis([x+.12,y0-.03,0],ax,ay,[0,0,1]));}
-  /* five fins standing down from it */
-  for(let k=-2;k<=2;k++)hdPart(out,mb=>{hdExtrude(mb,[[x+.22,y0-.05],[x+.15,y0-.06],[x-.012,y0-.02],[x-.012,y0+.06]],k*.16-.003,k*.16+.003,PL,.0015,2,true);},35);
-  /* the reversing lamps set in the valance, the red reflectors at its ends */
-  for(const s of [1,-1]){
-    hdPart(out,mb=>{hdRBox(mb,[x-.0185,y0+.03,s*.26],[.003,.014,.06],.004,HC.LENSR,2);},40);
-    hdPart(out,mb=>{for(let z=.21;z<=.311;z+=.02)ball(mb,[x-.016,y0+.03,s*z],.003,8,HC.BULB);},50);
-    hdPart(out,mb=>{hdRBox(mb,[x-.0195,y0+.05,s*.74],[.003,.012,.035],.003,HC.REFR,2);},40);}
+  hdDiffuser(out,car);
 }

@@ -22,7 +22,7 @@ Each car comes three ways:
 | [Wagon](models/wagon/) | Done | 532,457 (+33,666 engine bay) | 52,006 | 52,334 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Wagon](models/wagon/docs/front34.webp) |
 | [EV](models/ev/) | Done | 498,744 (+23,526 engine bay) | 55,314 | 55,432 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![EV](models/ev/docs/front34.webp) |
 | [Trail (4x4)](models/trail/) | Done | 492,105 (+27,684 engine bay) | 50,181 | 50,799 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Trail (4x4)](models/trail/docs/front34.webp) |
-| Coupe | To do | | | | | |
+| [Coupe](models/coupe/) | Done | 480,718 (+31,334 engine bay) | 50,361 | 50,475 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Coupe](models/coupe/docs/front34.webp) |
 | Muscle | To do | | | | | |
 <!-- /TABLE -->
 
@@ -123,6 +123,9 @@ So the game's shader needs nothing new for it.
   this.
 - **Baked EV's engine bay:** the baked cars keep the game's own engine bay, and the game has no electric one: it
   draws a stand-in engine under the EV's bonnet. The Studio EV has its front trunk and the motor's inverter.
+- **Liveries:** none of the three versions shows the game's paint liveries, such as the Muscle's two white stripes.
+  The game draws them in its paint shader, which picks the second colour by where each point is on the body
+  (`13_lit`). The viewer's paint doesn't do that yet, and neither do the .glb files.
 - **Hatch Studio triangle count:** lower than the SUV's because the car is much smaller (3.6 m against 4.9 m, on
   15-inch wheels). Every part on the SUV's list is there at the SUV's level: each wheel is 51,000 triangles against
   the SUV's 47,700, the cabin 64,000 against 54,000, and the engine bay 31,000 against the SUV's game bay of 3,000.
@@ -146,6 +149,8 @@ The method is SUV Studio's (cargames, branch `suv-studio/hd-truck`).
    - `79_bits`: underside, wipers, lamps, bumpers
    - `79_cabin`: a cabin generator, each car saying what its cabin has
    - `79_bay`: the engine bay, or an electric car's front trunk
+   - `79_parts`: parts first made for one car and shared once another needed them: the EV's lip, diffuser, race
+     mirrors and flush panels (the Coupe and the Muscle use them too), and vents cut into the top
 3. **Each car's own detail.** This is in `models/src/cars/<car>/`, one file a part: the wheel, face, tail, cabin,
    bolt-ons and engine bay. Each car leaves off the game's decals and boxes that it builds again in 3D.
 4. **Blender** (the `bpy` module, no window) does three jobs from what `models/tools/export_parts.js` writes out:

@@ -1,0 +1,45 @@
+{
+ "car": "coupe",
+ "game": {
+  "triangles": 50475,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 480718,
+  "triangles_bay": 31334,
+  "by_piece": {
+   "body": 218462,
+   "lamp_head": 8466,
+   "lamp_tail": 7366,
+   "under": 4303,
+   "hide": 143,
+   "hood": 15122,
+   "bay": 31334,
+   "wheel_fr": 53094,
+   "brake_fr": 3620,
+   "wheel_fl": 53094,
+   "brake_fl": 3620,
+   "wheel_rr": 53094,
+   "brake_rr": 3620,
+   "wheel_rl": 53094,
+   "brake_rl": 3620
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 85,
+  "draws_glb_traffic": 83,
+  "texture_mb": 0,
+  "glb_mb": 17.4,
+  "data_mb": 9.5
+ },
+ "baked": {
+  "triangles": 50361,
+  "draws_game": 7,
+  "draws_glb": 12,
+  "texture_mb_low": 24.0,
+  "texture_mb_medium": 96.0,
+  "glb_mb": 3.1,
+  "data_mb": 2.7
+ }
+}

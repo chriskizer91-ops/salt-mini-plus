@@ -7,7 +7,7 @@
    - The intakes: big black triangles at the corners, pointing up and out, a fine black mesh set back in each.
    - The slot across the bottom: a black opening, the same mesh in it.
    - The lip: a black splitter following the nose, its front edge rounded, a thin red line along it.
-   (Swept sections here are [up, out]: up the face, then out of it.)
+   (The lip is 79_parts hdLip, shared with the Coupe. Swept sections here are [up, out]: up the face, then out of it.)
    ===================================================================================== */
 function evFace(out,car){
   const K=HDK,D=K.D,dy=K.dy,Y=y=>y+dy,cuts=[car.body,car.hood],X=K.X;
@@ -36,16 +36,5 @@ function evFace(out,car){
   {const S=[[-.5,Y(.205)],[.5,Y(.205)],[.44,Y(.33)],[-.44,Y(.33)]];for(const c of cuts)hdCut(c,'F',S);
     hdRecess(out,'F',S,.09,.96,HC.GB,()=>HC.GB);hdHoney(out,'F',hdShrink(S,.94),.035,.013,.0016,.012,HC.HONEY);
     hdTrim(out,'F',hdResample(S,.008),.012,.004,HC.GB,true,50);}
-  evLip(out,car);
-}
-/* the lip: lofted along the nose at the game's height and reach (23_parts FRONTS.lip) */
-function evLip(out,car){
-  const K=HDK,D=K.D,X=K.X,F=D.B.fit,y=K.dy+.425+F.fdy,zw=F.lipZ||.84,uB=F.lipU||.35,n=48;
-  const sec=[[0,.011],[.003,.018],[.012,.022],[.08,.022],[1,.022],[1,0],[.08,0],[.012,.0],[.003,.004]];
-  const row=z=>{const uE=K.uFront(Math.abs(z)*.96,y+.04)-.045,back=Math.max(.06,uB-uE);return sec.map(([d,h])=>[X(uE+(d===1?back:d)),y+h,z]);};
-  const rows=[];for(let k=0;k<=n;k++){const t=k/n,z=-zw+2*zw*(.5-.5*Math.cos(t*PI));rows.push(row(z));}
-  hdPart(out,mb=>{hdLoft(mb,rows,HC.GB,true);hdCap(mb,rows[0],HC.GB,true);hdCap(mb,rows[n],HC.GB,false);},40);
-  /* the red line along its front edge */
-  hdPart(out,mb=>{const R=[];for(let k=0;k<=n;k++){const t=k/n,z=-zw*.995+2*zw*.995*(.5-.5*Math.cos(t*PI)),uE=K.uFront(Math.abs(z)*.96,y+.04)-.045;R.push([[X(uE)+.0006,y+.0085,z],[X(uE)+.0006,y+.0135,z]]);}
-    for(let k=0;k<n;k++)mb.quad(R[k][0],R[k+1][0],R[k+1][1],R[k][1],[1,1,1],0,MAT.ACCENT);},40);
+  hdLip(out,car);
 }

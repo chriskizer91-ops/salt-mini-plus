@@ -15,7 +15,7 @@ HD_CARS.ev={
     if(typeof evFace==='function'){const f=new MB();evFace(f,out);out.hd.face=f;}
     if(typeof evTail==='function'){const t=new MB();evTail(t,out);out.hd.tail=t;}
     if(typeof evCabin==='function'){const c=new MB();evCabin(c,out);out.hd.cabin=c;}
-    {const t=new MB();if(typeof evMirrors==='function')evMirrors(t,out);if(typeof evHandles==='function')evHandles(t,out);hdWipers(t,out);if(typeof evCharge==='function')evCharge(t,out);out.hd.trim=t;}
+    {const t=new MB();hdMirrorsRace(t,out);if(typeof evHandles==='function')evHandles(t,out);hdWipers(t,out);if(typeof evCharge==='function')evCharge(t,out);out.hd.trim=t;}
     if(typeof evBay==='function')out.bay=evBay(out);
     out.under=hdUnder(out);
   },
