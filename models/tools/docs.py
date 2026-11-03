@@ -35,7 +35,9 @@ def glb_prims(p, skip=()):
 glbS = os.path.join(M, NAME + '_studio.glb'); glbB = os.path.join(M, NAME + '_baked.glb')
 gS, gB = glb_prims(glbS, ('bay',)), glb_prims(glbB, ('bay', 'hood_pad'))
 gSt = glb_prims(glbS, ('bay', 'under', 'hide'))
-lowT = bk['pieces']['low_skin']['tris'] + bk['pieces']['low_glass']['tris'] + bk['pieces']['low_under']['tris'] + 4 * bk['pieces']['low_wheel']['tris']
+# (four wheels, and any spares the game hangs on the car: the 4x4's on its door)
+nsp = len((bk.get('D') or {}).get('spares') or [])
+lowT = bk['pieces']['low_skin']['tris'] + bk['pieces']['low_glass']['tris'] + bk['pieces']['low_under']['tris'] + (4 + nsp) * bk['pieces']['low_wheel']['tris']
 mb = lambda p: round(os.path.getsize(p) / 1048576, 1)
 tex = lambda w, h: round(w * h * 4 * 3 * 4 / 3 / 1048576, 1)
 N = {'car': CAR,
