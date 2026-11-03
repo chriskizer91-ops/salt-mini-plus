@@ -16,7 +16,7 @@ Each car comes three ways:
 <!-- TABLE -->
 | Car | Status | Studio triangles | Baked triangles | Game's own | Baked pictures (Low / Medium) | Picture |
 | --- | --- | --- | --- | --- | --- | --- |
-| SUV | To do | | | | | |
+| [SUV](models/suv/) | Done | 484,359 (+3,000 engine bay) | 51,408 | 51,586 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![SUV](models/suv/docs/front34.webp) |
 | [Pickup](models/pickup/) | Done | 545,652 (+31,712 engine bay) | 53,950 | 54,356 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Pickup](models/pickup/docs/front34.webp) |
 | [Hatch](models/hatch/) | Done | 430,908 (+31,178 engine bay) | 46,655 | 46,833 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Hatch](models/hatch/docs/front34.webp) |
 | Wagon | To do | | | | | |
@@ -86,6 +86,10 @@ seconds the first time you pick each one. The baked cars are unpacked from their
 
 Axes are the game's: x forward, y up, z right, metres, the ground at y = 0.
 
+The SUV's model is SUV Studio's, kept as it was. It uses one clear lens for its headlamps, fog lamps and reversing
+windows, so its .glb tells its lamps apart by where each piece is, and marks the lamp nodes rather than their
+materials. Its wheels have their brakes in them, as SUV Studio built them.
+
 The baked .glb's colour picture keeps the paint mask in its alpha. The material is opaque, so viewers ignore the
 alpha, but a game can read it to repaint the car in any colour. The game's-form file has the mask in the same place.
 Its material slots are Baked SUV Test's:
@@ -109,6 +113,15 @@ So the game's shader needs nothing new for it.
   - the Studio car: 13 draws (body solid, body glass and lenses, underside, hood, what the hood hides, four wheels,
     four brakes); 11 in traffic, which leaves out the underside and what the hood hides
 - **In a standard engine** reading the .glb, it's one draw a primitive. Each car's `numbers.json` gives both counts.
+
+## Known things to improve
+
+- **Baked Hatch:** shows some smearing on its box flares and front bumper. That's where the game's own mesh sits a
+  few centimetres off the Studio car's surfaces, so the bake's rays catch the wrong surface. The Studio Hatch
+  doesn't have this.
+- **Hatch Studio triangle count:** lower than the SUV's because the car is much smaller (3.6 m against 4.9 m, on
+  15-inch wheels). Every part on the SUV's list is there at the SUV's level: each wheel is 51,000 triangles against
+  the SUV's 47,700, the cabin 64,000 against 54,000, and the engine bay 31,000 against the SUV's game bay of 3,000.
 
 ## How the models are made
 

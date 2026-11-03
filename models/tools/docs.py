@@ -2,11 +2,11 @@
    - models/<car>/docs/*.webp: each picture as WebP (exact: the colour kept under any clear alpha); the side by side
      of the game's own, the Studio and the baked car; the Cycles render; the .glb check.
    - models/<car>/numbers.json: triangles, draws and texture memory for each version, the files' sizes.
-   usage: python3 models/tools/docs.py <car> <work-dir>"""
+   usage: python3 models/tools/docs.py <car> <work-dir> [folder: models/<folder>, the car's id by default]"""
 import sys, os, json, glob, struct
 from PIL import Image, ImageDraw, ImageFont
-CAR, X = sys.argv[1], sys.argv[2]
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'); M = os.path.join(ROOT, CAR); DOC = os.path.join(M, 'docs'); os.makedirs(DOC, exist_ok=True)
+CAR, X = sys.argv[1], sys.argv[2]; NAME = sys.argv[3] if len(sys.argv) > 3 else CAR
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'); M = os.path.join(ROOT, NAME); DOC = os.path.join(M, 'docs'); os.makedirs(DOC, exist_ok=True)
 F = lambda s: ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', s)
 def webp(im, name, q=90):
     p = os.path.join(DOC, name + '.webp'); im.save(p, 'WEBP', quality=q, method=6, exact=True); return p
@@ -32,7 +32,7 @@ def glb_prims(p, skip=()):
         if 'mesh' in nd and nd.get('name') not in skip:
             for pr in J['meshes'][nd['mesh']]['primitives']: n += 1; t += J['accessors'][pr['indices']]['count'] // 3
     return n, t
-glbS = os.path.join(M, CAR + '_studio.glb'); glbB = os.path.join(M, CAR + '_baked.glb')
+glbS = os.path.join(M, NAME + '_studio.glb'); glbB = os.path.join(M, NAME + '_baked.glb')
 gS, gB = glb_prims(glbS, ('bay',)), glb_prims(glbB, ('bay', 'hood_pad'))
 gSt = glb_prims(glbS, ('bay', 'under', 'hide'))
 lowT = bk['pieces']['low_skin']['tris'] + bk['pieces']['low_glass']['tris'] + bk['pieces']['low_under']['tris'] + 4 * bk['pieces']['low_wheel']['tris']
@@ -41,8 +41,8 @@ tex = lambda w, h: round(w * h * 4 * 3 * 4 / 3 / 1048576, 1)
 N = {'car': CAR,
      'game': {'triangles': lowT, 'draws_game': 7, 'texture_mb': 0},
      'studio': {'triangles': shut, 'triangles_bay': T.get('bay', 0), 'by_piece': T, 'draws_game': 13, 'draws_game_traffic': 11, 'draws_glb': gS[0], 'draws_glb_traffic': gSt[0],
-                'texture_mb': 0, 'glb_mb': mb(glbS), 'data_mb': mb(os.path.join(M, CAR + '_studio_data.js'))},
+                'texture_mb': 0, 'glb_mb': mb(glbS), 'data_mb': mb(os.path.join(M, NAME + '_studio_data.js'))},
      'baked': {'triangles': gB[1], 'draws_game': 7, 'draws_glb': gB[0], 'texture_mb_low': tex(1024, 1536), 'texture_mb_medium': tex(2048, 3072),
-               'glb_mb': mb(glbB), 'data_mb': mb(os.path.join(M, CAR + '_baked_data.js'))}}
+               'glb_mb': mb(glbB), 'data_mb': mb(os.path.join(M, NAME + '_baked_data.js'))}}
 json.dump(N, open(os.path.join(M, 'numbers.json'), 'w'), indent=1)
 print(json.dumps(N, indent=1))

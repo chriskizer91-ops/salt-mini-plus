@@ -8,15 +8,19 @@ const PAGE='file://'+path.resolve(path.join(__dirname,'..','..','viewer','viewer
 (async()=>{const b=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
   for(const [tag,ctx] of [['phone',devices['Pixel 7']],['laptop',{viewport:{width:1536,height:864},deviceScaleFactor:1.25}]]){
     const c=await b.newContext(ctx),p=await c.newPage(),errs=[];p.on('pageerror',e=>errs.push(e.message));
-    await p.goto(PAGE);await p.waitForFunction(()=>window.VIEWER&&VIEWER.cur,null,{timeout:900000,polling:500});await p.waitForTimeout(1500);
-    const tap=async sel=>{const el=await p.$(sel);if(tag==='phone')await el.tap();else await el.click();await p.waitForTimeout(900);};
-    await p.screenshot({path:path.join(out,`${tag}_1_open.png`)});
-    await tap('#carb');await p.screenshot({path:path.join(out,`${tag}_2_cars.png`)});await tap('#carb');
+    await p.goto(PAGE);await p.waitForFunction(()=>window.VIEWER&&VIEWER.cur,null,{timeout:900000,polling:500});
+    /* (the page's loop held, a frame drawn after each press: software GL is far too slow to keep drawing) */
+    await p.evaluate(()=>{VIEWER.hold(true);VIEWER.snap();});
+    const draw=()=>p.evaluate(()=>{VIEWER.settle();VIEWER.snap();});
+    const shot=async f=>{await draw();await p.screenshot({path:path.join(out,f),timeout:300000});};
+    const tap=async sel=>{const el=await p.$(sel);if(tag==='phone')await el.tap();else await el.click();await p.waitForTimeout(600);};
+    await shot(`${tag}_1_open.png`);
+    await tap('#carb');await shot(`${tag}_2_cars.png`);await tap('#carb');
     await tap('#vers button[data-v="baked"]');await p.waitForFunction(()=>VIEWER.cur&&VIEWER.cur.v==='baked',null,{timeout:300000});await p.waitForTimeout(1500);
-    await tap('#hood');await p.waitForTimeout(1500);await p.screenshot({path:path.join(out,`${tag}_3_baked_hood.png`)});
-    if(tag==='phone'){await tap('#moreb');await p.screenshot({path:path.join(out,`${tag}_4_more.png`)});const m=await p.$$('#more button');for(const x of m)if((await x.textContent())==='Paint'){await x.tap();break;}}
+    await tap('#hood');await shot(`${tag}_3_baked_hood.png`);
+    if(tag==='phone'){await tap('#moreb');await shot(`${tag}_4_more.png`);const m=await p.$$('#more button');for(const x of m)if((await x.textContent())==='Paint'){await x.tap();break;}}
     else await tap('#paintb');
     await p.waitForTimeout(500);const sw=await p.$$('#paints .sw');if(tag==='phone')await sw[5].tap();else await sw[5].click();await p.waitForTimeout(900);
-    await p.screenshot({path:path.join(out,`${tag}_5_paint.png`)});
+    await shot(`${tag}_5_paint.png`);
     console.log(tag,JSON.stringify(await p.evaluate(()=>VIEWER.stats())),errs.length?errs:'no page errors');await c.close();}
   await b.close();})();

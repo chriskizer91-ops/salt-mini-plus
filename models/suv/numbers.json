@@ -1,0 +1,42 @@
+{
+ "car": "stock",
+ "game": {
+  "triangles": 51586,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 484359,
+  "triangles_bay": 3000,
+  "by_piece": {
+   "body": 256059,
+   "lamp_head": 8908,
+   "lamp_tail": 13732,
+   "lamp_amber": 2016,
+   "lamp_reverse": 2696,
+   "hide": 156,
+   "hood": 9816,
+   "bay": 3000,
+   "wheel_fr": 47744,
+   "wheel_fl": 47744,
+   "wheel_rr": 47744,
+   "wheel_rl": 47744
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 81,
+  "draws_glb_traffic": 80,
+  "texture_mb": 0,
+  "glb_mb": 16.0,
+  "data_mb": 9.4
+ },
+ "baked": {
+  "triangles": 51408,
+  "draws_game": 7,
+  "draws_glb": 14,
+  "texture_mb_low": 24.0,
+  "texture_mb_medium": 96.0,
+  "glb_mb": 3.2,
+  "data_mb": 2.8
+ }
+}
