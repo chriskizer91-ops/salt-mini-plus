@@ -84,6 +84,10 @@ def make(name, P, N, C=None, M=None, weld=False, grp=None, gm=None):
         for o in sc.objects: o.select_set(o == ob)
         bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT'); bpy.ops.mesh.remove_doubles(threshold=1e-5); bpy.ops.object.mode_set(mode='OBJECT')
         for p in me.polygons: p.use_smooth = True
+        # (Salt Mini Plus: kept sharp where the game's surfaces meet at more than 50 degrees, as a box bumper's or a flare's
+        # edges do: welded smooth there, the normals bend round the edge and the bake's rays go sideways into the wrong
+        # surface, smearing it)
+        me.set_sharp_from_angle(angle=math.radians(50))
     return ob
 MATS = {}
 def bake_mat(i):
@@ -125,11 +129,11 @@ def target(ob, size, name, fill, colour):
     img.colorspace_settings.name = 'sRGB' if colour else 'Non-Color'
     m = bpy.data.materials.new(name); m.use_nodes = True; nt = m.node_tree; t = nt.nodes.new('ShaderNodeTexImage'); t.image = img; nt.nodes.active = t
     ob.data.materials.clear(); ob.data.materials.append(m); return img
-def bake(low, highs, kind, img, fill, extr, dist, samples=1, **kw):
+def bake(low, highs, kind, img, fill, extr, dist, samples=1, margin=6, **kw):
     for o in sc.objects: o.select_set(o in highs or o == low)
     bpy.context.view_layer.objects.active = low
     sc.cycles.samples = samples; b = sc.render.bake
-    b.use_selected_to_active = True; b.cage_extrusion = extr; b.max_ray_distance = dist; b.margin = 6; b.margin_type = 'EXTEND'
+    b.use_selected_to_active = True; b.cage_extrusion = extr; b.max_ray_distance = dist; b.margin = margin; b.margin_type = 'EXTEND'
     bpy.ops.object.bake(type=kind, **kw)
 def save(img, path):
     img.filepath_raw = path; img.file_format = 'PNG'; img.save()
@@ -171,9 +175,52 @@ def facing(P, N, C, M):
 def run(tag, low_name, high_name, size, extr, dist, margin):
     P, N, C, M, n = facing(*load(low_name)[:4]) + (None,); n = len(M); low = make(tag + '_low', P, N, weld=True, grp=load.grp[low_name], gm=M); unwrap(low, margin)
     # (the studio truck turned the same way: a ray reaching the back of a triangle would have Cycles shade it from inside)
-    Ph, Nh, Ch, Mh = facing(*load(high_name)[:4]); nh = len(Mh); high = make(tag + '_high', Ph, Nh, Ch, Mh)
-    for p in high.data.polygons: p.use_smooth = True
-    if len(high.data.loops) == len(Nh): high.data.normals_split_custom_set(Nh.tolist())
+    Ph, Nh, Ch, Mh = load(high_name)[:4]
+    def studio(Ph, Nh, Ch, Mh):
+        Ph, Nh, Ch, Mh = facing(Ph, Nh, Ch, Mh)
+        # (a corner whose normal points against its own triangle is turned round too: left, the shading flips
+        # partway across the triangle, a wedge of it baked as if seen from inside)
+        T = Ph.reshape(-1, 3, 3); g = np.cross(T[:, 1] - T[:, 0], T[:, 2] - T[:, 0]); V = Nh.reshape(-1, 3, 3)
+        bad = (V * g[:, None, :]).sum(2) < 0; V[bad] = -V[bad]
+        high = make(tag + '_high', Ph, Nh, Ch, Mh)
+        for p in high.data.polygons: p.use_smooth = True
+        if len(high.data.loops) == len(Nh): high.data.normals_split_custom_set(Nh.tolist())
+        return high
+    # (Salt Mini Plus: the Studio's parts keep no one winding either: a part built the same way on both sides of the car
+    # faces in on one of them, and the page never shows it, drawing both sides. The bake does: a ray meeting the back
+    # of a triangle bakes its normal pointing into the car and its occlusion black, on the flares most of all. So the
+    # bake is asked first: one quick pass notes, for each pixel, which Studio triangle its ray met and whether that
+    # triangle faced back along the ray; a triangle the rays mostly met from behind is turned round.)
+    nh = len(Mh); high = studio(Ph, Nh, Ch, Mh)
+    tm = bpy.data.materials.new('tid'); tm.use_nodes = True; tn = tm.node_tree; tn.nodes.clear()
+    ta = tn.nodes.new('ShaderNodeAttribute'); ta.attribute_name = 'tid'; te = tn.nodes.new('ShaderNodeEmission'); te.inputs['Strength'].default_value = 1
+    tn.links.new(ta.outputs['Color'], te.inputs['Color']); tn.links.new(te.outputs[0], tn.nodes.new('ShaderNodeOutputMaterial').inputs['Surface'])
+    def votes(high):
+        ida = high.data.color_attributes.new('tid', 'FLOAT_COLOR', 'CORNER')
+        ida.data.foreach_set('color', np.c_[np.repeat(np.arange(1, nh + 1, dtype=np.float32), 3), np.zeros((nh * 3, 2), np.float32), np.ones(nh * 3, np.float32)].ravel())
+        high.data.materials.clear(); high.data.materials.append(tm); high.data.polygons.foreach_set('material_index', np.zeros(nh, np.int32))
+        vote = {}
+        for key, kind, kw in (('tid', 'EMIT', {}), ('z', 'NORMAL', {'normal_space': 'TANGENT'})):
+            img = bpy.data.images.new(tag + '_' + key, size, size, alpha=False, float_buffer=True); img.colorspace_settings.name = 'Non-Color'
+            lm = bpy.data.materials.new(tag + '_' + key); lm.use_nodes = True; tx = lm.node_tree.nodes.new('ShaderNodeTexImage'); tx.image = img; lm.node_tree.nodes.active = tx
+            low.data.materials.clear(); low.data.materials.append(lm)
+            bake(low, [high], kind, img, None, extr, dist, 1, margin=0, **kw)
+            a = np.zeros(size * size * 4, np.float32); img.pixels.foreach_get(a); vote[key] = a.reshape(-1, 4); bpy.data.images.remove(img)
+        t = np.rint(vote['tid'][:, 0]).astype(np.int64) - 1; z = vote['z'][:, 2] * 2 - 1; ok = (t >= 0) & (t < nh)
+        back = np.bincount(t[ok], weights=(z[ok] < 0).astype(np.float64), minlength=nh); seen = np.bincount(t[ok], minlength=nh)
+        if os.environ.get('DIAG'):
+            r = back[seen > 0] / seen[seen > 0]
+            log(tag, 'vote: texels', int(ok.sum()), 'back share %.3f' % (z[ok] < 0).mean(), 'tri ratio hist', np.histogram(r, bins=[0, .01, .2, .4, .6, .8, .99, 1.01])[0].tolist())
+            np.save(os.path.join(OUT, tag + '_vote_t.npy'), t.reshape(size, size)); np.save(os.path.join(OUT, tag + '_vote_z.npy'), z.reshape(size, size))
+        return back, seen
+    back, seen = votes(high); flip = back * 2 > seen
+    log(tag, 'turned', int(flip.sum()), 'of', nh, 'Studio triangles the rays met from behind (', int(seen.astype(bool).sum()), 'met at all )')
+    bpy.data.objects.remove(high)
+    Nh = Nh.reshape(-1, 3, 3).copy(); Nh[flip] = -Nh[flip]; Nh = Nh.reshape(-1, 3)
+    high = studio(Ph, Nh, Ch, Mh)
+    if os.environ.get('DIAG'):
+        OUT0 = OUT; globals()['OUT'] = OUT + '/after'; os.makedirs(OUT + '/after', exist_ok=True); votes(high); globals()['OUT'] = OUT0
+        log('diag only'); sys.exit(0)
     log(tag, 'low', n, 'high', nh, 'triangles')
     imgs = {}
     def one(key, kind, fill, colour, samples=1, emit=None, **kw):
@@ -190,9 +237,22 @@ def run(tag, low_name, high_name, size, extr, dist, margin):
     one('rough', 'ROUGHNESS', (.5, .5, .5, 1), False)
     one('metal', 'EMIT', (0, 0, 0, 1), False, emit='metal')
     if tag == 'skin': one('coat', 'EMIT', (0, 0, 0, 1), False, emit='coat'); one('paint', 'EMIT', (0, 0, 0, 1), False, emit='paint')
+    # (Salt Mini Plus: where two Studio surfaces lie close, a ray can still pass the near one and meet the back of the far
+    # one: that pixel bakes a normal pointing into the car and a black occlusion, the speckle on the flares. Every
+    # picture takes those pixels from the nearest pixel whose ray met its surface from the front, within a few pixels.)
+    from PIL import Image as PI
+    from scipy import ndimage
+    pth = lambda k: os.path.join(OUT, '%s_%s.png' % (tag, k))
+    tz = np.asarray(PI.open(pth('tnrm')).convert('RGB'))[..., 2].astype(np.int16)
+    bad = tz < 120
+    if bad.any():
+        d, (iy, ix) = ndimage.distance_transform_edt(bad, return_indices=True); fix = bad & (d <= 12)
+        for k in imgs:
+            im = PI.open(pth(k)); a = np.asarray(im).copy(); a[fix] = a[iy[fix], ix[fix]]; PI.fromarray(a, im.mode).save(pth(k))
+        log(tag, 'refilled', int(fix.sum()), 'pixels met from behind (of', int(bad.sum()), ')')
     nn = write_mesh(low, os.path.join(OUT, tag + '.bin')); log(tag, 'mesh written', nn, 'triangles')
     bpy.data.objects.remove(low); bpy.data.objects.remove(high)
-run('skin', 'low_skin', 'high_body', SKIN, .03, .14, .002)
+run('skin', 'low_skin', 'high_body', SKIN, float(os.environ.get('CAGE', .03)), float(os.environ.get('RAY', .14)), .002)
 run('wheel', 'low_wheel', 'high_wheel', WHEEL, .02, .08, .003)
 for nm in ('low_glass', 'low_under'):
     P, N, C, M = facing(*load(nm)[:4]); plain(nm, P, N, os.path.join(OUT, nm[4:] + '.bin'), M)

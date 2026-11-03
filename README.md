@@ -116,9 +116,11 @@ So the game's shader needs nothing new for it.
 
 ## Known things to improve
 
-- **Baked Hatch:** shows some smearing on its box flares and front bumper. That's where the game's own mesh sits a
-  few centimetres off the Studio car's surfaces, so the bake's rays catch the wrong surface. The Studio Hatch
-  doesn't have this.
+- **Baked Hatch flares:** the speckled, chrome-looking smear is fixed. Some Studio parts were built facing inward on
+  one side of the car, and the bake read them from behind. The bake now turns those parts round first, then mends
+  any pixel that still met a surface from behind (`models/tools/bake.py`). A little soft grey shading is left on
+  the rear flares, where the game's flare sits a few centimetres off the Studio one. The Studio Hatch doesn't have
+  this.
 - **Hatch Studio triangle count:** lower than the SUV's because the car is much smaller (3.6 m against 4.9 m, on
   15-inch wheels). Every part on the SUV's list is there at the SUV's level: each wheel is 51,000 triangles against
   the SUV's 47,700, the cabin 64,000 against 54,000, and the engine bay 31,000 against the SUV's game bay of 3,000.
