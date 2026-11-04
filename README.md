@@ -13,6 +13,10 @@ Each car comes three ways:
 - **Baked**: the game's own mesh at the game's own triangle count, wearing the Studio car's detail as three
   pictures. It's the backup in case the Studio car doesn't fit the phone's budget.
 
+The first eight are the traffic cars and come all three ways. The other nine (the SUV's Sleeper, Rock & Mud and Race
+builds, the Coupe GT, the Hatch Group B, and the Wedge and Hypercar with their Night Runner and Track builds) come as
+the game's own and Studio only: they have no baked version.
+
 <!-- TABLE -->
 | Car | Status | Studio triangles | Baked triangles | Game's own | Baked pictures (Low / Medium) | Picture |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -24,15 +28,15 @@ Each car comes three ways:
 | [Trail (4x4)](models/trail/) | Done | 492,105 (+27,684 engine bay) | 50,181 | 50,799 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Trail (4x4)](models/trail/docs/front34.webp) |
 | [Coupe](models/coupe/) | Done | 480,718 (+31,334 engine bay) | 50,361 | 50,475 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Coupe](models/coupe/docs/front34.webp) |
 | [Muscle](models/muscle/) | Done | 420,615 (+30,160 engine bay) | 58,121 | 58,395 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Muscle](models/muscle/docs/front34.webp) |
-| SUV Sleeper | To do | | | | | |
-| SUV Rock & Mud | To do | | | | | |
-| SUV Race | To do | | | | | |
-| Coupe GT | To do | | | | | |
-| Hatch Group B | To do | | | | | |
-| Wedge | To do | | | | | |
-| Wedge Night Runner | To do | | | | | |
-| Hypercar | To do | | | | | |
-| Hypercar Track | To do | | | | | |
+| [SUV Sleeper](models/suv-sleeper/) | Done | 603,760 (+36,306 engine bay) | Studio only | 51,654 | Studio only | ![SUV Sleeper](models/suv-sleeper/docs/front34.webp) |
+| [SUV Rock & Mud](models/suv-rockmud/) | Done | 528,718 (+34,076 engine bay) | Studio only | 61,432 | Studio only | ![SUV Rock & Mud](models/suv-rockmud/docs/front34.webp) |
+| [SUV Race](models/suv-race/) | Done | 481,953 (+37,330 engine bay) | Studio only | 49,108 | Studio only | ![SUV Race](models/suv-race/docs/front34.webp) |
+| [Coupe GT](models/coupe-gt/) | Done | 430,719 (+31,390 engine bay) | Studio only | 52,023 | Studio only | ![Coupe GT](models/coupe-gt/docs/front34.webp) |
+| [Hatch Group B](models/hatch-groupb/) | Done | 455,649 (+31,206 engine bay) | Studio only | 52,579 | Studio only | ![Hatch Group B](models/hatch-groupb/docs/front34.webp) |
+| [Wedge](models/wedge/) | Done | 499,931 (+20,510 engine bay) | Studio only | 45,696 | Studio only | ![Wedge](models/wedge/docs/front34.webp) |
+| [Wedge Night Runner](models/wedge-nightrunner/) | Done | 535,168 (+20,538 engine bay) | Studio only | 48,735 | Studio only | ![Wedge Night Runner](models/wedge-nightrunner/docs/front34.webp) |
+| [Hypercar](models/hyper/) | Done | 602,807 (+20,430 engine bay) | Studio only | 50,283 | Studio only | ![Hypercar](models/hyper/docs/front34.webp) |
+| [Hypercar Track](models/hyper-track/) | Done | 537,951 (+20,458 engine bay) | Studio only | 48,841 | Studio only | ![Hypercar Track](models/hyper-track/docs/front34.webp) |
 <!-- /TABLE -->
 
 "Studio triangles" is the whole car as you see it with the hood shut: body, cabin, lamps, the four wheels and their
@@ -138,7 +142,19 @@ So the game's shader needs nothing new for it.
   draws a stand-in engine under the EV's bonnet. The Studio EV has its front trunk and the motor's inverter.
 - **Liveries:** none of the three versions shows the game's paint liveries, such as the Muscle's two white stripes.
   The game draws them in its paint shader, which picks the second colour by where each point is on the body
-  (`13_lit`). The viewer's paint doesn't do that yet, and neither do the .glb files.
+  (`13_lit`). The viewer's paint doesn't do that yet, and neither do the .glb files. The Wedge Night Runner's neon
+  slash down each side is one of these; its glow tubes and underglow are real parts and do light.
+- **Pop-up lamps:** the Wedge's pop-up headlamps are part of the hood piece (`hood`) in its .glb, not the headlamp
+  piece (`lamp_head`), because they're built into the bonnet. Their lenses are the headlamps' own glass, so they light with them in
+  the viewer.
+- **Hatch Group B's spot lamps:** they stay put when the bonnet opens, as in the game, so they sit in front of the
+  open engine bay.
+- **SUV Race and Rock & Mud cabins:** they keep the Studio SUV's own interior; the Race has no roll cage yet.
+- **Hypercar's front lid:** its nose lamps stay with the body when the lid opens, as the EV's do, so the open lid
+  shows the openings they sit in. On the Track, the flare ends just ahead of and behind each front wheel stand as
+  flat slabs, the shape the shared flares have.
+- **Coupe GT's front arches:** at the very top of each front arch the flare lies flat on the fender for a short
+  stretch, and a couple of its bolts sit on that flat strip.
 - **Hatch and Muscle Studio triangle counts:** lower than the SUV's because the cars are smaller and on 15-inch
   wheels. Every part on the SUV's list is there at the SUV's level. The Hatch's wheel is 51,000 triangles against
   the SUV's 47,700, its cabin 64,000 against 54,000, its engine bay 31,000 against the SUV's game bay of 3,000. The
