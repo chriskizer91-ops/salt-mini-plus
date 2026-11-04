@@ -20,10 +20,18 @@ for f in sorted(glob.glob(os.path.join(SH, CAR + '_studio_*.png'))):
 glbB = os.path.join(M, NAME + '_baked.glb'); BAKED = os.path.exists(glbB) and os.path.exists(os.path.join(SH, '%s_baked_front34.png' % CAR))
 VS = ('game', 'studio', 'baked') if BAKED else ('game', 'studio')
 ims = [Image.open(os.path.join(SH, '%s_%s_front34.png' % (CAR, v))).convert('RGB') for v in VS]
-W, H = ims[0].size; cw = int(W * .84); x0 = int(W * .12); y0, y1 = int(H * .14), int(H * .9)
-sbs = Image.new('RGB', (cw * len(VS), y1 - y0), (230, 229, 226)); d = ImageDraw.Draw(sbs)
+# (each cropped to the car and its shadow, the same box for all, with a strip above for the names, so a tall wing or
+#  roof rack isn't cut off or written over)
+import numpy as np
+def carbox(im):
+    a = np.asarray(im).astype(int); m = np.abs(a - a[3, 3]).sum(2) > 18; ys, xs = np.nonzero(m)
+    return xs.min(), ys.min(), xs.max(), ys.max()
+W, H = ims[0].size; bs = [carbox(im) for im in ims]
+x0, x1 = max(0, min(b[0] for b in bs) - 30), min(W, max(b[2] for b in bs) + 30)
+y0, y1 = max(0, min(b[1] for b in bs) - 20), min(H, max(b[3] for b in bs) + 20); cw, top = x1 - x0, 64
+sbs = Image.new('RGB', (cw * len(VS), y1 - y0 + top), tuple(int(c) for c in np.asarray(ims[0])[3, 3])); d = ImageDraw.Draw(sbs)
 for i, (im, t) in enumerate(zip(ims, ('Game\'s own', 'Studio', 'Baked'))):
-    sbs.paste(im.crop((x0, y0, x0 + cw, y1)), (i * cw, 0)); d.text((i * cw + 28, 26), t, fill=(40, 40, 40), font=F(30))
+    sbs.paste(im.crop((x0, y0, x1, y1)), (i * cw, top)); d.text((i * cw + 28, 18), t, fill=(40, 40, 40), font=F(30))
 webp(sbs, 'compare')
 for f, n in ((os.path.join(X, 'cycles_front34.png'), 'cycles_front34'), (os.path.join(X, 'glb_check.png'), 'glb_check'), (os.path.join(X, 'glb_check_baked.png'), 'glb_check_baked')):
     if os.path.exists(f): webp(Image.open(f).convert('RGB'), n)

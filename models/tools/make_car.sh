@@ -1,14 +1,14 @@
 #!/bin/sh
 # Everything a car gets, from the Studio's code (models/src): run from the repo's top, e.g. sh models/tools/make_car.sh pickup
 # (about ten minutes on two processor cores: the bake and the Cycles render take most of it). Its work folder is
-# /tmp/smp-<car> (W=... for another); what it writes is in models/<car>:
+# /tmp/smp-<car> (W=... for another; it's unset after, as shot.js reads W as the picture's width); what it writes is in models/<car>:
 #   <car>_studio.glb, <car>_baked.glb             the Studio car and the baked car, in their pieces (studio_glb.py, baked_glb.py)
 #   <car>_studio_data.js, <car>_baked_data.js     the same in the game's own mesh form (pack_studio.js, pack_game.py)
 #   docs/*.webp, numbers.json                     the pictures and the numbers (shot.js, cycles_render.py, glb_check.js, docs.py)
 #   (OUT=models/suv for the SUV, whose build is 'stock'; KEEP_BAKED=1 keeps its baked data as Baked SUV Test made it;
 #   STUDIO_ONLY=1 makes no baked version: no bake, no baked data or .glb, no baked pictures)
 set -e
-car=$1; X=${W:-/tmp/smp-$car}; M=${OUT:-models/$car}; N=$(basename $M); V="${VIEWS:-front34 rear34 side wheel face tail cabin bay:open}"
+car=$1; X=${W:-/tmp/smp-$car}; unset W; M=${OUT:-models/$car}; N=$(basename $M); V="${VIEWS:-front34 rear34 side wheel face tail cabin bay:open}"
 mkdir -p $M/docs $X/shots
 node models/tools/export_parts.js $car $X
 python3 models/tools/studio_glb.py $X/studio $M/${N}_studio.glb > $X/glb.log 2>&1

@@ -1,0 +1,39 @@
+{
+ "car": "sleeper",
+ "game": {
+  "triangles": 51654,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 603760,
+  "triangles_bay": 36306,
+  "by_piece": {
+   "body": 310773,
+   "lamp_head": 23636,
+   "lamp_tail": 13256,
+   "lamp_amber": 1200,
+   "lamp_reverse": 472,
+   "under": 3928,
+   "hide": 149,
+   "hood": 13154,
+   "bay": 36306,
+   "wheel_fr": 55678,
+   "brake_fr": 3620,
+   "wheel_fl": 55678,
+   "brake_fl": 3620,
+   "wheel_rr": 55678,
+   "brake_rr": 3620,
+   "wheel_rl": 55678,
+   "brake_rl": 3620
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 100,
+  "draws_glb_traffic": 98,
+  "texture_mb": 0,
+  "glb_mb": 20.5,
+  "data_mb": 12.7
+ },
+ "baked": null
+}
