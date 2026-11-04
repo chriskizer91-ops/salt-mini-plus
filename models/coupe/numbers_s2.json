@@ -1,0 +1,33 @@
+{
+ "car": "coupe",
+ "studio": {
+  "triangles": 480718,
+  "triangles_bay_up": 512052,
+  "by_piece": {
+   "body": 188442,
+   "hood": 15122,
+   "hide": 143,
+   "cabin": 45852,
+   "under": 4303,
+   "bay": 31334,
+   "wheel": 53094,
+   "brake": 3620
+  },
+  "build_ms": 6010
+ },
+ "studio2": {
+  "triangles": 707820,
+  "triangles_bay_up": 707820,
+  "by_piece": {
+   "body": 208109,
+   "hood": 16538,
+   "hide": 0,
+   "cabin": 45478,
+   "under": 210839,
+   "bay": 0,
+   "wheel": 53094,
+   "brake": 3620
+  },
+  "build_ms": 6496
+ }
+}

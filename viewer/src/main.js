@@ -55,6 +55,8 @@ const key=new THREE.DirectionalLight(0xffffff,1.8);key.position.set(3.2,7.5,2.4)
 const SMAP=PHONE?2048:4096;key.shadow.mapSize.set(SMAP,SMAP);Object.assign(key.shadow.camera,{left:-4.5,right:4.5,top:4.5,bottom:-4.5,near:1,far:22});
 key.shadow.radius=6;key.shadow.blurSamples=16;key.shadow.bias=-.0004;key.shadow.normalBias=.02;scene.add(key,key.target);
 const rim=new THREE.DirectionalLight(0xdfe8ff,.7);rim.position.set(-6,3,-4);scene.add(rim);
+/* (a soft light from below, as under a car on a lift, on only while the camera is down under the sills) */
+const pit=new THREE.DirectionalLight(0xffffff,0);pit.position.set(1.5,-6,1);scene.add(pit,pit.target);
 const {meshes,setLights:matLights,mergedMeshes}=makeMats(THREE,K);
 
 /* ---------- the baked car: its meshes unpacked (positions 16-bit in a box, normals 8-bit, the atlas 16-bit, a material
@@ -190,7 +192,7 @@ function hud(){if(!cur)return;const t=countTris(cur.root);
 /* ---------- the loop (held by the picture tool) ---------- */
 let held=false;
 function keepNear(){if(!cur)return;const t=controls.target,L=cur.D.L;t.x=Math.max(-L*.75,Math.min(L*.75,t.x));t.y=Math.max(-.4,Math.min(2.8,t.y));t.z=Math.max(-2.4,Math.min(2.4,t.z));
-  const under=camera.position.y<.01;floor.visible=!under;pool.visible=!under;}
+  const under=camera.position.y<.01;floor.visible=!under;pool.visible=!under;pit.intensity=camera.position.y<.3?1.1:0;}
 const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();let fly=null;
 function focusAt(cx,cy){const r=cv.getBoundingClientRect();ndc.set((cx-r.left)/r.width*2-1,-(cy-r.top)/r.height*2+1);ray.setFromCamera(ndc,camera);
   const hit=ray.intersectObject(car,true).find(h=>isShown(h.object)&&!(h.object.material&&h.object.material.transparent));if(!hit)return false;

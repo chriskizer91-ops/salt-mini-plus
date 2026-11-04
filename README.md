@@ -19,30 +19,54 @@ builds, the Coupe GT, the Hatch Group B, and the Wedge and Hypercar with their N
 the game's own and Studio only: they have no baked version.
 
 <!-- TABLE -->
-| Car | Status | Studio triangles | Baked triangles | Game's own | Baked pictures (Low / Medium) | Picture |
-| --- | --- | --- | --- | --- | --- | --- |
-| [SUV](models/suv/) | Done | 484,359 (+3,000 engine bay) | 51,408 | 51,586 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![SUV](models/suv/docs/front34.webp) |
-| [Pickup](models/pickup/) | Done | 545,652 (+31,712 engine bay) | 53,950 | 54,356 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Pickup](models/pickup/docs/front34.webp) |
-| [Hatch](models/hatch/) | Done | 430,908 (+31,178 engine bay) | 46,655 | 46,833 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Hatch](models/hatch/docs/front34.webp) |
-| [Wagon](models/wagon/) | Done | 532,457 (+33,666 engine bay) | 52,006 | 52,334 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Wagon](models/wagon/docs/front34.webp) |
-| [EV](models/ev/) | Done | 498,744 (+23,526 engine bay) | 55,314 | 55,432 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![EV](models/ev/docs/front34.webp) |
-| [Trail (4x4)](models/trail/) | Done | 492,105 (+27,684 engine bay) | 50,181 | 50,799 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Trail (4x4)](models/trail/docs/front34.webp) |
-| [Coupe](models/coupe/) | Done | 480,718 (+31,334 engine bay) | 50,361 | 50,475 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Coupe](models/coupe/docs/front34.webp) |
-| [Muscle](models/muscle/) | Done | 420,615 (+30,160 engine bay) | 58,121 | 58,395 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Muscle](models/muscle/docs/front34.webp) |
-| [SUV Sleeper](models/suv-sleeper/) | Done | 603,760 (+36,306 engine bay) | Studio only | 51,654 | Studio only | ![SUV Sleeper](models/suv-sleeper/docs/front34.webp) |
-| [SUV Rock & Mud](models/suv-rockmud/) | Done | 528,718 (+34,076 engine bay) | Studio only | 61,432 | Studio only | ![SUV Rock & Mud](models/suv-rockmud/docs/front34.webp) |
-| [SUV Race](models/suv-race/) | Done | 481,953 (+37,330 engine bay) | Studio only | 49,108 | Studio only | ![SUV Race](models/suv-race/docs/front34.webp) |
-| [Coupe GT](models/coupe-gt/) | Done | 430,719 (+31,390 engine bay) | Studio only | 52,023 | Studio only | ![Coupe GT](models/coupe-gt/docs/front34.webp) |
-| [Hatch Group B](models/hatch-groupb/) | Done | 455,649 (+31,206 engine bay) | Studio only | 52,579 | Studio only | ![Hatch Group B](models/hatch-groupb/docs/front34.webp) |
-| [Wedge](models/wedge/) | Done | 499,931 (+20,510 engine bay) | Studio only | 45,696 | Studio only | ![Wedge](models/wedge/docs/front34.webp) |
-| [Wedge Night Runner](models/wedge-nightrunner/) | Done | 535,168 (+20,538 engine bay) | Studio only | 48,735 | Studio only | ![Wedge Night Runner](models/wedge-nightrunner/docs/front34.webp) |
-| [Hypercar](models/hyper/) | Done | 602,807 (+20,430 engine bay) | Studio only | 50,283 | Studio only | ![Hypercar](models/hyper/docs/front34.webp) |
-| [Hypercar Track](models/hyper-track/) | Done | 537,951 (+20,458 engine bay) | Studio only | 48,841 | Studio only | ![Hypercar Track](models/hyper-track/docs/front34.webp) |
+| Car | Status | Studio triangles | Studio 2 triangles | Baked triangles | Game's own | Baked pictures (Low / Medium) | Picture |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [SUV](models/suv/) | Done | 484,359 (+3,000 engine bay) | 808,095 | 51,408 | 51,586 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![SUV](models/suv/docs/front34.webp) |
+| [Pickup](models/pickup/) | Done | 545,652 (+31,712 engine bay) | To do | 53,950 | 54,356 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Pickup](models/pickup/docs/front34.webp) |
+| [Hatch](models/hatch/) | Done | 430,908 (+31,178 engine bay) | To do | 46,655 | 46,833 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Hatch](models/hatch/docs/front34.webp) |
+| [Wagon](models/wagon/) | Done | 532,457 (+33,666 engine bay) | To do | 52,006 | 52,334 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Wagon](models/wagon/docs/front34.webp) |
+| [EV](models/ev/) | Done | 498,744 (+23,526 engine bay) | To do | 55,314 | 55,432 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![EV](models/ev/docs/front34.webp) |
+| [Trail (4x4)](models/trail/) | Done | 492,105 (+27,684 engine bay) | To do | 50,181 | 50,799 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Trail (4x4)](models/trail/docs/front34.webp) |
+| [Coupe](models/coupe/) | Done | 480,718 (+31,334 engine bay) | 707,820 | 50,361 | 50,475 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Coupe](models/coupe/docs/front34.webp) |
+| [Muscle](models/muscle/) | Done | 420,615 (+30,160 engine bay) | To do | 58,121 | 58,395 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Muscle](models/muscle/docs/front34.webp) |
+| [SUV Sleeper](models/suv-sleeper/) | Done | 603,760 (+36,306 engine bay) | To do | Studio only | 51,654 | Studio only | ![SUV Sleeper](models/suv-sleeper/docs/front34.webp) |
+| [SUV Rock & Mud](models/suv-rockmud/) | Done | 528,718 (+34,076 engine bay) | To do | Studio only | 61,432 | Studio only | ![SUV Rock & Mud](models/suv-rockmud/docs/front34.webp) |
+| [SUV Race](models/suv-race/) | Done | 481,953 (+37,330 engine bay) | To do | Studio only | 49,108 | Studio only | ![SUV Race](models/suv-race/docs/front34.webp) |
+| [Coupe GT](models/coupe-gt/) | Done | 430,719 (+31,390 engine bay) | To do | Studio only | 52,023 | Studio only | ![Coupe GT](models/coupe-gt/docs/front34.webp) |
+| [Hatch Group B](models/hatch-groupb/) | Done | 455,649 (+31,206 engine bay) | To do | Studio only | 52,579 | Studio only | ![Hatch Group B](models/hatch-groupb/docs/front34.webp) |
+| [Wedge](models/wedge/) | Done | 499,931 (+20,510 engine bay) | To do | Studio only | 45,696 | Studio only | ![Wedge](models/wedge/docs/front34.webp) |
+| [Wedge Night Runner](models/wedge-nightrunner/) | Done | 535,168 (+20,538 engine bay) | To do | Studio only | 48,735 | Studio only | ![Wedge Night Runner](models/wedge-nightrunner/docs/front34.webp) |
+| [Hypercar](models/hyper/) | Done | 602,807 (+20,430 engine bay) | To do | Studio only | 50,283 | Studio only | ![Hypercar](models/hyper/docs/front34.webp) |
+| [Hypercar Track](models/hyper-track/) | Done | 537,951 (+20,458 engine bay) | To do | Studio only | 48,841 | Studio only | ![Hypercar Track](models/hyper-track/docs/front34.webp) |
 <!-- /TABLE -->
 
 "Studio triangles" is the whole car as you see it with the hood shut: body, cabin, lamps, the four wheels and their
 brakes, and the Trail's spare on its door. The engine bay is counted separately because it's only drawn with the hood
 up. The baked pictures' memory includes their mipmaps.
+
+## Studio 2
+
+The Studio car with the rest of it built again: everything a close camera, a low camera and the garage can see.
+Its underside is built whole in place of the game's, its engine bay is its own (showing what that build runs, in
+the game's colours for it), and it wears the road-car bits. The wheel houses are deeper and the cabin is finished.
+Each is its own entry, `HD_CARS[id + '2']`, picked with `KIT.setAlt('2')`. The shape, wheelbase, track, ride height
+and wheel positions are exactly the game's.
+
+- **Its own pieces:** the underside and the engine bay are separate, so the game can leave out what can't be seen.
+  The wheels come in two: what turns (`wheel`) and what only steers (`brake`).
+- **Studio 1 and Game never change:** after each car, every car's Studio and Game is built and every part's arrays
+  are compared with before (`models/tools/same_check.js`).
+- **Pictures:** each car's `docs/s2_*.webp`, Studio and Studio 2 side by side (`sh models/tools/s2_car.sh <car> <folder>`).
+- **"Whole car"** is everything drawn with the hood shut: the four wheels and brakes counted, and the engine bay too,
+  because Studio 2 draws it all the time (it shows from underneath and through the grille). "Hood" is the hood with
+  what lifts with it. "Build" is how long it takes to build here, in Node (the viewer in Edge takes about as long).
+
+<!-- S2TABLE -->
+| Car | Whole car | Body | Underside | Engine bay | Cabin | Hood | One wheel | One brake | Build | Pictures |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| SUV | 808,095 | 249,956 | 209,125 | 63,374 | 82,440 | 12,224 | 44,684 | 3,060 | 9.2 s | [front](models/suv/docs/s2_front34.webp), [rear](models/suv/docs/s2_rear34low.webp), [under](models/suv/docs/s2_under.webp), [bay](models/suv/docs/s2_bay.webp), [cabin](models/suv/docs/s2_cabin.webp) |
+| Coupe | 707,820 | 208,109 | 210,839 | in the underside | 45,478 | 16,538 | 53,094 | 3,620 | 6.5 s | [front](models/coupe/docs/s2_front34.webp), [rear](models/coupe/docs/s2_rear34low.webp), [under](models/coupe/docs/s2_under.webp), [bay](models/coupe/docs/s2_bay.webp), [cabin](models/coupe/docs/s2_cabin.webp) |
+<!-- /S2TABLE -->
 
 ## The viewer
 
@@ -53,7 +77,7 @@ up. The baked pictures' memory includes their mipmaps.
 - **The bar along the bottom:**
   - the car's name: pick a car
   - **Game / Studio / Studio 2 / Baked**: switch between the versions. Studio 2 shows where a car has one (so far the
-    Coupe): the Studio car with the rest of it built again, its underside whole, its own engine bay and the road-car
+    Coupe and the SUV Stock): the Studio car with the rest of it built again, its underside whole, its own engine bay and the road-car
     bits. Its underside and bay are pieces of their own, and the bay is drawn with the hood shut too (it shows from
     underneath)
   - **Hood**: open or close the hood
@@ -62,6 +86,7 @@ up. The baked pictures' memory includes their mipmaps.
 - **On the phone:** to keep the screen clear, the versions are one button that says which is showing (tap it for the
   others), and Paint, Lights, the camera views (Under among them) and Reset are under **•••**.
 - **Top right:** the car, the version, its triangle count and its draw calls.
+- **Underneath:** with the camera down under the sills, a soft light comes on from below, as under a car on a lift.
 
 The Studio cars are built in the page from the code, the same way SUV Studio builds its truck. That takes a few
 seconds the first time you pick each one. The baked cars are unpacked from their pictures.

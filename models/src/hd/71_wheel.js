@@ -9,8 +9,10 @@
    - The brake behind it: a vented rotor (two plates, forty vanes, a hat), a single-piston floating caliper
      with its bracket, slide-pin boots and bleeder, and the dust shield.
    ===================================================================================== */
-function hdWheel(w,b){
-  const out=new MB(),R=w.R,W=w.W,hw=W/2,rimR=w.rim*.0254/2,base=R-.009;
+/* (Salt Mini Plus: given fixed, an MB, what only steers goes there instead, the dust shield and the caliper with its
+   bracket, pins and bleeder, as a Studio 2 car's wheels are in two pieces: what turns, and what only steers) */
+function hdWheel(w,b,fixed){
+  const out=new MB(),FX=fixed||out,R=w.R,W=w.W,hw=W/2,rimR=w.rim*.0254/2,base=R-.009;
   /* ---------- the tyre carcass ---------- */
   hdPart(out,mb=>{
     const half=[[rimR+.004,.094],[rimR+.016,.099],[rimR+.03,.107],[rimR+.045,.114],[rimR+.054,.1195],[rimR+.06,.1215],[rimR+.066,.1205],[rimR+.072,.118],
@@ -94,20 +96,20 @@ function hdWheel(w,b){
   /* the hat: the rotor's centre, out to the hub's mounting face */
   hdPart(out,mb=>{hdRev(mb,[[ri+.002,zc+.014],[.088,zc+.016],[.085,.004],[.04,.004],[.04,-.002]],96,HC.ROTORF,0,TAU,true);},30);
   /* the dust shield behind */
-  hdPart(out,mb=>{hdRev(mb,[[.06,zc-.05],[.17,zc-.044],[.182,zc-.03],[.184,zc-.022]],96,HC.CAST);},35);
+  hdPart(FX,mb=>{hdRev(mb,[[.06,zc-.05],[.17,zc-.044],[.182,zc-.03],[.184,zc-.022]],96,HC.CAST);},35);
   /* the caliper: a floating single-piston body over the top-rear of the rotor */
   const ca0=PI*.56,ca1=PI*.84,cr=.152;
-  hdPart(out,mb=>{const path=[],n=14;for(let i=0;i<=n;i++){const a=ca0+(ca1-ca0)*i/n;path.push([Math.cos(a)*cr,Math.sin(a)*cr,zc-.004]);}
+  hdPart(FX,mb=>{const path=[],n=14;for(let i=0;i<=n;i++){const a=ca0+(ca1-ca0)*i/n;path.push([Math.cos(a)*cr,Math.sin(a)*cr,zc-.004]);}
     /* the body's section across its arc: radial (x) and along the axle (y), a rounded box */
     const sec=hdRRect(.03,.034,.011,5).map(([x,y])=>[y,x]);hdSweep(mb,path,sec,cal,[0,0,1],true,true);},40);
   /* the piston's housing on the inboard side, and the bridge's ribs */
   {const am=(ca0+ca1)/2,c=Math.cos(am),s=Math.sin(am);
-    hdPart(out,mb=>{hdCyl(mb,[c*.15,s*.15,zc-.03],[c*.15,s*.15,zc-.062],.03,.027,28,cal);},40);
-    for(const t of [.2,.5,.8]){const a=ca0+(ca1-ca0)*t;hdPart(out,mb=>{hdRBox(mb,[Math.cos(a)*.184,Math.sin(a)*.184,zc-.004],[.006,.006,.03],.004,cal,2);},40,null);}
+    hdPart(FX,mb=>{hdCyl(mb,[c*.15,s*.15,zc-.03],[c*.15,s*.15,zc-.062],.03,.027,28,cal);},40);
+    for(const t of [.2,.5,.8]){const a=ca0+(ca1-ca0)*t;hdPart(FX,mb=>{hdRBox(mb,[Math.cos(a)*.184,Math.sin(a)*.184,zc-.004],[.006,.006,.03],.004,cal,2);},40,null);}
     /* the slide pins' rubber boots and the bracket's ends, and the bleeder */
     for(const a of [ca0-.06,ca1+.06]){const c2=Math.cos(a),s2=Math.sin(a);
-      hdPart(out,mb=>{hdCyl(mb,[c2*.146,s2*.146,zc-.03],[c2*.146,s2*.146,zc-.052],.009,.007,14,SV([.02,.02,.022],MAT.RUBBER));},40);
-      hdPart(out,mb=>{hdRBox(mb,[c2*.146,s2*.146,zc-.012],[.016,.016,.018],.005,HC.CAST,2);},40);}
-    hdPart(out,mb=>{hdCyl(mb,[c*.18,s*.18,zc-.05],[c*.196,s*.196,zc-.055],.004,.004,10,HC.BOLT);},40);}
+      hdPart(FX,mb=>{hdCyl(mb,[c2*.146,s2*.146,zc-.03],[c2*.146,s2*.146,zc-.052],.009,.007,14,SV([.02,.02,.022],MAT.RUBBER));},40);
+      hdPart(FX,mb=>{hdRBox(mb,[c2*.146,s2*.146,zc-.012],[.016,.016,.018],.005,HC.CAST,2);},40);}
+    hdPart(FX,mb=>{hdCyl(mb,[c*.18,s*.18,zc-.05],[c*.196,s*.196,zc-.055],.004,.004,10,HC.BOLT);},40);}
   return out;
 }
