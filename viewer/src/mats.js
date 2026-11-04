@@ -36,6 +36,8 @@ function matFor0(id,em,b){
     case MAT.TAIL:return P({color:col('#7a0a06'),roughness:.08,metalness:.1,clearcoat:1,clearcoatRoughness:.02,emissive:col('#ff1206'),emissiveIntensity:.05});
     case MAT.HEAD:return P({color:col('#d8dce0'),metalness:.95,roughness:.07,clearcoat:1,clearcoatRoughness:.01});
     case MAT.LED:return P({color:col('#ffffff'),emissive:col('#dfe8ff'),emissiveIntensity:1.2});
+    /* (a build's neon: the Night Runner's glow tube and strips, lit in its second colour) */
+    case MAT.UNDERGLOW:case MAT.STRIP:return P({color:col(b.paint2),emissive:col(b.paint2),emissiveIntensity:1.6,roughness:.3});
     case MAT.AMBER:return P({color:col('#c9661c'),roughness:.08,metalness:.15,clearcoat:1,clearcoatRoughness:.02,emissive:col('#ff7a10'),emissiveIntensity:.04});
     case MAT.MESH:return P({color:col('#0c0c0d'),roughness:.55,metalness:.2});
     case MAT.RIM:return P({color:col(b.rim),metalness:1,roughness:.22});

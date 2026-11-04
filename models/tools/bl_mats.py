@@ -66,6 +66,7 @@ def mat_for(i, inv, B, target='cycles'):
     if k == 'SM_TINT': return glass(k, (.3, .3, .3, 1), .6)
     if k in ('MESH', 'SM_HONEY', 'SM_GLOSSBLK', 'SMOKE'): return principled(k, vc=k == 'SM_GLOSSBLK', base=None if k == 'SM_GLOSSBLK' else (.01, .01, .011, 1), rough=.18, coat=.6)
     if k == 'RIM': return principled(k, hexlin(B['rim']), metal=1, rough=.25)
+    if k in ('UNDERGLOW', 'STRIP'): return principled(k, hexlin(B['paint2']), rough=.3, emit=hexlin(B['paint2']), emit_s=3.0)
     if k == 'SM_WHITE': return principled(k, vc=True, metal=.05, rough=.35, coat=.8, coat_r=.06)
     if k == 'SM_BRUSH': return principled(k, vc=True, metal=1, rough=.15)
     if k == 'SM_ROTORF': return principled(k, vc=True, metal=.85, rough=.38)

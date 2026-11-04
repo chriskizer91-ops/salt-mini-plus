@@ -16,8 +16,11 @@ const PAGE='file://'+path.resolve(path.join(__dirname,'..','..','viewer','viewer
     const tap=async sel=>{const el=await p.$(sel);if(tag==='phone')await el.tap();else await el.click();await p.waitForTimeout(600);};
     await shot(`${tag}_1_open.png`);
     await tap('#carb');await shot(`${tag}_2_cars.png`);await tap('#carb');
-    await tap('#vers button[data-v="baked"]');await p.waitForFunction(()=>VIEWER.cur&&VIEWER.cur.v==='baked',null,{timeout:300000});await p.waitForTimeout(1500);
-    await tap('#hood');await shot(`${tag}_3_baked_hood.png`);
+    /* (a car with no baked version has no Baked button: the game's own instead, and the button seen to be hidden) */
+    const hasB=await p.evaluate(()=>!document.querySelector('#vers button[data-v="baked"]').hidden),v2=hasB?'baked':'game';
+    if(!hasB)console.log(tag,'no Baked button, as there is no baked version');
+    await tap(`#vers button[data-v="${v2}"]`);await p.waitForFunction(v=>VIEWER.cur&&VIEWER.cur.v===v,v2,{timeout:300000});await p.waitForTimeout(1500);
+    await tap('#hood');await shot(`${tag}_3_${v2}_hood.png`);
     if(tag==='phone'){await tap('#moreb');await shot(`${tag}_4_more.png`);const m=await p.$$('#more button');for(const x of m)if((await x.textContent())==='Paint'){await x.tap();break;}}
     else await tap('#paintb');
     await p.waitForTimeout(500);const sw=await p.$$('#paints .sw');if(tag==='phone')await sw[5].tap();else await sw[5].click();await p.waitForTimeout(900);
