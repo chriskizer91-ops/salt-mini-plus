@@ -1,0 +1,33 @@
+{
+ "car": "crawler",
+ "studio": {
+  "triangles": 528718,
+  "triangles_bay_up": 562794,
+  "by_piece": {
+   "body": 309789,
+   "hood": 10868,
+   "hide": 124,
+   "cabin": 53572,
+   "under": 4165,
+   "bay": 34076,
+   "wheel": 34490,
+   "brake": 3060
+  },
+  "build_ms": 8241
+ },
+ "studio2": {
+  "triangles": 790531,
+  "triangles_bay_up": 790531,
+  "by_piece": {
+   "body": 328949,
+   "hood": 12468,
+   "hide": 0,
+   "cabin": 84840,
+   "under": 147774,
+   "bay": 66300,
+   "wheel": 34490,
+   "brake": 3060
+  },
+  "build_ms": 9447
+ }
+}

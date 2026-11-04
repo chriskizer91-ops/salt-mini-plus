@@ -10,7 +10,7 @@
    - The mast aerial on the right front fender, its base and its whip leaning back.
    - Rubber seals round the side glass.
    - (On the hood, so they lift with it: the washer jets at its back edge, suvHoodBits.)
-   o.noSensors, o.noAerial, o.noMarkers: a build that doesn't wear them.
+   o.noSensors, o.noAerial, o.noMarkers, o.noTowEye: a build that doesn't wear them.
    ===================================================================================== */
 /* an oval badge on a surface (p, n): the chrome rim, the dark field, the raised chevron */
 function suvBadge(out,p,n,w=.07,h=.03){const M=cpFrame(p,n),ov=[];for(let k=0;k<40;k++){const a=k/40*TAU;ov.push([Math.cos(a)*w,Math.sin(a)*h]);}
@@ -38,7 +38,7 @@ function suvExtras2(out,car,o={}){
       hdPart(out,mb=>{hdRev(mb,[[0,.0016],[.007,.0015],[.0098,.001],[.0104,0],[.0104,-.004]],24,SV([1,1,1],MAT.CLAD));},40,null,M);};
     for(const s of [1,-1]){sensor('R',s*.22,Y(.6));sensor('R',s*.55,Y(.6));}}
   /* ---------- the tow eye's cover in the front bumper ---------- */
-  {const {p,n}=cpOn('F',.55,Y(.47),0),M=cpFrame(p,n),R=hdRRect(.026,.017,.008,5);
+  if(!o.noTowEye){const {p,n}=cpOn('F',.55,Y(.47),0),M=cpFrame(p,n),R=hdRRect(.026,.017,.008,5);
     hdPart(out,mb=>{const a=R.map(([x,y])=>[x,y,.0004]),b=R.map(([x,y])=>[x*1.06,y*1.1,.0004]);hdLoft(mb,[[...a,a[0]],[...b,b[0]]],HC.GB,false);},30,null,M);
     hdPart(out,mb=>{hdExtrude(mb,[[-.011,-.0035],[.004,-.0035],[.004,-.007],[.012,0],[.004,.007],[.004,.0035],[-.011,.0035]],0,.0008,HC.GB,0,1,false);},30,null,M);}
   /* ---------- the mast aerial on the right front fender ---------- */

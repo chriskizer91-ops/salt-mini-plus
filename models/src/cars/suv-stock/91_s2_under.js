@@ -42,7 +42,7 @@ function suvUnder2(car,o={}){
     SPR=SMC('#56606b',SM.PAINTED),DAMP=SMC('#2a2b2e',SM.PAINTED),BOLT=HC.BOLT,BLK=SMC('#141516',SM.PAINTED),CV=SMC('#7d8086',SM.ENGINE);
   const sk0=u=>secKeys(D,clamp(u,0,L)).P[0];
   /* (the frame's drop against the wheel's centre: none on the Stock; the wheel's side out at its track) */
-  const dF=dy-(LY.R-.378),tsF=LY.tw-.8,tsR=LY.twR-.8,EXT=o.exhaust||'single';
+  const dF=dy-(LY.R-.378),tsF=LY.tw-.8,tsR=LY.twR-.8,EXT=o.exhaust||'single',SOLID=o.susp==='solid',wR0=()=>LY.R;
   /* ================= the skin's underside ================= */
   /* the game's floor out of the body into the underside; the floor under the hood (the game's hide, drawn while the hood
      is shut) too, its nose kept, the rest given way to the bay (drawn all the time) and the shield under it */
@@ -103,9 +103,9 @@ function suvUnder2(car,o={}){
      it, the gearbox's, a tube ahead of the tank, one behind it, the rear (the hitch's) */
   const xm=(u,y,hw,hh,m=FRAME)=>part(mb=>{const z=RZ(u)-.01,pts=[];for(let k=0;k<=12;k++){const zz=-z+2*z*k/12;pts.push(Pt(u,y,zz));}hdSweep(mb,pts,hdRRect(hw,hh,.007,3),m,[0,1,0],true,true);},40);
   xm(.3,yb(.45),.03,.032);xm(.74,yb(.345),.028,.026);xm(2.88,yb(.37),.028,.028);xm(3.5,yb(.40),.03,.03);
-  /* (the K-member: a deep box behind the axle, swept down between the rails under the sump, the lower arms' rear
+  if(!SOLID){/* (the K-member: a deep box behind the axle, swept down between the rails under the sump, the lower arms' rear
      brackets on it) */
-  part(mb=>{const pts=[];for(let k=0;k<=16;k++){const z=-.4+.8*k/16,dip=.03*Math.cos(z/.4*PI/2);pts.push(Pt(1.16,yb(.335-dip),z));}hdSweep(mb,pts,hdRRect(.045,.03,.008,3),FRAME,[0,1,0],true,true);},40);
+  part(mb=>{const pts=[];for(let k=0;k<=16;k++){const z=-.4+.8*k/16,dip=.03*Math.cos(z/.4*PI/2);pts.push(Pt(1.16,yb(.335-dip),z));}hdSweep(mb,pts,hdRRect(.045,.03,.008,3),FRAME,[0,1,0],true,true);},40);}
   /* (the gearbox's: from rail to rail, dipping under the gearbox, its mount on top) */
   {const u=2.25;part(mb=>{const pts=[];for(let k=0;k<=18;k++){const z=-RZ(u)+2*RZ(u)*k/18,dip=.012*Math.exp(-Math.pow(z/.2,2));pts.push(Pt(u,yb(.423-dip),z));}hdSweep(mb,pts,hdRRect(.032,.022,.006,3),FRAME,[0,1,0],true,true);},40);
     for(const s of [1,-1])part(mb=>{const c=Pt(u,yb(.423),s*(RZ(u)-.04));hdRBox(mb,c,[.045,.03,.012],.004,FRAME,2);for(const dz of [-.02,.02])cpHex(mb,V3.add(c,[dz,-.03,0]),[0,-1,0],.008,.006);},30);}
@@ -126,10 +126,12 @@ function suvUnder2(car,o={}){
       suvBodyMount(U,Pt(u,y+.022,s*z1),Math.max(.004,top-(y+.022)));}
     for(const u of [.52,4.3,4.72]){const y=RY(u)+RH(u),top=u<1?yb(.5):pan(u,s*RZ(u));suvBodyMount(U,Pt(u,y,s*RZ(u)),Math.max(.004,top-y));}}
 
+  const wR=LY.R,FD=SOLID?Pt(D.uFa+.22,LY.R+.012,.16):Pt(.93,wR0()+.022+dF,-.2),fdz=SOLID?.16:-.2;
+  if(!SOLID){
   /* ================= the front suspension ================= */
   /* (the lower arm's pivots on brackets under the rail, its ball joint in the knuckle; the upper arm on the wheelhouse
      wall; the coilover between, through the upper arm's opening into the tower) */
-  const wR=LY.R,FS={F:[.78,yb(.30),.40],R:[1.10,yb(.30),.40],B:[.93,wR-.163,.715],UF:[.76,wR+.322+dF,.49],UR:[1.10,wR+.322+dF,.49],UB:[.935,wR+.267,.625],SA:[.80,wR-.048,.695],C0:[.935,.262+dy*.444+(wR-.378)*.556,.575],C1:[.935,wR+.467+dF,.565]};
+  const FS={F:[.78,yb(.30),.40],R:[1.10,yb(.30),.40],B:[.93,wR-.163,.715],UF:[.76,wR+.322+dF,.49],UR:[1.10,wR+.322+dF,.49],UB:[.935,wR+.267,.625],SA:[.80,wR-.048,.695],C0:[.935,.262+dy*.444+(wR-.378)*.556,.575],C1:[.935,wR+.467+dF,.565]};
   for(const s of [1,-1]){const Q=([u,y,z])=>Pt(u,y,s*(z>.55?z+tsF:z));
     /* the lower arm: two pressed legs, a brace across them with the coilover's clevis, the ball joint */
     const B=Q(FS.B);
@@ -178,7 +180,7 @@ function suvUnder2(car,o={}){
   /* the front differential: cast, bolted to the engine's left beside the sump, its cover facing forward, the pinion
      back toward the transfer case; the left output straight out, the right through a long shaft under the sump to its
      support bearing on the block */
-  const FD=Pt(.93,wR+.022+dF,-.2),fdz=-.2;
+
   {part(mb=>{const rings=[];for(let k=0;k<=14;k++){const t=k/14,u=.81+.25*t,e=Math.sin(Math.max(.08,Math.min(1,t*1.05))*PI)**.55,w=.11*e,h=.1*e;
       rings.push(hdRRect(Math.max(.02,w),Math.max(.02,h),Math.max(.01,Math.min(w,h)*.6),5).map(([z,y])=>Pt(u,FD[1]+y,fdz+z)));}hdLoft(mb,rings,ALU,true);hdCap(mb,rings[0],ALU,true);hdCap(mb,rings[14],ALU,false);},35);
     part(mb=>{for(let k=0;k<10;k++){const a=k/10*TAU;cpHex(mb,Pt(.815,FD[1]+Math.sin(a)*.085,fdz+Math.cos(a)*.095),[1,0,0],.007,.006);}
@@ -197,8 +199,9 @@ function suvUnder2(car,o={}){
     part(mb=>{const c=Pt(.93,y,.28);cpRev(mb,V3.add(c,[0,0,-.02]),V3.add(c,[0,0,.02]),[[.02,0],[.045,0],[.047,.006],[.047,.034],[.045,.04],[.02,.04]],ALU,24,30);
       hdRBox(mb,V3.add(c,[0,.07,0]),[.03,.05,.012],.006,ALU,2);for(const du of [-.02,.02])cpHex(mb,V3.add(c,[du,.11,.012]),[0,0,1],.007,.005);},30);
     half(Pt(.93,y,.31),Pt(.93,wR,.69+tsF));}
+  }
   /* the splash shield under the nose and the front of the engine, ribbed, screwed to the crossmember and the bumper */
-  {const ys=yb(.29);part(mb=>{const rows=[];for(let u=.3;u<=.82+1e-6;u+=.02){const row=[];for(let z=-.38;z<=.381;z+=.02)row.push(Pt(u,ys+.012*sm01((.4-u)/.1),z));rows.push(row);}hdLoft(mb,rows,SMC('#1a1b1d',SM.PLASTIC),false,true);},30);
+  if(!o.skids){const ys=yb(.29);part(mb=>{const rows=[];for(let u=.3;u<=.82+1e-6;u+=.02){const row=[];for(let z=-.38;z<=.381;z+=.02)row.push(Pt(u,ys+.012*sm01((.4-u)/.1),z));rows.push(row);}hdLoft(mb,rows,SMC('#1a1b1d',SM.PLASTIC),false,true);},30);
     part(mb=>{for(const z of [-.24,-.08,.08,.24])hdRBox(mb,Pt(.58,ys-.004,z),[.2,.004,.006],.003,SMC('#1a1b1d',SM.PLASTIC),1);
       for(const [u,z] of [[.32,-.3],[.32,.3],[.32,0],[.8,-.3],[.8,.3],[.56,-.37],[.56,.37]])hdCyl(mb,Pt(u,ys-.001,z),Pt(u,ys-.005,z),.008,.007,12,STEEL);
       for(let z=-.12;z<=.121;z+=.04)hdRBox(mb,Pt(.48,ys-.002,z),[.05,.002,.012],.002,SMC('#0b0b0c',SM.PLASTIC),1);},30);}
@@ -228,10 +231,10 @@ function suvUnder2(car,o={}){
       cpHex(mb,Pt(2.5,yc-.18,-.04),[0,-1,0],.011,.006);cpHex(mb,Pt(2.45,yc-.06,.095),[0,0,1],.011,.006);
       hdTube(mb,[Pt(2.44,yc+.12,-.04),Pt(2.44,yc+.2,-.02),Pt(2.3,yb(.74),.05)],.004,6,HOSE,false,true);},30);
     cpRev(U,Pt(2.62,axY(2.62)-.02,0),Pt(2.68,axY(2.62)-.025,0),[[0,0],[.042,0],[.045,.01],[.045,.04],[.035,.05],[.038,.06],[0,.06]],ALU,24,35);
-    cpRev(U,Pt(2.33,yb(.49),-.15),Pt(2.27,yb(.488),-.152),[[0,0],[.038,0],[.04,.012],[.04,.04],[.03,.06],[0,.06]],ALU,24,35);}
+    cpRev(U,Pt(2.33,yb(.49),SOLID?.15:-.15),Pt(2.27,yb(.488),SOLID?.152:-.152),[[0,0],[.038,0],[.04,.012],[.04,.04],[.03,.06],[0,.06]],ALU,24,35);}
   /* the front driveshaft, from the transfer case's front output forward along the left of the gearbox and the sump to
      the front differential's pinion: CV joints each end in their boots */
-  {const a=Pt(2.27,yb(.488),-.152),b=Pt(1.1,FD[1]+.012,fdz-.005),d=V3.norm(V3.sub(b,a));
+  {const a=Pt(2.27,yb(.488),SOLID?.152:-.152),b=SOLID?FD:Pt(1.1,FD[1]+.012,fdz-.005),d=V3.norm(V3.sub(b,a));
     cpBoot(U,a,V3.add(a,V3.mul(d,.08)),.034,.022,6);cpRev(U,V3.add(a,V3.mul(d,.08)),V3.add(b,V3.mul(d,-.08)),[[.022,0],[.022,V3.len(V3.sub(b,a))-.16]],STEEL,16,40);
     cpBoot(U,V3.add(b,V3.mul(d,-.08)),b,.022,.034,6);}
   /* the rear driveshaft: the slip yoke out of the transfer case, a U-joint, the tube with its balance weights, a
@@ -298,8 +301,22 @@ function suvUnder2(car,o={}){
       /* the tip: polished, rolled at its end, where the game's comes out */
       const a=Q([L-.12,yb(.43),.64]),b=Q([L+.04,yb(.43),.64]);cpRev(U,a,b,[[.03,0],[.044,.014],[.048,.022],[.048,.154],[.044,.16],[.04,.156],[.04,.03]],MM.CHROME,32,40);
       cpRev(U,V3.add(b,[.07,0,0]),V3.add(b,[.004,0,0]),[[0,0],[.034,0],[.034,.06]],SMC('#151515',SM.CAST),20,40);D.tips.push({p:b,d:[-1,0,0],r:.048});}}
+  /* (a crawler's: the headers' collectors joined in a Y, one pipe tucked up along the right rail, its muffler, over
+     the rear axle and out to the game's tip, turned down behind the rear wheel) */
+  else if(EXT==='crawl'){const r=.03,TUBE=(pts,rr=r,m=EXH2())=>part(mb=>{hdTube(mb,suvPath(pts,5,2),rr,14,m,false,true);},40);D.tips=[];
+    for(const e of (car.bay&&car.bay.ex)||[]){const s=e.s,Q=([u,y,z])=>Pt(u,y,s*z);
+      part(mb=>{obox(mb,V3.add(e.p,[-.004,0,0]),[1,0,0],[0,1,0],[0,0,1],[.004,.04,.04],EXHB);for(const dd of [-.03,.03])cpHex(mb,V3.add(e.p,[-.008,dd,0]),[-1,0,0],.007,.006);},30);
+      TUBE([V3.add(e.p,[-.008,0,0]),Q([1.42,yb(.43),.36]),Q([1.7,yb(.41),.3]),Q([1.95,yb(.405),s>0?.22:.0]),Q([2.1,yb(.405),s>0?.2:-.18])],.032);}
+    part(mb=>{ball(mb,Pt(2.12,yb(.405),.2),.04,16,EXH2());},40);
+    TUBE([Pt(2.12,yb(.405),.2),Pt(2.3,yb(.41),.3),Pt(2.38,yb(.41),.34)],.034);
+    cpRev(U,Pt(2.38,yb(.41),.34),Pt(2.84,yb(.41),.34),[[0,0],[.034,0],[.06,.04],[.062,.07],[.062,.39],[.06,.42],[.034,.46],[0,.46]],SMC('#2a2b2e',SM.PAINTED),28,35);
+    TUBE([Pt(2.84,yb(.41),.34),Pt(3.0,yb(.41),.38),Pt(3.4,yb(.43),.38),Pt(3.65,LY.Rr+.13,.38),Pt(3.95,LY.Rr+.13,.38),Pt(4.2,yb(.48),.42),Pt(4.45,yb(.5),.59),Pt(L-.22,yb(.5),.59),Pt(L-.22+.01,yb(.5),.55)],.03);
+    for(const [u,z,y] of [[2.6,.34,yb(.41)+.06],[3.3,.38,yb(.43)],[4.55,.59,yb(.5)]])part(mb=>{const c=Pt(u,y,z),t=V3.add(c,[0,.045,0]);hdCyl(mb,c,t,.005,.005,8,STEEL);hdCyl(mb,V3.add(t,[-.016,0,0]),V3.add(t,[.016,0,0]),.019,.019,14,RB);hdRBox(mb,V3.add(t,[0,.024,0]),[.022,.004,.022],.003,STEEL,1);},30);
+    {const a=Pt(L-.22,yb(.5),.55),d=V3.norm([-.6,-.8,0]),bw=V3.add(a,V3.mul(d,.1));
+      cpRev(U,V3.add(a,V3.mul(d,-.02)),bw,[[.028,0],[.038,.012],[.04,.02],[.04,.1],[.036,.106],[.033,.102],[.033,.03]],MM.CHROME,32,40);D.tips.push({p:bw,d:[d[0],d[1],d[2]],r:.04});}}
 
   /* ================= the rear ================= */
+  if(!SOLID){
   /* the subframe: two side members, a beam ahead of the axle and one behind, on four bushes up to the rails */
   const sfy=yb(.305),sfz=.34;
   for(const s of [1,-1]){cpBar(U,[Pt(3.56,sfy+.01,s*sfz),Pt(3.7,sfy,s*sfz),Pt(3.95,sfy,s*sfz),Pt(4.16,sfy+.012,s*sfz)],.026,.03,.008,FRAME,[0,1,0],38);
@@ -347,6 +364,71 @@ function suvUnder2(car,o={}){
     for(const s of [1,-1]){part(mb=>{hdRBox(mb,Pt(u,y,s*.26),[.02,.02,.018],.008,RB,2);hdRBox(mb,Pt(u,y+.004,s*.26),[.024,.018,.011],.005,STEEL,2);hdRBox(mb,Pt(u+.03,(y+sfy)/2,s*.26),[.004,(y-sfy)/2+.01,.016],.004,FRAME,2);},30);
       part(mb=>{const a=Pt(3.99,y-.005,s*.56),b=Pt(3.99,yb(.272),s*.56);hdCyl(mb,a,b,.0055,.0055,8,STEEL);ball(mb,a,.011,10,BOLT);ball(mb,b,.011,10,BOLT);},35);}}
 
+  }
+  /* ================= solid axles (a lifted build's, susp 'solid') ================= */
+  /* each: the housing (its differential on the right, as the game's, a red cover, the truss along its top, the pinion
+     toward the transfer case), kingpin knuckles at the front, two long lower links and two upper ones to the frame, a
+     track bar at the front, coilovers up into the towers and bypass shocks beside them, hydraulic bump stops, limit
+     straps; the front's steering: the box on the left horn, the drag link, the tie rod and its hydraulic ram */
+  if(SOLID){const RED=SMC('#b8261c',SM.PAINTED),SPRS=o.spring?SMC(o.spring,SM.PAINTED):SMC('#c8301c',SM.PAINTED),LINK=SMC('#2c2d30',SM.PAINTED),BYP=SMC('#1f4fb8',SM.PAINTED),BYPS=SMC('#c4c6ca',SM.BRUSH);
+    for(const front of [1,0]){const ua=front?D.uFa:D.uRa,dir=front?1:-1,R=front?LY.R:LY.Rr,tw=front?LY.tw:LY.twR,zk=tw-.075,zD=.16,yA=R,Pa=(du,y,z)=>Pt(ua+du,y,z);
+      /* the centre section: the pumpkin, the cover's bolts, the fill plug, the pinion's snout and its yoke */
+      part(mb=>{ball(mb,Pa(0,yA,zD),.15,28,CASTI);hdCyl(mb,Pa(-dir*.06,yA,zD),Pa(-dir*.12,yA,zD),.135,.13,32,RED);for(let k=0;k<10;k++){const a=k/10*TAU;cpHex(mb,Pa(-dir*.122,yA+Math.sin(a)*.115,zD+Math.cos(a)*.115),[-dir,0,0],.008,.007);}
+        cpHex(mb,Pa(-dir*.124,yA+.03,zD),[-dir,0,0],.014,.008);for(let k=-2;k<=2;k++)hdRBox(mb,Pa(-dir*.123,yA,zD+k*.04),[.003,.09-Math.abs(k)*.02,.006],.002,RED,1);},35);
+      cpRev(U,Pa(dir*.1,yA,zD),Pa(dir*.21,yA+.008,zD),[[0,0],[.075,0],[.06,.04],[.045,.08],[.045,.1],[.05,.11],[0,.11]],CASTI,28,35);
+      /* the tubes out to the ends, the truss over them, the brackets for the links and the coilovers */
+      part(mb=>{hdCyl(mb,Pa(0,yA,zD-.12),Pa(0,yA,-zk+.05),.047,.047,24,CASTI);hdCyl(mb,Pa(0,yA,zD+.12),Pa(0,yA,zk-.05),.047,.047,24,CASTI);
+        for(const z of [-zk+.08,zk-.08,zD-.13,zD+.13])hdCyl(mb,Pa(0,yA,z-.008),Pa(0,yA,z+.008),.052,.052,24,CASTI);},35);
+      part(mb=>{const t=[Pa(0,yA+.05,-zk+.12),Pa(0,yA+.09,-.3),Pa(0,yA+.12,zD-.05),Pa(0,yA+.12,zD+.05),Pa(0,yA+.09,.45),Pa(0,yA+.05,zk-.12)];hdSweep(mb,suvPath(t,4,1),[[-.004,-.04],[.004,-.04],[.004,.0],[-.004,0]],LINK,[1,0,0],true,true);
+        for(const z of [-.45,-.15,.32,.5])hdRBox(mb,Pa(0,yA+.07+.02*Math.cos(z*3),z),[.004,.025,.012],.002,LINK,1);},30);
+      /* the ends: the knuckle round each C, its two ball joints, the steering arm; the rear's flanges */
+      for(const s of [1,-1]){const Q=(du,y,z)=>Pa(du,y,s*z);
+        if(front){cpRev(U,Q(0,yA,zk-.05),Q(0,yA,zk+.005),[[0,0],[.06,0],[.06,.055],[0,.055]],CASTI,28,35);
+          part(mb=>{hdRBox(mb,Q(0,yA+.11,zk-.015),[.04,.022,.035],.01,CASTI,3);hdRBox(mb,Q(0,yA-.11,zk-.015),[.04,.022,.035],.01,CASTI,3);
+            for(const e of [1,-1]){hdCyl(mb,Q(0,yA+e*.135,zk-.02),Q(0,yA+e*.16,zk-.02),.022,.02,18,FORGE);cpHex(mb,Q(0,yA+e*.165,zk-.02),[0,e,0],.012,.01);}},35);
+          cpBar(U,[Q(-.02,yA+.12,zk-.02),Q(-.1,yA+.13,zk-.03),Q(-.17,yA+.1,zk-.04)],.016,.012,.006,CASTI,[0,1,0],40);}
+        else part(mb=>{hdCyl(mb,Q(0,yA,zk-.06),Q(0,yA,zk+.005),.075,.075,28,CASTI);for(let k=0;k<6;k++){const a=k/6*TAU;cpHex(mb,Q(Math.cos(a)*.058,yA+Math.sin(a)*.058,zk+.005),[0,0,s],.007,.006);}},35);
+        /* the lower link: long, a rod end each end in its bracket, the frame's bracket hanging under the rail */
+        {const a=Q(0,yA-.085,.45),fu=ua+dir*.95,b=Pt(fu,yb(.37),s*.47);
+          part(mb=>{hdCyl(mb,V3.lerp(a,b,.04),V3.lerp(a,b,.96),.024,.024,16,LINK);ball(mb,a,.03,14,BOLT);ball(mb,b,.03,14,BOLT);for(const t of [.1,.9])hdCyl(mb,V3.lerp(a,b,t-.02),V3.lerp(a,b,t+.02),.028,.028,6,BOLT);
+            for(const dz of [-.03,.03]){hdRBox(mb,V3.add(a,[0,.03,dz]),[.035,.05,.004],.004,LINK,2);hdRBox(mb,V3.add(b,[0,.04,dz]),[.035,.06,.004],.004,FRAME,2);}},35);}
+        /* the coilover, up into the tower; the bypass shock beside it, its three tubes and its reservoir */
+        cpCoilover(U,Q(dir*.12,yA+.06,tw-.3),Pt(ua+dir*.12,yb(.86),s*.6),{bodyL:.32,s0:.16,s1:.55,rs:.062,turns:7,wire:.012,spring:SPRS,body:DAMP,seat:STEEL});
+        {const a=Q(-dir*.12,yA+.03,tw-.27),b=Pt(ua-dir*.12,yb(.9),s*.62),d=V3.norm(V3.sub(b,a)),Lb=V3.len(V3.sub(b,a));
+          cpRev(U,a,V3.add(a,V3.mul(d,Lb*.55)),[[0,0],[.033,0],[.035,.02],[.035,Lb*.53],[.025,Lb*.55]],BYP,24,35);cpRev(U,V3.add(a,V3.mul(d,Lb*.55)),b,[[.011,0],[.011,Lb*.45]],MM.CHROME,14,40);
+          part(mb=>{const sd=V3.norm(V3.cross(d,[1,0,0]));for(let k=0;k<3;k++){const off=V3.mul(V3.norm(V3.add(V3.mul(sd,Math.cos(k*.5-.5)),[0,0,0])),.048),p0=V3.add(V3.add(a,V3.mul(d,Lb*.08)),off),p1=V3.add(V3.add(a,V3.mul(d,Lb*.48)),off);
+            hdCyl(mb,p0,p1,.009,.009,10,BYPS);hdRBox(mb,V3.lerp(p0,p1,.5),[.006,.012,.006],.003,BYP,1);}
+            const rv=Pt(ua-dir*.12,yb(.78),s*.5);hdCyl(mb,V3.add(rv,[0,-.1,0]),V3.add(rv,[0,.1,0]),.03,.03,20,BYP);hdTube(mb,[V3.add(a,V3.mul(d,Lb*.5)),V3.add(rv,[0,-.12,0])],.006,8,SMC('#7d7f83',SM.SATIN),false,true);},35);}
+        /* the bump stop: a hydraulic can on the frame over the tube, its pad on the axle; the limit strap */
+        part(mb=>{const c=Pt(ua,yb(.6),s*.43);hdCyl(mb,c,V3.add(c,[0,-.12,0]),.03,.03,20,SMC('#c8a23a',SM.PAINTED));hdCyl(mb,V3.add(c,[0,-.12,0]),V3.add(c,[0,-.15,0]),.014,.014,12,MM.CHROME);
+          hdRBox(mb,Pa(0,yA+.055,s*.43),[.035,.008,.035],.004,LINK,2);hdRBox(mb,V3.add(c,[0,.02,0]),[.05,.012,.05],.004,FRAME,2);},30);
+        part(mb=>{const a=Pt(ua+dir*.05,yb(.62),s*.5),b=Pa(dir*.05,yA+.06,s*.5);hdSweep(mb,[a,V3.lerp(a,b,.5),b],[[-.022,-.002],[.022,-.002],[.022,.002],[-.022,.002]],SMC('#d8a21a',SM.CLOTH),[1,0,0],true,true);},30);}
+      /* the upper links, triangulated to the frame's crossmember */
+      for(const z of [zD-.13,zD+.13]){const a=Pa(dir*.05,yA+.15,z),b=Pt(ua+dir*.6,yb(.47),Math.sign(z-zD)*.27);
+        part(mb=>{hdCyl(mb,V3.lerp(a,b,.05),V3.lerp(a,b,.95),.02,.02,14,LINK);ball(mb,a,.026,12,BOLT);ball(mb,b,.026,12,BOLT);for(const dz of [-.025,.025])hdRBox(mb,V3.add(b,[0,.03,dz]),[.03,.045,.004],.004,FRAME,2);},35);}
+      part(mb=>{const u=ua+dir*.6,pts=[];for(let k=0;k<=8;k++)pts.push(Pt(u,yb(.5),-.4+.8*k/8));hdSweep(mb,pts,hdRRect(.025,.025,.006,3),FRAME,[0,1,0],true,true);},35);
+      /* the diff's guard: a steel shoe round the pumpkin's underside */
+      part(mb=>{const rows=[];for(let k=0;k<=10;k++){const a=PI*(.15+.7*k/10),row=[];for(let j=0;j<=6;j++){const z=zD-.13+.26*j/6;row.push(Pa(-Math.cos(a)*.17*dir,yA-Math.sin(a)*.17,z));}rows.push(row);}hdLoft(mb,rows,SMC('#2a2b2e',SM.PAINTED),false,front>0);},30);
+      if(front){
+        /* the track bar from the frame's left to the axle's right, its brace */
+        part(mb=>{const a=Pt(ua-.08,yb(.5),-.42),b=Pa(-.08,yA+.07,.6);hdCyl(mb,V3.lerp(a,b,.04),V3.lerp(a,b,.96),.024,.024,16,LINK);ball(mb,a,.03,12,BOLT);ball(mb,b,.03,12,BOLT);hdRBox(mb,V3.add(a,[0,.04,0]),[.04,.05,.03],.006,FRAME,2);},35);
+        /* the steering: the box on the left horn, the pitman arm, the drag link to the right knuckle, the tie rod between the
+           arms and its ram, the shaft up to the firewall */
+        const box=Pt(.48,yb(.45),-.44),pit=Pt(.52,yb(.32),-.5),arm=e=>Pa(-.17,yA+.1,e*(zk-.04));
+        part(mb=>{hdRBox(mb,box,[.07,.06,.05],.015,CASTI,3);hdCyl(mb,V3.add(box,[0,-.06,0]),pit,.016,.016,12,FORGE);ball(mb,pit,.02,12,BOLT);
+          hdCyl(mb,pit,arm(1),.017,.017,14,LINK);ball(mb,arm(1),.02,12,BOLT);hdCyl(mb,arm(-1),arm(1),.019,.019,14,LINK);
+          const r0=V3.lerp(arm(-1),arm(1),.25),r1=V3.lerp(arm(-1),arm(1),.75);hdCyl(mb,V3.add(r0,[-.03,0,0]),V3.add(V3.lerp(r0,r1,.65),[-.03,0,0]),.025,.025,18,SMC('#2c4fb0',SM.PAINTED));hdCyl(mb,V3.add(V3.lerp(r0,r1,.65),[-.03,0,0]),V3.add(r1,[-.03,0,0]),.011,.011,12,MM.CHROME);
+          for(const q of [r0,r1])hdCyl(mb,V3.add(q,[0,0,0]),V3.add(q,[-.03,0,0]),.008,.008,8,BOLT);
+          hdTube(mb,suvPath([V3.add(box,[.02,.06,0]),Pt(.7,yb(.6),-.44),Pt(1.1,yb(.72),-.4),Pt(1.38,yb(.82),-.34)],4,1),.012,12,STEEL,false,true);
+          for(const zz of [-.03,.03])hdTube(mb,suvPath([V3.add(r0,[-.03,.02,zz]),Pt(.6,yb(.4),-.3+zz),V3.add(box,[.03,.0,.05+zz])],4,1),.005,8,SMC('#7d7f83',SM.SATIN),false,true);},35);}
+      /* the brake's hoses, from the frame to each end */
+      for(const s of [1,-1])part(mb=>{const p=[Pt(ua+dir*.15,yb(.62),s*.48),Pa(dir*.1,yA+.15,s*.6),Pa(dir*.05,yA+.1,s*(zk-.06))];hdTube(mb,suvPath(p,4,1),.0065,8,HOSE,false,true);},40);}}
+  /* ================= skid plates (o.skids) ================= */
+  if(o.skids){const SK=SMC('#3b3d41',SM.PAINTED),plate=(u0,u1,y,z,holes)=>{part(mb=>{const rows=[];for(let u=u0;u<=u1+1e-6;u+=.02){const row=[];for(let zz=-z;zz<=z+1e-6;zz+=.03)row.push(Pt(u,y-.01*sm01((u0+.06-u)/.06),zz));rows.push(row);}hdLoft(mb,rows,SK,false,true);
+      const e=[];for(let u=u0;u<=u1+1e-6;u+=.04)e.push(Pt(u,y,z));hdTube(mb,e,.004,6,SK,false,true);const e2=e.map(p=>[p[0],p[1],-p[2]]);hdTube(mb,e2,.004,6,SK,false,true);},30);
+      part(mb=>{for(const [u,zz] of holes){const c=Pt(u,y-.001,zz);hdCyl(mb,c,V3.add(c,[0,-.002,0]),.03,.03,20,SMC('#111214',SM.PAINTED));}for(const u of [u0+.03,u1-.03])for(const zz of [-z+.03,z-.03])cpHex(mb,Pt(u,y-.002,zz),[0,-1,0],.009,.006);},25);};
+    plate(.28,.7,yb(.36),.4,[[.4,-.2],[.4,.2],[.55,0]]);plate(1.18,2.1,yb(.36),.22,[[1.4,0],[1.7,.1],[1.95,-.1]]);plate(2.2,2.72,yb(.37),.22,[[2.46,0]]);
+    {const [t0,t1,z0,z1]=SUV_TANK;part(mb=>{hdRBox(mb,Pt((t0+t1)/2,yb(.235),(z0+z1)/2-.01),[(t1-t0)/2+.01,.004,(z1-z0)/2-.01],.004,SK,2);for(let k=-3;k<=3;k++)hdRBox(mb,Pt((t0+t1)/2+k*.06,yb(.231),(z0+z1)/2-.01),[.006,.003,(z1-z0)/2-.04],.002,SK,1);},30);}}
   /* ================= the tank, the filler, the spare ================= */
   if(o.tank!=='cell'){const [t0,t1,z0,z1]=SUV_TANK,top=yb(.465),bot=yb(.25),TC=[(t0+t1)/2,(top+bot)/2,(z0+z1)/2];
     part(mb=>{hdRBox(mb,Pt(TC[0],TC[1],TC[2]-.01),[(t1-t0)/2-.02,(top-bot)/2,(z1-z0)/2-.03],.04,TANK,5);},35);
