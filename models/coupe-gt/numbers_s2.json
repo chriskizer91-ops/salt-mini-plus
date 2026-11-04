@@ -1,0 +1,33 @@
+{
+ "car": "coupeGT",
+ "studio": {
+  "triangles": 430719,
+  "triangles_bay_up": 462109,
+  "by_piece": {
+   "body": 210930,
+   "hood": 22848,
+   "hide": 134,
+   "cabin": 55452,
+   "under": 4187,
+   "bay": 31390,
+   "wheel": 30672,
+   "brake": 3620
+  },
+  "build_ms": 7560
+ },
+ "studio2": {
+  "triangles": 653405,
+  "triangles_bay_up": 653405,
+  "by_piece": {
+   "body": 216372,
+   "hood": 24264,
+   "hide": 0,
+   "cabin": 62070,
+   "under": 213531,
+   "bay": 0,
+   "wheel": 30672,
+   "brake": 3620
+  },
+  "build_ms": 8439
+ }
+}

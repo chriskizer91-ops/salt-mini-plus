@@ -4128,6 +4128,131 @@ function cgWingBlade(out,x,yw,hw,c,th,aoa,m){
 
 ;
 /* =====================================================================================
+   THE COUPE GT'S STUDIO 2 CABIN AND ITS OWN BITS:
+   - The cabin: the Coupe's Studio 2 cabin (cars/coupe 85 cpCabin v2: the taller tunnel, the console on it, the buckets)
+     with the cage the Studio's has (85 cgCage), and what a GT racer carries: a harness bar across the main hoop and a
+     red four-point harness on each bucket, the master cut-off's red knob on the dash's middle, the extinguisher on the
+     floor between the seats, a net in the driver's window.
+   - Outside: the cut-off's pull at the windscreen's foot, a red tow strap front and back.
+   ===================================================================================== */
+function cg2Cabin(out,car){
+  const K=HDK,D=K.D,G=D.G,X=K.X,dy=D.dy,pil=G.pillars.map(p=>p[0]),uh=pil[0]+.02,yF=.22+dy;
+  cpCabin(out,car,1);cgCage(out,car,{uh,inset:.075,r:.019});
+  const WEB=SMC('#c41e1a',SM.CLOTH),ALU=SMC('#b9bcc1',SM.BRUSH),BLK=SV([.012,.012,.013],SM.DASH),CAGE=SMC('#2c2d30',SM.SATIN),cy=(u,z)=>cpFloorY(u,z)+dy+.035;
+  /* ---------- the harness bar, the harnesses ---------- */
+  const hb=yF+.6,zb=K.sideZ(uh,hb)-.085;hdPart(out,mb=>{hdTube(mb,[[X(uh),hb,-zb],[X(uh),hb,zb]],.017,14,CAGE,false,true);},40);
+  const W=(pts,w=.022)=>hdPart(out,mb=>{hdSweep(mb,suvPath(pts,4,2),[[-w,-.0015],[w,-.0015],[w,.0015],[-w,.0015]],WEB,[0,0,1],true,true);},40);
+  for(const s of [1,-1]){const c=[X(pil[0]-.36),yF+.18,s*.4],M=M4T(c[0],c[1],c[2]),Mb=M4.mul(M,M4RZ(.3)),at=p=>M4.xform(Mb,p),bk=M4.xform(M,[.2,.13,0]);
+    for(const e of [-1,1]){W([[X(uh)+.02,hb+.017,c[2]+e*.07],at([-.11,.68,e*.06]),at([.02,.62,e*.06]),at([.03,.36,e*.055]),at([.04,.14,e*.045]),V3.add(bk,[-.03,0,e*.02])]);
+      hdPart(out,mb=>{hdRBox(mb,at([.035,.42,e*.055]),[.004,.022,.028],.003,ALU,2);},30);
+      const fl=[c[0]-.02,cy(pil[0]-.34,c[2]+e*.24)+.004,c[2]+e*.24];W([fl,M4.xform(M,[.0,.12,e*.2]),M4.xform(M,[.1,.13,e*.12]),V3.add(bk,[0,0,e*.03])]);
+      hdPart(out,mb=>{hdRBox(mb,V3.add(fl,[0,.01,0]),[.02,.01,.018],.004,ALU,2);cpHex(mb,V3.add(fl,[0,.02,0]),[0,1,0],.007,.005);},30);}
+    hdPart(out,mb=>{hdCyl(mb,V3.add(bk,[0,-.004,0]),V3.add(bk,[0,.012,0]),.04,.038,28,ALU);hdCyl(mb,V3.add(bk,[0,.012,0]),V3.add(bk,[0,.019,0]),.028,.025,24,SMC('#1a1a1c',SM.PLASTIC));},40);}
+  /* ---------- the master cut-off on the dash's middle ---------- */
+  {const u=G.cowl+.44,x=X(u),y=D.belt(u)-.17;hdPart(out,mb=>{const p=[x,y,.03];hdRBox(mb,p,[.004,.025,.025],.004,SMC('#d6b21a',SM.PLASTIC),2);hdCyl(mb,V3.add(p,[-.004,0,0]),V3.add(p,[-.024,0,0]),.016,.014,18,SMC('#c41e1a',SM.PLASTIC));
+      hdRBox(mb,V3.add(p,[-.03,0,0]),[.006,.004,.016],.003,SMC('#c41e1a',SM.PLASTIC),1);},35);}
+  /* ---------- the extinguisher on the passenger's side of the tunnel ---------- */
+  {const z=.2,u0=pil[0]-.3,u1=pil[0]-.6,rr=.048,y=Math.max(cy(u0,z),cy(u1,z))+rr+.012,A=[X(u0),y,z],B=[X(u1),y,z];
+    hdPart(out,mb=>{cpRev(mb,A,B,[[0,0],[rr*.6,0],[rr,.03],[rr,.26],[rr*.7,.29],[.016,.3]],SMC('#c41e1a',SM.PAINTED),28,40);},40);
+    hdPart(out,mb=>{hdCyl(mb,B,V3.add(B,[.03,0,0]),.016,.014,14,MM.CHROME);hdRBox(mb,V3.add(B,[.045,.02,0]),[.018,.007,.011],.004,BLK,2);
+      for(const u of [u0-.07,u1+.08]){const ring=[];for(let k=0;k<=24;k++){const a=k/24*TAU;ring.push([X(u),y+Math.sin(a)*(rr+.004),z+Math.cos(a)*(rr+.004)]);}hdTube(mb,ring,.005,6,ALU,true,false);}},40);}
+  /* ---------- the net in the driver's window ---------- */
+  {const u0=G.cowl+.45,u1=pil[0]-.12,y0=D.belt(u0)+.03,y1=D.belt(u0)+.28,p=(u,y)=>[X(u),y,-(K.sideZ(u,Math.min(y,D.belt(u)+.2))-.11)];
+    hdPart(out,mb=>{for(let k=0;k<=8;k++){const u=u0+(u1-u0)*k/8,pts=[];for(let j=0;j<=5;j++)pts.push(p(u,y0+(y1-y0)*j/5));hdTube(mb,pts,.0035,6,BLK,false,false);}
+      for(let j=0;j<=5;j++){const y=y0+(y1-y0)*j/5,pts=[];for(let k=0;k<=8;k++)pts.push(p(u0+(u1-u0)*k/8,y));hdTube(mb,pts,.0035,6,BLK,false,false);}},30);}
+}
+function cg2Bits(out,car){
+  const K=HDK,D=K.D,G=D.G,X=K.X,dy=K.dy,L=D.L,RED=SMC('#d02020',MAT.FABRIC);
+  /* the tow straps, on their loops under the splitter's middle and the diffuser's */
+  for(const [u,z,dir,y] of [[-.04,.32,1,.3+dy],[L+.02,-.3,-1,.36+dy]]){const x=X(u),a=[x-dir*.01,y,z],b=[x+dir*.08,y-.04,z];
+    hdPart(out,mb=>{const path=[a,V3.lerp(a,b,.5),b,[b[0]+dir*.012,b[1]-.02,z],[b[0]-dir*.005,b[1]-.035,z],V3.add(V3.lerp(a,b,.5),[0,-.03,0]),[a[0],a[1]-.025,z]];
+      hdSweep(mb,suvPath(path,3,1),[[-.003,-.014],[.003,-.014],[.003,.014],[-.003,.014]],RED,[0,0,1],true,true);},40);}
+  /* the cut-off's pull at the windscreen's foot, its spark sticker */
+  {const u=G.cowl-.02,z=.62,y=K.topY(u,z),p=[X(u),y+.002,z];
+    hdPart(out,mb=>{hdCyl(mb,p,V3.add(p,[0,.01,0]),.015,.015,18,HC.GB);hdCyl(mb,V3.add(p,[0,.01,0]),V3.add(p,[0,.028,0]),.004,.004,8,MM.CHROME);
+      const ring=[];for(let k=0;k<=20;k++){const a=k/20*TAU;ring.push(V3.add(p,[Math.cos(a)*.013,.038+Math.sin(a)*.011,0]));}hdTube(mb,ring,.0032,8,SMC('#c41e1a',SM.PLASTIC),true,false);},40);
+    hdPart(out,mb=>{hdExtrude(mb,[[-.02,-.016],[.02,-.016],[0,.02]],0,.0008,SMC('#1b5fd0',MAT.COL,.2),0,1,false);hdExtrude(mb,[[-.004,-.011],[.005,.0],[.0,.0],[.005,.012],[-.005,.001],[0,.001]],.0008,.0012,SMC('#e8e6df',MAT.COL,.3),0,1,false);},
+      30,null,M4.basis([X(u+.005),K.topY(u+.005,z-.06)+.0015,z-.06],[0,0,1],[-1,0,0],[0,1,0]));}
+  /* rubber seals round the side glass */
+  for(const P0 of hdSideGlass())for(const s of [1,-1]){const P=hdResample(P0,.012);if(P.length<4)continue;const pts=P.map(([u,y])=>hdSS(s,u,y,.0045));pts.push(pts[0]);
+    hdPart(out,mb=>{hdSweep(mb,pts,[[-.0045,-.002],[.0045,-.002],[.0035,.0012],[-.0035,.0012]],HC.SEAL,[0,0,s],true,false);},50);}
+}
+
+;
+/* =====================================================================================
+   THE COUPE GT'S STUDIO 2 (KIT.setAlt('2') picks HD_CARS.coupeGT2 for the build 'coupeGT'): its Studio car (80 to 86
+   here) with the rest of it built from the Coupe's Studio 2 (cars/coupe 90 to 93), as the game gives both cars the same
+   chassis and engine:
+   - the underside and the engine bay are the Coupe's, built for the Coupe's height and then set down with the GT's
+     body (cg2Low: the body's heights seen as the Coupe's while they are built, the whole moved down after), the
+     suspension's outer ends carried out to the GT's wider track and up to its wheels' centres (cg2Track); its own
+     side pipes off the right bank, along inside the sill to the game's two exits ahead of the rear wheel, beside the
+     Coupe's quads; the diffuser and the valance are the underside's (the tail's own diffuser left off);
+   - the cabin caged, harnessed, its cut-off, extinguisher and window net (95); outside the cut-off's pull, the tow
+     straps, the glass's seals (no plates, badges, markers, sensors or aerial: a race car's).
+   ===================================================================================== */
+/* (build f with the body's heights seen DY higher, the Coupe's: for the bay the hood's surface (read short of its edge,
+   where the GT's flared fender rises past it) and the arches; for the underside the sections and the skin (taken off
+   the body as the body is, then seen as the Coupe's). Returns what f built and the skin's own MB, so the caller can
+   set the rest down by DY. The two are kept apart: the hood's surface is read through the sections, and remembers
+   what it reads.) */
+function cg2Low(DY,f,under){const D=HDK.D,tY=D.topY,aY=archY,sK=secKeys,hU=hdUnder,hz=D.hood.hz;let skin=null;
+  if(!under){D.topY=(u,z)=>tY(u,Math.min(Math.abs(z),hz(clamp(u,D.hood.u0,D.hood.u1))-.05))-DY;archY=(D2,u)=>{const y=aY(D2,u);return y<0?y:y-DY;};}
+  else{secKeys=(D2,u)=>{const r=sK(D2,u);return Object.assign({},r,{P:r.P.map(([z,y])=>[z,y-DY])});};
+    hdUnder=c=>{const w=secKeys;secKeys=sK;let s;try{s=hU(c);}finally{secKeys=w;}xformMB(s,M4T(0,-DY,0));skin=s;return s;};}
+  try{return {r:f(),skin};}finally{D.topY=tY;archY=aY;secKeys=sK;hdUnder=hU;}}
+/* (the suspension's outer ends out to the GT's track and up to its wheels: every point near an axle, past the cradle's
+   pivots and below the towers, moved out by DT and up by DR, eased in between; from the vertex 'from' on) */
+function cg2Track(mb,from,DT,DR){const D=HDK.D,p=mb.p;
+  for(let i=from;i<p.length;i+=3){const u=D.uC-p[i],y=p[i+1],z=p[i+2],az=Math.abs(z);let fu=0;
+    for(const ua of [D.uFa,D.uRa]){const du=u-ua;fu=Math.max(fu,sm01((du+.22)/.06)*sm01((.26-du)/.06));}
+    const w=fu*sm01((az-.45)/.21)*(1-sm01((y-.56)/.1));if(w<=0)continue;p[i+1]=y+DR*w;p[i+2]=z+Math.sign(z)*DT*w;}}
+HD_CARS.coupeGT2={
+  skip:Object.assign({},HD_CARS.coupeGT.skip,{REARS:['coupeDiff']}),
+  noGame:{under:1,exhaust:1},
+  build(out){
+    const b=out.b,lk=b.look,D=out.D,DY=D.dy,G=D.G;
+    const W=cgWheel(lk.tyre);out.wheel=out.wheelR=W.spin;out.brake=out.brakeR=W.fixed;
+    {const ar=new MB(),sk=cgSkinSnap(out);hdArches(ar,out);cgSkinBack(out,sk);cgDropFlare(out);out.hd.arches=ar;}
+    {const fl=new MB();hdFlares(fl);cgFlareBolts(fl,out);out.hd.flares=fl;}
+    {const f=new MB();cgFace(f,out);out.hd.face=f;}
+    {const t=new MB();cpTail(t,out,{noDiff:1});out.hd.tail=t;}
+    {const h=new MB();cgHood(h,out);cpBonnetBits(h,out);out.hd.hood=h;}
+    {const c=new MB();cg2Cabin(c,out);out.hd.cabin=c;}
+    {const t=new MB();hdMirrorsRace(t,out);hdWipers(t,out);cgWing(t,out);cgSkirts(t,out);cgRaceKit(t,out);out.hd.trim=t;}
+    {const x=new MB();cg2Bits(x,out);out.hd.extras=x;}
+    /* the bay and the underside, the Coupe's, set down with the body */
+    const bay=cg2Low(DY,()=>cpBay2(out)).r;for(const m of [bay.bay,bay.engine,bay.liner])if(m&&m.p)xformMB(m,M4T(0,DY,0));
+    /* (the pad and the frame under the bonnet kept under its skin, where the GT's louvres and fender edges dip) */
+    /* (and down under the louvres' pockets, 84 cgHood's outlines, so the frame doesn't show through them) */
+    {const H=D.hood,p=bay.liner.p,vo=D.B.fit.ventU||0;for(let i=0;i<p.length;i+=3){const u=D.uC-p[i];if(u<H.u0||u>H.u1)continue;const az=Math.abs(p[i+2]),z=Math.min(az,H.hz(u));
+      const inV=u>.68+vo&&u<1.27+vo&&az>.2&&az<.6;p[i+1]=Math.min(p[i+1],D.topY(u,z)-(inV?.062:az>.5?.04:.006));}}
+    const U0=cg2Low(DY,()=>cpUnder(out),1),U=U0.r,ns=U0.skin?U0.skin.p.length:0;
+    cg2Track(U,ns,lk.track/2-.82,(lk.tyre.R-.35)-DY);xformMB(U,M4T(0,DY,0));for(const t of D.tips)t.p=V3.add(t.p,[0,DY,0]);
+    out.bay=bay;out.under=U;cg2SidePipes(U,out);
+    hdPut(out.under,out.bay.bay);out.bay.bay=new MB();if(!HD_KEEP_ENGINE){hdPut(out.under,out.bay.engine);out.bay.engine=new MB();}
+  },
+  views:HD_CARS.coupeGT.views
+};
+/* the side pipes: a branch off the right bank's pipe after its catalyst, out under the floor to inside the right sill,
+   back along it and split in two out through the sill to the game's exits, ahead of the rear wheel; the tips first in
+   D.tips, as the game lists them, the quads after */
+function cg2SidePipes(U,car){
+  const K=HDK,D=K.D,X=K.X,dy=D.dy,F=D.B.fit,Pt=(u,y,z)=>[X(u),y,z],EXH=SMC('#a29e96',SM.SATIN),STEEL=SMC('#2a2b2e',SM.ENGINE),RB=SV([.02,.02,.021],MAT.RUBBER);
+  const TUBE=(pts,rr)=>hdPart(U,mb=>{hdTube(mb,suvPath(pts,5,2),rr,14,EXH,false,true);},40);
+  const yl=.17+dy,uo=k=>D.uRa-D.arch.a-.18+k,yo=u=>F.sideExY!=null?D.sill(u)+F.sideExY:.36+dy+F.rdy,zo=F.sideEx||.86,side=[];
+  TUBE([Pt(1.95,.205+dy,.26),Pt(2.05,yl,.36),Pt(2.25,yl,.6),Pt(2.8,yl,.64)],.027);
+  for(const k of [-.09,.09]){const ua=uo(k),ya=yo(ua),c=Pt(ua,ya,zo),d0=[0,-.15,1],bw=V3.add(c,V3.mul(d0,.1)),d=V3.norm(d0);
+    TUBE([Pt(2.8,yl,.64),Pt(ua-.14,yl,.66),Pt(ua-.03,(yl+ya)/2,.68),Pt(ua,ya,.74),c],.025);
+    cpRev(U,V3.add(c,V3.mul(d,-.03)),bw,[[.03,0],[.042,.012],[.046,.02],[.046,.124],[.042,.13],[.038,.126],[.038,.03]],MM.CHROME,32,40);
+    cpRev(U,V3.add(bw,V3.mul(d,-.06)),V3.add(bw,V3.mul(d,-.004)),[[0,0],[.036,0],[.036,.056]],SMC('#151515',SM.CAST),20,40);side.push({p:bw,d,r:.046});}
+  /* the hangers off the floor */
+  for(const u of [2.3,2.75])hdPart(U,mb=>{const c=Pt(u,yl+.025,.62),t=V3.add(c,[0,.02,0]);hdCyl(mb,c,t,.005,.005,8,STEEL);hdCyl(mb,V3.add(t,[-.014,0,0]),V3.add(t,[.014,0,0]),.016,.016,14,RB);},30);
+  D.tips=[...side,...D.tips];
+}
+
+;
+/* =====================================================================================
    THE COUPE IN THE STUDIO: the game's own front-engine V8 fastback (21_suv BODIES.coupe, 25_coupe, the Stock build in
    32_builds: "A track car with plates"), built finer, with each part modelled again in this folder, one file a
    part: 81 the wheel, 82 the face, 83 the tail, 84 the bonnet's vents, 85 the cabin, 87 the engine bay. The lip,
