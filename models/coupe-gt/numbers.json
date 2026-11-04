@@ -1,0 +1,37 @@
+{
+ "car": "coupeGT",
+ "game": {
+  "triangles": 52023,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 430719,
+  "triangles_bay": 31390,
+  "by_piece": {
+   "body": 250550,
+   "lamp_head": 8466,
+   "lamp_tail": 7366,
+   "under": 4187,
+   "hide": 134,
+   "hood": 22848,
+   "bay": 31390,
+   "wheel_fr": 30672,
+   "brake_fr": 3620,
+   "wheel_fl": 30672,
+   "brake_fl": 3620,
+   "wheel_rr": 30672,
+   "brake_rr": 3620,
+   "wheel_rl": 30672,
+   "brake_rl": 3620
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 93,
+  "draws_glb_traffic": 91,
+  "texture_mb": 0,
+  "glb_mb": 14.2,
+  "data_mb": 10.0
+ },
+ "baked": null
+}
