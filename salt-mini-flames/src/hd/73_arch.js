@@ -4,7 +4,7 @@
    opening 72 steps round, from just inside the body side to the inner wall, in black grained plastic, with the
    inner wall closing the back of the house.
    ===================================================================================== */
-function hdArches(out,car){
+function hdArches(out,car,opt={}){
   const K=HDK,D=K.D,X=K.X,A=D.arch;
   /* the game's wells and the floor riding over the arches: dropped from the body */
   for(const src of [car.body,car.hide]){const p=src.p,keep=[];
@@ -14,14 +14,18 @@ function hdArches(out,car){
     /* the game's flare: a triangle standing off the body side (a corner more than 4 mm out) round an arch */
     /* (Salt Mini Plus: only on a build that has flares: a car without them, its fenders swelling round the arches,
        would lose its own skin) */
-    if(!drop&&D.look.flares&&y>D.arch.cy-.06){for(const ua of [D.uFa,D.uRa]){const Ar=ua===D.uRa?D.archB:A;if(Math.abs(u-ua)>Ar.a+(D.look.flares?D.look.flares.w:0)+.05)continue;
+    /* (opt.skin, for a widebody: the game's flare never rises above the belt less 2 cm, so a triangle reaching above the
+       belt less 1.2 cm is the fender's own skin and is kept; and the flare is taken off out to its full stand-off, as a
+       flare standing out more than 6 cm would otherwise keep its outer part) */
+    if(!drop&&D.look.flares&&y>D.arch.cy-.06&&!(opt.skin&&Math.max(p[o+1],p[o+4],p[o+7])>D.belt(u)-.012)){const lim=opt.skin?D.look.flares.out+.05:.06;
+      for(const ua of [D.uFa,D.uRa]){const Ar=ua===D.uRa?D.archB:A;if(Math.abs(u-ua)>Ar.a+(D.look.flares?D.look.flares.w:0)+.05)continue;
       let off=-1;for(let k=0;k<3;k++){const vu=D.uC-p[o+k*3],vy=p[o+k*3+1],vz=Math.abs(p[o+k*3+2]);off=Math.max(off,vz-K.sideZ(vu,Math.min(vy,D.belt(vu)-.02)));}
-      if(off>.004&&off<.06){drop=true;break;}}}
+      if(off>.004&&off<lim){drop=true;break;}}}
     if(!drop)keep.push(t);}
   const q={p:[],n:[],c:[],m:[]};for(const t of keep){for(let k=0;k<9;k++){q.p.push(src.p[t*9+k]);q.n.push(src.n[t*9+k]);}for(let k=0;k<12;k++)q.c.push(src.c[t*12+k]);for(let k=0;k<3;k++)q.m.push(src.m[t*3+k]);}
   Object.assign(src,q);}
   const LIN=HC.LINER;
-  for(const ua of [D.uFa,D.uRa])for(const s of [1,-1]){const Ar=ua===D.uRa?D.archB:A,zi=D.plan(ua)*.7,n=72;
+  for(const ua of [D.uFa,D.uRa])for(const s of [1,-1]){const Ar=ua===D.uRa?D.archB:A,zi=opt.zi!=null?opt.zi:D.plan(ua)*.7,n=72;
     hdPart(out,mb=>{const rings=[];
       for(let k=0;k<=n;k++){const ph=-.02+(PI+.04)*k/n,[u,y]=archPt(D,ua,ph,.012),zo=Math.max(zi+.05,K.sideZ(u,Math.min(y,D.belt(u)-.05))-.012);
         /* across the liner: the outer edge, a soft round, then straight in to the inner wall */

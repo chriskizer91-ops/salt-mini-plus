@@ -4,7 +4,9 @@
    ===================================================================================== */
 function buildParts(K){
   const lk=K.D.look;
-  if(!BODY_NOUNDER)underbody(K);flares(K);roof(K);spoiler(K);exhausts(K);
+  /* (Salt Mini Plus: a car whose Studio builds its own underside or exhaust leaves the game's off: HD_CARS[id].noGame) */
+  const ng=typeof HD_CUR!=='undefined'&&HD_ON&&HD_CUR&&HD_CUR.noGame||{};
+  if(!BODY_NOUNDER&&!ng.under)underbody(K);flares(K);roof(K);spoiler(K);if(!ng.exhaust)exhausts(K);
   if(FRONTS[lk.front])FRONTS[lk.front](K);if(REARS[lk.rear])REARS[lk.rear](K);
   if(HOODS[lk.hood])HOODS[lk.hood](K);
   for(const x of lk.extras||[])if(EXTRAS[x])EXTRAS[x](K);

@@ -29,7 +29,9 @@ function hdBayGen(car,o){
   const Ew=p=>M4.xform(EM,p);
   /* (Salt Mini Plus: an electric car's layout 'EV' has no engine: nothing is drawn where it would be, no hoses run to it
      and nothing breathes; a front trunk stands in its place, the motor's inverter under it) */
-  const EV=E.layout==='EV';
+  /* (and 'MID': a mid-engined car's front, the same front trunk without the electric motor under it: its engine is
+     behind the cabin, built by the car itself) */
+  const EV=E.layout==='EV'||E.layout==='MID',ELEC=E.layout==='EV';
   const P=(f,deg=32)=>hdPart(st,f,deg),Q=(f,deg=32)=>EV?null:hdPart(en,f,deg,null,EM);
   /* ---------- the inner fenders: aprons from the tub up to a rolled flange, the tubs round the tyres ---------- */
   const N=40,ytub=u=>{const a=archY(D,u);return a>0?Math.min(edge(u)-.03,a+.045):-1;};
@@ -192,11 +194,11 @@ function hdBayGen(car,o){
       hdPart(en,mb=>{const pts=[];for(let k=0;k<=10;k++){const t=k/10*PI;pts.push([P0[0]+Math.cos(t)*.018*a,y+Math.sin(t)*.022,z]);}hdTube(mb,pts,.0035,8,MM.CHROME,false,true);hdRBox(mb,[P0[0],y,z],[.026,.004,.012],.003,HC.CAST,1);},40);}
     hdPart(en,mb=>{for(let z=-zt+.08;z<=zt-.08+1e-6;z+=.04)hdRBox(mb,[X(uc2),yBot+.003,z],[(u1-u0)/2-.06,.003,.008],.003,SMC('#141415',SM.RUBBER),1);},30);
     /* under it, the front motor's inverter in its cast case, the orange high-voltage cables back along the aprons */
-    const xi=X(D.uFa),yi=Math.max(yFloor+.08,yBot-.12);
+    if(ELEC){const xi=X(D.uFa),yi=Math.max(yFloor+.08,yBot-.12);
     hdPart(en,mb=>{hdRBox(mb,[xi,yi,0],[.13,.06,.24],.025,ALU,4);for(let k=-4;k<=4;k++)hdRBox(mb,[xi+.131,yi,k*.05],[.004,.045,.01],.003,ALU,1);
       hdCyl(mb,[xi,yi-.06,0],[xi,yi-.14,0],.12,.12,32,ALU);},35);
     for(const s2 of [1,-1])hdPart(en,mb=>{const ORA=SMC('#e8761e',SM.HOSE),z0=s2*.2,pts=[[xi-.13,yi+.03,z0],[xi-.2,yi+.08,s2*(zt+.06)],[X(u1-.05),yTop(u1)-.12,s2*(zt+.07)],[X(uR-.06),edge(uR)-.2,s2*(zt+.02)]];
-      hdTube(mb,pts,.013,10,ORA,false,true);hdTube(mb,pts.map(v=>[v[0],v[1]-.028,v[2]]),.01,10,ORA,false,true);},40);}
+      hdTube(mb,pts,.013,10,ORA,false,true);hdTube(mb,pts.map(v=>[v[0],v[1]-.028,v[2]]),.01,10,ORA,false,true);},40);}}
   /* ---------- breathing: an airbox and its tube to the throttle body, or a turbo's pipes and the intercooler ---------- */
   if(!EV&&!E.carb){const tb=Ew(I.tb),zA=hz(uF+.25)-.22,box=[X(uF+.25),edge(uF+.25)-.17,-zA];
     if(E.turbo&&I.turbo){const c=Ew(I.turbo.c),cc=Ew([I.turbo.c[0]+.14,I.turbo.c[1],I.turbo.c[2]]),zic=zr+.05,yic=yrB+.02,xic=X(uF-.035);

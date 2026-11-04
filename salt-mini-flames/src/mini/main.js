@@ -47,8 +47,17 @@ const PRESETS=[
     why:'Smooth power and a firm hold: a 6.2 V8 with a street cam and no boost, 4.88 off-road gears, traction control on (Help: Middle), the ground at 200% (as the county plays) and grip up at both ends (125%). On the SUV, floored from a stop on the salt, the tyres slip about 1.5% (stock: about 3%), and 0 to 60 is about 6 seconds.'}];
 /* the factory cars, each driven on its own build (the game's physics, engine and sound for it) and drawn as the game
    draws it (Game) or modelled for a close look (Studio: Salt Mini Plus's models, built here from their code) */
-const CARS=[['stock','SUV'],['pickup','Pickup'],['hatch','Hatch'],['wagon','Wagon'],['ev','EV'],['trail','Trail'],['coupe','Coupe'],['muscle','Muscle']];
+/* (by body, then each of its builds that has a Studio model: the game's build ids, 32_builds and 37_newbuilds) */
+const BODIES=[['SUV',[['stock','Stock'],['sleeper','Sleeper'],['crawler','Rock & Mud'],['race','Race']]],['Pickup',[['pickup','Stock']]],
+  ['Hatch',[['hatch','Stock'],['hatchB','Group B']]],['Wagon',[['wagon','Stock']]],['EV',[['ev','Stock']]],['Trail',[['trail','Stock']]],
+  ['Coupe',[['coupe','Stock'],['coupeGT','GT']]],['Muscle',[['muscle','Stock']]],['Wedge',[['wedge','Stock'],['wedgeNR','Night Runner']]],['Hyper',[['hyper','Stock'],['hyperTrack','Track']]]];
+const CARS=[],BODY_OF={},BUILD_NAME={};for(const [body,bs] of BODIES)for(const [id,bn] of bs){CARS.push([id,bn==='Stock'?body:body+' '+bn]);BODY_OF[id]=body;BUILD_NAME[id]=bn;}
 const CAR_NAME=Object.fromEntries(CARS);
+/* the HUD's name: the body for a stock car, the build's own name otherwise (SUV, SLEEPER, NIGHT RUNNER) */
+const hudName=id=>(BUILD_NAME[id]==='Stock'?BODY_OF[id]:BUILD_NAME[id]).toUpperCase();
+/* the versions a car has: the game's own, its Studio model, and a second Studio version where one has been made */
+const VERS=[['game','Game'],['studio','Studio'],['studio2','Studio 2']];
+const hasVer=(id,v)=>v!=='studio2'||!!(K.HD_CARS&&K.HD_CARS[id+'2']);
 const sameT=(a,b)=>{const ka=Object.keys(a),kb=Object.keys(b);return ka.length===kb.length&&ka.every(k=>a[k]===b[k]);};
 /* (a preset's engine as the sheet would make it on the car fitted: the torque goes with the displacement) */
 const presetT=p=>tuner.sheetT(p.raw||p.T);
@@ -56,7 +65,7 @@ function presetMatch(){return PRESETS.find(p=>sameT(presetT(p),state.T)&&(p.fd||
   Object.keys(HAND1).every(k=>Math.abs(p.hand[k]-state.hand[k])<1e-6))||null;}
 const state=(()=>{const d={car:'stock',ver:'studio',tunes:{},T:Object.assign({},FLAME_T),fd:0,plus:0,level:'middle',trac:1,hand:Object.assign({},HAND0),steerMode:'slide',cam:0};
   try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
-    if(s&&typeof s==='object'){if(s.T&&typeof s.T==='object')d.T=s.T;if(s.fd>=1.5&&s.fd<=5)d.fd=s.fd;if(s.plus>=1&&s.plus<=12)d.plus=s.plus;if(CAR_NAME[s.car])d.car=s.car;if(s.ver==='game'||s.ver==='studio')d.ver=s.ver;if(s.tunes&&typeof s.tunes==='object')d.tunes=s.tunes;if(DR.ASSISTS[s.level])d.level=s.level;
+    if(s&&typeof s==='object'){if(s.T&&typeof s.T==='object')d.T=s.T;if(s.fd>=1.5&&s.fd<=5)d.fd=s.fd;if(s.plus>=1&&s.plus<=12)d.plus=s.plus;if(CAR_NAME[s.car])d.car=s.car;if(VERS.some(([v])=>v===s.ver))d.ver=s.ver;if(s.tunes&&typeof s.tunes==='object')d.tunes=s.tunes;if(DR.ASSISTS[s.level])d.level=s.level;
       if(s.trac>=.5&&s.trac<=2)d.trac=s.trac;if(s.hand)for(const k in HAND0)if(s.hand[k]>=.5&&s.hand[k]<=2)d.hand[k]=s.hand[k];
       if(['slide','tilt','buttons'].includes(s.steerMode))d.steerMode=s.steerMode;if(s.cam>=0&&s.cam<=3)d.cam=s.cam|0;}}catch(e){}return d;})();
 const save=()=>{try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch(e){}};
@@ -141,8 +150,9 @@ function disposeTruck(){if(!truck)return;truck.root.removeFromParent();
 /* the car the physics is driving, built as chosen. Everything fixed to the body is merged, one mesh a material (the
    shell, the Studio's parts, the underside, a spare wheel); the hood and what it hides; and at each wheel a steering
    group holding the brake (it steers but doesn't roll) and the wheel (it rolls too). The wheels follow the physics' */
-function buildTruck(){const t0=performance.now(),id=state.car,studio=state.ver==='studio';disposeTruck();K.setHD(studio);
-  let T;try{T=K.studioBuild(id,studio?.25:1);}finally{K.setHD(true);}const b=T.b,D=T.D,body=new THREE.Group();
+function buildTruck(){if(!hasVer(state.car,state.ver))state.ver='studio';const t0=performance.now(),id=state.car,studio=state.ver!=='game';disposeTruck();
+  K.setHD(studio);if(K.setAlt)K.setAlt(state.ver==='studio2'?'2':'');
+  let T;try{T=K.studioBuild(id,studio?.25:1);}finally{K.setHD(true);if(K.setAlt)K.setAlt('');}const b=T.b,D=T.D,body=new THREE.Group();
   const fixed=[T.body];for(const [nm,src] of Object.entries(T.hd||{}))if(src&&src.p&&nm!=='hood')fixed.push(src);if(T.under)fixed.push(T.under);
   body.add(mergedMeshes(fixed,'body',b),mergedMeshes([T.hood,T.hd&&T.hd.hood].filter(Boolean),'hood',b),mergedMeshes([T.hide],'hide',b));
   const wF=mergedMeshes([T.wheel],'wheel',b),wR=T.wheelR===T.wheel?wF:mergedMeshes([T.wheelR],'wheel',b);
@@ -312,8 +322,8 @@ function flameStep(dt){if(!car)return;const pt=car.pt,e=VOICE.spec||pt.e,S=FL.S=
   FX.update(FL.t,FL.k,FL.len,car.speed);}
 /* ---------- the car: which of the factory cars, and Game or Studio ---------- */
 /* each car keeps its own tune (the Tune sheet, the final drive, the Plus tune); the Drive tab's settings are shared */
-async function switchCar(id,ver){if(id===state.car&&ver===state.ver)return;const newCar=id!==state.car,L=$('loading');
-  L.textContent='Building the '+CAR_NAME[id]+(ver==='studio'?' (Studio)':' (Game)');L.hidden=false;
+async function switchCar(id,ver){if(!hasVer(id,ver))ver='studio';if(id===state.car&&ver===state.ver)return;const newCar=id!==state.car,L=$('loading');
+  L.textContent='Building the '+CAR_NAME[id]+' ('+Object.fromEntries(VERS)[ver]+')';L.hidden=false;
   if(newCar){state.tunes[state.car]={T:state.T,fd:state.fd,plus:state.plus};const t=state.tunes[id]||{T:{nos:3},fd:0,plus:0};
     state.T=Object.assign({},t.T);state.fd=t.fd||0;state.plus=t.plus||0;}
   state.car=id;state.ver=ver;save();FL.burst=FL.rev=FL.k=0;FL.overrun=0;
@@ -322,11 +332,14 @@ async function switchCar(id,ver){if(id===state.car&&ver===state.ver)return;const
   if(newCar){tuner.setCar(id);const at=bay.open?bay.at:{x:car.p[0],z:car.p[2],yaw:Math.atan2(-car.M[6],car.M[0])};spawn(at);
     if(bay.open){for(let i=0;i<360;i++)car.step(1/240,{steer:0,thr:0,brk:0,hb:1,nos:false});bay.rpm=null;}}
   buildTruck();place();L.hidden=true;tuner.refresh(true);driveSheet.sync();syncCarTab();syncTouch();}
-function syncCarTab(){for(const b of $('carChips').children)b.setAttribute('aria-pressed',String(b.dataset.id===state.car));
-  for(const b of $('verChips').children)b.setAttribute('aria-pressed',String(b.dataset.v===state.ver));
-  const w=$('carWhy');if(!w||!truck)return;const n=CAR_NAME[state.car];
-  w.textContent=`${n}, ${state.ver==='studio'?'Studio':'Game'}: ${Math.round(truck.tris/1000)}k triangles, ${truck.draws} draws, built in ${(truck.ms/1000).toFixed(1)} s. `+
-    (state.ver==='studio'?'Modelled for a close look (Salt Mini Plus\'s models). ':'As Road Not Found draws it. ')+'It drives on its own physics and engine, and keeps its own tune.';}
+/* the Car tab: the bodies, the builds of the one picked (when it has more than one), and its versions */
+function syncCarTab(){const body=BODY_OF[state.car];for(const b of $('carChips').children)b.setAttribute('aria-pressed',String(b.dataset.body===body));
+  const bb=$('buildChips'),builds=BODIES.find(x=>x[0]===body)[1];bb.textContent='';bb.hidden=builds.length<2;
+  for(const [id,n] of builds){const b=document.createElement('button');b.type='button';b.textContent=n;b.dataset.id=id;b.setAttribute('aria-pressed',String(id===state.car));b.onclick=()=>switchCar(id,state.ver);bb.appendChild(b);}
+  for(const b of $('verChips').children){b.hidden=!hasVer(state.car,b.dataset.v);b.setAttribute('aria-pressed',String(b.dataset.v===state.ver));}
+  const w=$('carWhy');if(!w||!truck)return;const n=CAR_NAME[state.car],vn=Object.fromEntries(VERS)[state.ver];
+  w.textContent=`${n}, ${vn}: ${Math.round(truck.tris/1000)}k triangles, ${truck.draws} draws, built in ${(truck.ms/1000).toFixed(1)} s. `+
+    (state.ver==='studio2'?'The second Studio version: the rest of the car modelled again (Salt Mini Plus\'s models). ':state.ver==='studio'?'Modelled for a close look (Salt Mini Plus\'s models). ':'As Road Not Found draws it. ')+'It drives on its own physics and engine, and keeps its own tune.';}
 
 /* a preset: the whole setup at once, then every sheet and the note brought up to date */
 function applyPreset(p){state.T=presetT(p);state.fd=p.fd||0;state.plus=p.plus||0;state.trac=p.trac;state.level=p.level;state.hand=Object.assign({},p.hand);
@@ -405,7 +418,7 @@ void main(){
 hudScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),hudMat));
 const DB=new THREE.Vector2();
 function hudDraw(){
-  const pm=presetMatch(),label=(CAR_NAME[state.car]||'SUV').toUpperCase()+' '+(pm?pm.hud:'CUSTOM'),x=car.p[0];
+  const pm=presetMatch(),label=hudName(state.car)+(pm?(pm.id==='stock'&&BUILD_NAME[state.car]!=='Stock'?'':' '+pm.hud):' CUSTOM'),x=car.p[0];
   const place=x<-5?'BEHIND THE START':x>ROAD_X1?'PAST THE END OF THE ROAD':Math.abs(car.p[2])>ROAD_HW+1?'OUT ON THE SALT · MILE '+(x/MILE).toFixed(2):'SALT FLATS ROAD · MILE '+(x/MILE).toFixed(2);
   UI.miniHud({car,touch:TOUCH.on,label,place,level:state.level,levelName:DR.ASSISTS[state.level].name,trac:state.trac,od,rear:rearOn,popT:VOICE.popT});
   if(hudBuf!==UI.HB8){hudBuf=UI.HB8;if(hudTex)hudTex.dispose();hudTex=new THREE.DataTexture(hudBuf,UI.BW,UI.BH,THREE.RGBAFormat,THREE.UnsignedByteType);
@@ -527,8 +540,10 @@ addEventListener('resize',resize);
 /* ---------- start ---------- */
 UI.setRes(COARSE?2:3);UI.txtFonts();resize();bindTouch();
 $('menuBtn').addEventListener('click',()=>{wakeAudio();bayToggle();});$('bayDone').onclick=bayClose;
-{const cb=$('carChips');for(const [id,n] of CARS){const b=document.createElement('button');b.type='button';b.textContent=n;b.dataset.id=id;b.onclick=()=>switchCar(id,state.ver);cb.appendChild(b);}
-  const vb=$('verChips');for(const [v,n] of [['game','Game'],['studio','Studio']]){const b=document.createElement('button');b.type='button';b.textContent=n;b.dataset.v=v;b.onclick=()=>switchCar(state.car,v);vb.appendChild(b);}}
+{const cb=$('carChips');for(const [body,bs] of BODIES){const b=document.createElement('button');b.type='button';b.textContent=body;b.dataset.body=body;
+    /* (a body picked: the build already driven if it's this body's, else its stock build) */
+    b.onclick=()=>switchCar(BODY_OF[state.car]===body?state.car:bs[0][0],state.ver);cb.appendChild(b);}
+  const vb=$('verChips');for(const [v,n] of VERS){const b=document.createElement('button');b.type='button';b.textContent=n;b.dataset.v=v;b.onclick=()=>switchCar(state.car,v);vb.appendChild(b);}}
 {const box=$('presets');for(const p of PRESETS){const b=document.createElement('button');b.type='button';b.textContent=p.name;b.dataset.id=p.id;b.setAttribute('aria-pressed','false');b.onclick=()=>applyPreset(p);box.appendChild(b);}}
 cv.addEventListener('pointerdown',wakeAudio);
 /* the truck is built after the first picture is up (it takes a moment: a few hundred thousand triangles) */

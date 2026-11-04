@@ -6,7 +6,7 @@
    - The honeycomb across the tail above the diffuser.
    (The diffuser is the EV's, 79_parts hdDiffuser, without the reversing lamps the game doesn't give the Coupe.)
    ===================================================================================== */
-function cpTail(out,car){
+function cpTail(out,car,o={}){
   const K=HDK,D=K.D,dy=K.dy,Y=y=>y+dy,cuts=[car.body],GUIDE=SV([1,1,1],MAT.TAIL);
   for(const s of [1,-1]){const Lp=[[.22,.70],[.62,.706],[.8,.728],[.87,.762],[.8,.768],[.22,.726]].map(([z,y])=>[s*z,Y(y)]);
     hdLampUnit(out,'R',Lp,cuts,{deep:.035,k:.88,wall:HC.GB,back:()=>HC.GB,bulge:.0015,cell:.004,lens:()=>HC.REDL,tol:.04,
@@ -21,5 +21,6 @@ function cpTail(out,car){
   /* ---------- the honeycomb above the diffuser ---------- */
   {const H0=RR2(-.46,.46,Y(.37),Y(.43),.02);for(const c of cuts)hdCut(c,'R',H0);hdRecess(out,'R',H0,.05,.96,HC.GB,()=>HC.GB);
     hdHoney(out,'R',hdShrink(H0,.95),.025,.014,.0016,.012,HC.HONEY);}
-  hdDiffuser(out,car,{rev:false});
+  /* (Studio 2 leaves it off: the underside builds its own diffuser and valance, 88_under) */
+  if(!o.noDiff)hdDiffuser(out,car,{rev:false});
 }

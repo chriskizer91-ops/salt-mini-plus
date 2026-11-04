@@ -1,8 +1,9 @@
 # Redline County: Salt Mini Flame Test
 
 **Salt Mini Flame Test** (the folder `salt-mini-flames/`, the page `salt-mini-flames.html`): a copy of Salt Mini
-(cargames, `salt-mini/` on the branch `suv-studio/hd-truck`) with four things added: **all eight factory cars to drive**, each as the game draws it or as its
-Studio model (Salt Mini Plus's models), **fire out of the tailpipe when you rev**, **five presets** in the bay (Stock,
+(cargames, `salt-mini/` on the branch `suv-studio/hd-truck`) with four things added: **seventeen cars to drive** (the eight factory cars and nine more of the
+game's builds), each as the game draws it or as its Studio model (Salt Mini Plus's models), and the Coupe also as its
+second Studio version (Studio 2), **fire out of the tailpipe when you rev**, **five presets** in the bay (Stock,
 Flame, Drift & donuts, Top speed, Grip), each found and checked by driving it on the page's physics, and **salt dust**
 off the tyres (and tyre smoke off the blacktop). Everything else is Salt Mini as it was: the Studio SUV, the game's
 physics, HUD, controls, cameras, the Digital Engine's sound and the Tune sheet. It has its own save (`smf-` keys), so
@@ -13,46 +14,83 @@ it (run `npm ci` in this folder once first).
 
 ## The cars (the bay's Car tab)
 
-Menu, then **Car**: the eight factory cars (SUV, Pickup, Hatch, Wagon, EV, Trail, Coupe, Muscle) and **Game** or
-**Studio**. Each car drives on its own build: the game's physics, engine, gearbox, drive (the Coupe and the Muscle are
-rear-drive) and sound for it, exactly as Road Not Found has them; low range and lockers where the car has them. The
-Tune sheet, the presets and the flames follow the car (its own factory engine is what edits are measured from; fire
-from its own tips). Each car keeps its own tune; the Drive tab's settings are shared. The car and the version are
-saved.
+Menu, then **Car**: three rows. The bodies (SUV, Pickup, Hatch, Wagon, EV, Trail, Coupe, Muscle, Wedge, Hyper); the
+builds of the one picked, when it has more than one (the SUV's Stock, Sleeper, Rock & Mud and Race; the Hatch's
+Group B; the Coupe's GT; the Wedge's Night Runner; the Hyper's Track); and its versions: **Game**, **Studio**, and
+**Studio 2** where a car has one (so far the Coupe). Each car drives on its own build: the game's physics, engine,
+gearbox, drive and sound for it, exactly as Road Not Found has them; low range and lockers where the car has them.
+The Tune sheet, the presets and the flames follow the car (its own factory engine is what edits are measured from;
+fire from its own tips: the Night Runner's six). Each car keeps its own tune; the Drive tab's settings are shared.
+The car and the version are saved. The HUD names the build (SUV, SLEEPER, NIGHT RUNNER) and the preset.
 
 - **Game**: the car exactly as Road Not Found + Traffic builds it.
 - **Studio**: the same car modelled for a close look, from the models next door (`../models/src`), built in the
-  page from its code the way the Studio SUV always was: so the page is about 2.7 MB, not
-  the viewer's 24 MB. The baked versions aren't used.
+  page from its code the way the Studio SUV always was: so the page is about 3 MB, not the viewer's 24 MB. The baked
+  versions aren't used.
+- **Studio 2**: a second Studio version (the Coupe's: its underside built whole, the exhaust out to four tips in the
+  valance, its own engine bay, the plate, the high stop lamp, badges, markers and seals; the cabin's tunnel taller).
+  The SUV's and the other cars' can come in the same way.
 
-Built in the test browser (a computer without a graphics card, so a phone or the laptop will differ):
+Built in the test browser (a computer without a graphics card, so a phone or the laptop will differ; its build times
+also vary from run to run, the Rock & Mud's from 6 to 13 seconds). Memory is the car's own shapes while it's being
+drawn:
 
-| Car | Studio: triangles, draws, build | Game: triangles, draws |
-|---|---|---|
-| SUV | 484k, 78, 4.5 s | 52k, 48 |
-| Pickup | 545k, 94, 3.5 s | 54k, 48 |
-| Hatch | 430k, 84, 1.6 s | 47k, 45 |
-| Wagon | 532k, 83, 3.9 s | 52k, 45 |
-| EV | 498k, 88, 3.4 s | 55k, 48 |
-| Trail | 491k, 105, 1.9 s | 51k, 51 |
-| Coupe | 480k, 84, 2.7 s | 50k, 45 |
-| Muscle | 419k, 85, 2.0 s | 58k, 43 |
+| Car | Studio: triangles, draws, memory, build | Studio 2 | Game: triangles, draws, memory |
+|---|---|---|---|
+| SUV | 484k, 78, 37 MB, 6.7 s |  | 52k, 48, 5 MB |
+| SUV Sleeper | 603k, 99, 46 MB, 7.7 s |  | 52k, 51, 5 MB |
+| SUV Rock & Mud | 528k, 99, 45 MB, 12.8 s |  | 61k, 50, 6 MB |
+| SUV Race | 481k, 88, 40 MB, 6.8 s |  | 49k, 49, 5 MB |
+| Pickup | 545k, 94, 41 MB, 9.5 s |  | 54k, 48, 5 MB |
+| Hatch | 430k, 84, 31 MB, 8.3 s |  | 47k, 45, 4 MB |
+| Hatch Group B | 455k, 87, 34 MB, 19.6 s |  | 53k, 50, 5 MB |
+| Wagon | 532k, 83, 40 MB, 81 s |  | 52k, 45, 5 MB |
+| EV | 498k, 88, 36 MB, 6.8 s |  | 55k, 48, 5 MB |
+| Trail | 491k, 105, 30 MB, 2.8 s |  | 51k, 51, 4 MB |
+| Coupe | 480k, 84, 34 MB, 4.3 s | 707k, 95, 59 MB, 5.9 s | 50k, 45, 5 MB |
+| Coupe GT | 430k, 92, 35 MB, 5.6 s |  | 52k, 48, 5 MB |
+| Muscle | 419k, 85, 31 MB, 4.3 s |  | 58k, 43, 5 MB |
+| Wedge | 499k, 96, 37 MB, 9.4 s |  | 46k, 49, 4 MB |
+| Wedge Night Runner | 534k, 99, 39 MB, 2 s |  | 49k, 53, 5 MB |
+| Hyper | 602k, 99, 46 MB, 2.9 s |  | 50k, 49, 5 MB |
+| Hyper Track | 537k, 102, 44 MB, 2.9 s |  | 49k, 50, 5 MB |
 
-A Game car builds in about 0.2 s. Only the car being driven is kept: the last one is thrown away (its memory given
-back) when another is built.
+A Game car builds in a fraction of a second. Only the car being driven is kept: the last one is thrown away (its
+memory given back) when another is built. The five builds without a Studio model yet (the Trail's Crawler, the
+Wagon's Sleeper, the Pickup's Prerunner, the Muscle's Drag, the EV's Race) aren't in the list.
 
-- **Draws**: the Studio car's parts are merged, one mesh a material (Salt Mini Plus's `mergedMeshes`), and the SUV
-  now goes the same way: 78 draws where it was drawn a part at a time before.
+- **Draws**: the Studio car's parts are merged, one mesh a material (Salt Mini Plus's `mergedMeshes`).
 - **The wheels**: each sits in a steering group holding its brake (the caliper and dust shield steer but don't roll)
   and the wheel (it rolls), placed where the physics has it. The Trail's spare is on its door.
-- **The SUV is unchanged**: with Salt Mini Plus's Studio kit in, every one of its parts builds to exactly the same
-  arrays as before (each part's positions, normals, colours and materials compared).
 - **The presets on other cars**: a preset's engine is made as the sheet would make it on that car, so a bigger
   engine keeps that car's own torque per litre (the Hatch's 1.8 turbo makes a lot per litre, so its Drift engine is
-  about 710 hp where the SUV's is 545). The numbers in the presets' notes were measured on the SUV. Every preset was
-  run 20 seconds on every car: no errors, nothing rolled.
+  about 710 hp where the SUV's is 545); the Drift, Grip and Top speed presets say V8 and (Drift, Grip) no boost, so
+  they mean the same engine on every car. The numbers in the presets' notes were measured on the SUV. Every preset
+  was run 20 seconds on every car: no errors, nothing rolled. The cars with more power from the factory than a preset
+  gives (the Sleeper, the Rock & Mud, the Hyper) go faster on Stock.
 - **The EV** runs on its electric motor, which the Tune sheet's engine doesn't describe, so only Stock is offered for
   it (the engine presets made nonsense of it: Top speed crawled to 63 mph).
+
+### Where the cars' code comes from, and how it was checked
+
+The Studio kit (`src/hd/`) and each car's detail (`src/cars/`) are the models' (`../models/src` on the main line at
+ff2e84e, with the nine new builds), merged with the Coupe's Studio 2 from the viewer build it was sent in
+(`salt-mini-plus-viewer_2.html`: its code isn't in the models yet). The two had grown apart from the copy this page
+had (4e76f10): the main line added the widebody arches, the mid-engined front trunk and the race numbers' font; the
+viewer added the second-version hooks (`KIT.setAlt`, `HD_CARS.coupe2`), the deeper arches and the cabin's tunnel.
+Each shared file was merged three ways from that common copy; one line clashed (the arches' options, `opt` kept,
+`opt.zi` added). The Studio 2 files are in `src/cars/coupe/` as `90_s2_kit`, `91_s2_under`, `92_s2_bay`,
+`93_s2_bits` and `99_s2` (named here so they load after the Coupe's own). Checked by building every car and comparing
+every part's arrays (positions, colours, materials; `tools/hashpage.js`):
+
+- the eight cars that were here, Studio and Game: **identical** to before;
+- the nine new builds: **identical** to the models' own viewer at ff2e84e;
+- the Coupe's Studio 2: **identical** to the viewer it came in (589k triangles of parts, 707k drawn with the four
+  wheels).
+
+`src/game/23_parts.js` (a car builder, not physics) has the models' Studio 2 hook in it; the game's own cars build
+exactly as before. `tools/sync_models.sh` refuses to run until the models have the Studio 2 code themselves, so it
+can't take the Coupe's Studio 2 away.
 
 ## Where the fire comes from
 
@@ -233,3 +271,11 @@ in the test browser, so the F readout on the laptop and the phone is where to se
 ![The Coupe (Game) on the two-step: fire from all four tips](docs/coupe_two_step.webp)
 
 ![The Muscle (Studio) doing donuts on the salt](docs/muscle_donuts.webp)
+
+![The nine new builds, Studio](docs/new_builds.webp)
+
+![The Coupe: Studio and Studio 2, from the front and low from behind](docs/coupe_levels.webp)
+
+![The Car tab on a phone: bodies, builds, versions](docs/phone_cartab.webp)
+
+![Night Runner on the Top speed preset, on a phone held sideways: fire from all six pipes](docs/hud_night_runner.webp)
