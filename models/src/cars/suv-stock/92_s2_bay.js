@@ -268,7 +268,8 @@ function suvBay2(car,o={}){
 
   /* ================= under the hood: the insulation pad, the pressed inner frame ================= */
   {const FAB=SMC('#1c1c1e',MAT.FABRIC),nz=12;
-    for(let u=H.u0+.06;u<H.u1-.04;u+=.06){const v=Math.min(u+.06,H.u1-.04);for(let k=0;k<nz;k++){const f=u=>hz(u)-.06,z0=-f(u)+2*f(u)*k/nz,z1=-f(u)+2*f(u)*(k+1)/nz,w0=-f(v)+2*f(v)*k/nz,w1=-f(v)+2*f(v)*(k+1)/nz;
+    /* (o.noPad: a race car's hood, its inner frame bare) */
+    if(!o.noPad)for(let u=H.u0+.06;u<H.u1-.04;u+=.06){const v=Math.min(u+.06,H.u1-.04);for(let k=0;k<nz;k++){const f=u=>hz(u)-.06,z0=-f(u)+2*f(u)*k/nz,z1=-f(u)+2*f(u)*(k+1)/nz,w0=-f(v)+2*f(v)*k/nz,w1=-f(v)+2*f(v)*(k+1)/nz;
       ln.quad([X(u),topY(u,z0)-.014,z0],[X(u),topY(u,z1)-.014,z1],[X(v),topY(v,w1)-.014,w1],[X(v),topY(v,w0)-.014,w0],FAB[0],0,FAB[2]);}}
     hdPart(ln,mb=>{const rib=(pts)=>hdSweep(mb,pts,[[-.012,-.016],[.012,-.016],[.018,-.004],[-.018,-.004]],PAINT,[0,1,0],false,true);
       for(const s of [1,-1]){const pts=[];for(let u=H.u0+.03;u<=H.u1-.02;u+=.05)pts.push([X(u),topY(u,hz(u)-.03),s*(hz(u)-.03)]);rib(pts);
@@ -325,7 +326,13 @@ function suvBay2(car,o={}){
       for(const s of [1,-1]){const t=T[s>0?0:1]||T[0];if(!t)continue;
         P(mb=>{const R=suvPath([Pt(.68,y0+.01,s*.19),Pt(.74,y0-.08,s*.3),Pt(.84,yb(.72),s*.39),[t.inlet[0]+.07,t.inlet[1]+.06,t.inlet[2]],t.inlet],5,2);hdTube(mb,R,.04,16,HOSE,false,true);
           for(let k=2;k<R.length-2;k+=2)hdCyl(mb,V3.add(R[k],[.004,0,0]),V3.add(R[k],[-.004,0,0]),.043,.043,16,HOSE);
-          hdCyl(mb,V3.add(t.inlet,[.012,0,0]),V3.add(t.inlet,[-.004,0,0]),.044,.044,16,BOLT);},40);}}}
+          hdCyl(mb,V3.add(t.inlet,[.012,0,0]),V3.add(t.inlet,[-.004,0,0]),.044,.044,16,BOLT);},40);}}
+    /* (no ram box: a cone filter on each turbo's inlet, on a short silicone elbow, turned out toward the wheel house) */
+    else for(const s of [1,-1]){const t=T[s>0?0:1]||T[0];if(!t)continue;const a=t.inlet,d=V3.norm([1,.05,s*.35]),b=V3.add(V3.add(a,[.06,0,0]),V3.mul(d,.05)),e=V3.add(b,V3.mul(d,.17));
+      P(mb=>{hdTube(mb,[V3.add(a,[-.004,0,0]),V3.add(a,[.04,0,0]),b],.042,16,SMC('#1b3a8a',SM.HOSE),false,true);hdCyl(mb,V3.add(a,[.01,0,0]),V3.add(a,[.022,0,0]),.046,.046,16,BOLT);
+        hdCyl(mb,b,V3.add(b,V3.mul(d,.025)),.05,.05,24,MM.CHROME);const n=V3.norm(V3.cross(d,[0,1,0])),w=V3.cross(n,d);
+        for(let k=0;k<28;k++){const q=k/28*TAU,dir=V3.add(V3.mul(n,Math.cos(q)),V3.mul(w,Math.sin(q))),p0=V3.add(V3.add(b,V3.mul(d,.025)),V3.mul(dir,.054)),p1=V3.add(V3.add(e,V3.mul(d,-.012)),V3.mul(dir,.042));hdCyl(mb,p0,p1,.0065,.0055,5,SMC('#9e1c18',SM.CLOTH));}
+        hdCyl(mb,V3.add(b,V3.mul(d,.02)),V3.add(e,V3.mul(d,-.01)),.048,.036,20,SMC('#2a1210',SM.CLOTH));hdCyl(mb,V3.add(e,V3.mul(d,-.012)),e,.044,.04,24,MM.CHROME);hdCyl(mb,e,V3.add(e,V3.mul(d,.004)),.03,.02,18,HC.BOLT);},40);}}
   /* ================= the nitrous: a plate under the throttle body, its two solenoids on the intake, the lines ================= */
   /* (on the blower: a plate under each carburettor, the two solenoids on the manifold ahead of the case) */
   const NS=BLW?[.175,.46,-.065]:[hx-.18,.48,-.06];

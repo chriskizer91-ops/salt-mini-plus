@@ -28,7 +28,11 @@
    - The lines: two brake lines and the fuel feed and return clipped along the right rail, the vapour line.
    o: the build's choices (the Stock's are the defaults): exhaust 'single' or 'dual' (from the bay's turbos: an X, two
    mufflers, two tips), tank 'cell' (a fuel cell under the cargo floor where the spare hangs), spare and hitch (false:
-   left off), trans 'race4' (a race automatic, its deep finned pan), nos (the bottle's feed line forward to the bay).
+   left off), trans 'race4' (a race automatic, its deep finned pan) or 'seq6' (a sequential box: no pan, a ribbed
+   bottom, its oil pump and the shift barrel's housing), nos (the bottle's feed line forward to the bay); exhaust
+   'side' (the turbos' two pipes back along the right to the game's two side exits ahead of the rear wheel), tray (the
+   build's own undertray in place of the splash shield), railEnd (where the frame's rails stop, its last crossmember
+   there: short of a diffuser), tank 'inside' (a cell in the cargo area, built with the cabin).
    A lowered or lifted build's frame, and so everything on it, moves with its body (dy); what's on the wheel stays
    with the wheel, out at its track.
    ===================================================================================== */
@@ -84,10 +88,10 @@ function suvUnder2(car,o={}){
     else for(const s of [1,-1])sh(2.34,2.9,s>0?.18:-.42,s>0?.42:-.18,.014);}
 
   /* ================= the frame ================= */
-  const RZ=u=>suvRailZ(u),RY=u=>suvRailY(u)+dy,RH=u=>suvRailH(u),RW=.036;
+  const RZ=u=>suvRailZ(u),RY=u=>suvRailY(u)+dy,RH=u=>suvRailH(u),RW=.036,RE=o.railEnd||4.88;
   for(const s of [1,-1]){
     /* the rail: a boxed section swept from the bumper's horn to the hitch, deeper under the cabin */
-    const us=[];for(let u=.16;u<=4.88+1e-6;u+=.03)us.push(u);
+    const us=[];for(let u=.16;u<=RE+1e-6;u+=.03)us.push(u);
     part(mb=>{suvSweepVar(mb,us.map(u=>Pt(u,RY(u),s*RZ(u))),i=>hdRRect(RW,RH(us[i]),.008,3),FRAME,[0,1,0],true);},40);
     /* the seam along its top and bottom where the two halves are welded, and the tooling holes in its sides */
     part(mb=>{for(const e of [1,-1]){const p=us.map(u=>Pt(u,RY(u)+e*(RH(u)-.002),s*(RZ(u)+RW+.0015)));hdTube(mb,p,.002,5,FRAME,false,true);}},30);
@@ -111,7 +115,7 @@ function suvUnder2(car,o={}){
     for(const s of [1,-1])part(mb=>{const c=Pt(u,yb(.423),s*(RZ(u)-.04));hdRBox(mb,c,[.045,.03,.012],.004,FRAME,2);for(const dz of [-.02,.02])cpHex(mb,V3.add(c,[dz,-.03,0]),[0,-1,0],.008,.006);},30);}
   /* the rear crossmember with the hitch: the bar between the rails' ends, the receiver under it with its pin, the
      safety chains' loops and its cap */
-  {const u=4.875,y=yb(.455),yr=y-.07,hitch=o.hitch!==false;part(mb=>{const pts=[];for(let k=0;k<=14;k++)pts.push(Pt(u,y,-.5+1.0*k/14));hdSweep(mb,pts,hdRRect(.032,.032,.006,3),FRAME,[0,1,0],true,true);},40);
+  {const u=o.railEnd?RE-.005:4.875,y=yb(.455),yr=y-.07,hitch=o.hitch!==false;part(mb=>{const pts=[];for(let k=0;k<=14;k++)pts.push(Pt(u,y,-.5+1.0*k/14));hdSweep(mb,pts,hdRRect(.032,.032,.006,3),FRAME,[0,1,0],true,true);},40);
     /* (the receiver hangs from the bar's middle on a plate, low enough to clear the bumper's foot) */
     if(hitch)part(mb=>{const a=Pt(4.85,yr,0),b=Pt(4.935,yr,0);hdRBox(mb,V3.lerp(a,b,.5),[(4.935-4.85)/2,.026,.026],.004,FRAME,2);hdRBox(mb,Pt(4.87,(yr+y)/2,0),[.02,(y-yr)/2,.03],.004,FRAME,2);
       hdRBox(mb,Pt(4.93,yr,0),[.006,.03,.03],.004,FRAME,2);for(const s of [1,-1]){hdCyl(mb,Pt(4.9,yr,s*.026),Pt(4.9,yr,s*.036),.008,.008,12,BOLT);}
@@ -201,7 +205,7 @@ function suvUnder2(car,o={}){
     half(Pt(.93,y,.31),Pt(.93,wR,.69+tsF));}
   }
   /* the splash shield under the nose and the front of the engine, ribbed, screwed to the crossmember and the bumper */
-  if(!o.skids){const ys=yb(.29);part(mb=>{const rows=[];for(let u=.3;u<=.82+1e-6;u+=.02){const row=[];for(let z=-.38;z<=.381;z+=.02)row.push(Pt(u,ys+.012*sm01((.4-u)/.1),z));rows.push(row);}hdLoft(mb,rows,SMC('#1a1b1d',SM.PLASTIC),false,true);},30);
+  if(!o.skids&&!o.tray){const ys=yb(.29);part(mb=>{const rows=[];for(let u=.3;u<=.82+1e-6;u+=.02){const row=[];for(let z=-.38;z<=.381;z+=.02)row.push(Pt(u,ys+.012*sm01((.4-u)/.1),z));rows.push(row);}hdLoft(mb,rows,SMC('#1a1b1d',SM.PLASTIC),false,true);},30);
     part(mb=>{for(const z of [-.24,-.08,.08,.24])hdRBox(mb,Pt(.58,ys-.004,z),[.2,.004,.006],.003,SMC('#1a1b1d',SM.PLASTIC),1);
       for(const [u,z] of [[.32,-.3],[.32,.3],[.32,0],[.8,-.3],[.8,.3],[.56,-.37],[.56,.37]])hdCyl(mb,Pt(u,ys-.001,z),Pt(u,ys-.005,z),.008,.007,12,STEEL);
       for(let z=-.12;z<=.121;z+=.04)hdRBox(mb,Pt(.48,ys-.002,z),[.05,.002,.012],.002,SMC('#0b0b0c',SM.PLASTIC),1);},30);}
@@ -218,6 +222,14 @@ function suvUnder2(car,o={}){
     if(o.trans==='race4')part(mb=>{const y0=axY(1.86)-.15;hdRBox(mb,Pt(1.86,y0,0),[.24,.04,.125],.012,CASTA2(),3);for(let k=-6;k<=6;k++)hdRBox(mb,Pt(1.86+k*.034,y0-.042,0),[.005,.012,.11],.003,CASTA2(),1);
       for(let k=0;k<16;k++){const t=k/16*TAU;cpHex(mb,Pt(1.86+Math.cos(t)*.23,y0+.03,Math.sin(t)*.118),[0,-1,0],.0065,.005);}cpHex(mb,Pt(1.98,y0-.055,.05),[0,-1,0],.011,.006);
       hdRBox(mb,Pt(1.7,axY(1.7)-.02,.15),[.02,.015,.012],.004,SMC('#b0201c',SM.PLASTIC),1);hdTube(mb,[Pt(1.7,axY(1.7)-.02,.165),Pt(1.6,axY(1.6)+.05,.2),Pt(1.45,yb(.7),.25)],.003,6,HOSE,false,true);},30);
+    /* (a sequential box: no pan, its case ribbed along its bottom, the drain; its oil pump and filter on the right, the
+       shift barrel's housing on the left with the selector rod's lever) */
+    else if(o.trans==='seq6')part(mb=>{const y0=axY(1.86)-.122;for(let k=-3;k<=3;k++)hdRBox(mb,Pt(1.86,y0,k*.034),[.25,.012,.005],.003,ALU,1);
+      for(let k=-5;k<=5;k++)hdRBox(mb,Pt(1.86+k*.045,y0+.004,0),[.005,.01,.11],.003,ALU,1);cpHex(mb,Pt(1.98,y0-.012,.05),[0,-1,0],.011,.006);
+      const pp=Pt(1.72,axY(1.72)-.06,.15);hdCyl(mb,pp,V3.add(pp,[-.1,0,0]),.026,.026,18,SMC('#2a2b2e',SM.ENGINE));hdCyl(mb,V3.add(pp,[-.1,0,0]),V3.add(pp,[-.13,0,0]),.03,.03,18,SMC('#1b3a8a',SM.PAINTED));
+      hdRBox(mb,V3.add(pp,[-.05,.03,0]),[.02,.01,.012],.004,SMC('#1a1a1c',SM.PLASTIC),1);
+      const sb=Pt(1.9,axY(1.9)+.03,-.135);hdCyl(mb,V3.add(sb,[.1,0,0]),V3.add(sb,[-.1,0,0]),.032,.032,20,ALU);for(const d of [-.1,.1])hdCyl(mb,V3.add(sb,[d-.006,0,0]),V3.add(sb,[d+.006,0,0]),.038,.038,20,ALU);
+      hdCyl(mb,V3.add(sb,[.05,0,-.03]),V3.add(sb,[.05,.09,-.04]),.008,.008,8,STEEL);hdCyl(mb,V3.add(sb,[.05,.09,-.04]),Pt(2.36,yb(.62),-.08),.006,.006,8,STEEL);},30);
     else part(mb=>{const y0=axY(1.86)-.128;hdRBox(mb,Pt(1.86,y0,0),[.24,.018,.122],.012,ALU,3);for(let k=-6;k<=6;k++)hdRBox(mb,Pt(1.86+k*.034,y0-.019,0),[.004,.003,.1],.002,ALU,1);
       for(let k=0;k<16;k++){const t=k/16*TAU,cu=Math.cos(t),cz=Math.sin(t);cpHex(mb,Pt(1.86+cu*.23,y0-.01,cz*.115),[0,-1,0],.0065,.005);}cpHex(mb,Pt(1.98,y0-.019,.05),[0,-1,0],.011,.006);},30);
     part(mb=>{for(const z of [.09,.11])hdTube(mb,[Pt(1.7,axY(1.7)-.06,.13+z*.1),Pt(1.5,yb(.44),.2+z*.1),Pt(1.2,yb(.4),.33+z*.1),Pt(.7,yb(.45),.4+z*.1),Pt(.34,yb(.62),.45)],.0045,8,LINE,false,true);
@@ -314,6 +326,29 @@ function suvUnder2(car,o={}){
     for(const [u,z,y] of [[2.6,.34,yb(.41)+.06],[3.3,.38,yb(.43)],[4.55,.59,yb(.5)]])part(mb=>{const c=Pt(u,y,z),t=V3.add(c,[0,.045,0]);hdCyl(mb,c,t,.005,.005,8,STEEL);hdCyl(mb,V3.add(t,[-.016,0,0]),V3.add(t,[.016,0,0]),.019,.019,14,RB);hdRBox(mb,V3.add(t,[0,.024,0]),[.022,.004,.022],.003,STEEL,1);},30);
     {const a=Pt(L-.22,yb(.5),.55),d=V3.norm([-.6,-.8,0]),bw=V3.add(a,V3.mul(d,.1));
       cpRev(U,V3.add(a,V3.mul(d,-.02)),bw,[[.028,0],[.038,.012],[.04,.02],[.04,.1],[.036,.106],[.033,.102],[.033,.03]],MM.CHROME,32,40);D.tips.push({p:bw,d:[d[0],d[1],d[2]],r:.04});}}
+  /* (a race car's side exits: each turbo's downpipe on its own pipe, the left one crossing under the gearbox, both back
+     along the right of the tunnel, through a flex section, out sideways to the game's two exits ahead of the rear wheel;
+     V-band clamps at the joints, the hangers) */
+  else if(EXT==='side'){const r=.036,ys=yb(.36),TUBE=(pts,rr=r,m=EXH2())=>part(mb=>{hdTube(mb,suvPath(pts,5,2),rr,14,m,false,true);},40);D.tips=[];
+    const F=D.B.fit,ex=(car.bay&&car.bay.ex)||[],uo=k=>D.uRa-D.arch.a-.18+k,yo=u=>F.sideExY!=null?D.sill(u)+F.sideExY:yb(.36)+F.rdy,zo=F.sideEx||.86;
+    const vb=(p,d)=>part(mb=>{hdCyl(mb,V3.add(p,V3.mul(d,-.006)),V3.add(p,V3.mul(d,.006)),r+.006,r+.006,20,SMC('#c9c8c4',SM.BRUSH));const q=V3.add(p,V3.mul(V3.norm(V3.cross(d,[0,1,0])),r+.008));cpHex(mb,q,V3.norm(V3.cross(d,[0,1,0])),.005,.004);},30);
+    for(const e of ex){const s=e.s,ua=uo(s>0?-.09:.09),ya=yo(ua);
+      part(mb=>{obox(mb,V3.add(e.p,[-.004,0,0]),[1,0,0],[0,1,0],[0,0,1],[.004,.04,.04],EXHB);for(const dd of [-.03,.03])cpHex(mb,V3.add(e.p,[-.008,dd,0]),[-1,0,0],.007,.006);},30);
+      const run=s>0?[V3.add(e.p,[-.008,0,0]),Pt(1.46,yb(.37),.36),Pt(1.7,ys,.34),Pt(2.3,ys,.35),Pt(2.75,ys,.38),Pt(ua-.12,ya,.43),Pt(ua,ya,.5)]
+        :[V3.add(e.p,[-.008,0,0]),Pt(1.46,yb(.37),-.36),Pt(1.72,ys,-.32),Pt(1.98,ys,-.2),Pt(2.12,ys,.08),Pt(2.3,ys,.24),Pt(2.95,ys,.26),Pt(ua-.12,ya,.4),Pt(ua,ya,.5)];
+      TUBE(run.slice(0,4));
+      /* the flex section: a braided bellows between two V-bands */
+      {const R=suvPath(run,5,2),i0=Math.round(R.length*.42),a=R[i0],b2=R[i0+3],d=V3.norm(V3.sub(b2,a));
+        TUBE(run.slice(3));vb(a,d);vb(b2,d);part(mb=>{for(let k=0;k<=8;k++){const c=V3.lerp(a,b2,k/8);hdCyl(mb,V3.add(c,V3.mul(d,-.004)),V3.add(c,V3.mul(d,.004)),r+.007,r+.007,18,SMC('#b8b6b0',SM.SATIN));}},30);}
+      /* out through the sill to the tip: the game's own line, its outlet a touch down */
+      {const c=Pt(ua,ya,zo),d0=[0,-.15,1],bw=V3.add(c,V3.mul(d0,.1)),d=V3.norm(d0);TUBE([Pt(ua,ya,.5),Pt(ua,ya,.7),c],r+.004);vb(Pt(ua,ya,.62),[0,0,1]);
+        cpRev(U,V3.add(c,V3.mul(d,-.03)),bw,[[.03,0],[.042,.012],[.046,.02],[.046,.124],[.042,.13],[.038,.126],[.038,.03]],MM.CHROME,32,40);
+        cpRev(U,V3.add(bw,V3.mul(d,-.06)),V3.add(bw,V3.mul(d,-.004)),[[0,0],[.036,0],[.036,.056]],SMC('#151515',SM.CAST),20,40);D.tips.push({p:bw,d,r:.046,o:s});}}
+    /* (in the game's order: the front exit first) */
+    D.tips.sort((a,b)=>b.p[0]-a.p[0]);for(const t of D.tips)delete t.o;
+    /* the hangers off the floor */
+    for(const [u,z] of [[1.9,.34],[2.6,.36],[2.6,.25],[2.98,.4]])part(mb=>{const c=Pt(u,ys+.03,z),t=V3.add(c,[0,.05,0]);hdCyl(mb,c,t,.005,.005,8,STEEL);hdCyl(mb,V3.add(t,[-.016,0,0]),V3.add(t,[.016,0,0]),.019,.019,14,RB);
+      hdRBox(mb,V3.add(t,[0,.024,0]),[.022,.004,.022],.003,STEEL,1);},30);}
 
   /* ================= the rear ================= */
   if(!SOLID){
@@ -430,7 +465,7 @@ function suvUnder2(car,o={}){
     plate(.28,.7,yb(.36),.4,[[.4,-.2],[.4,.2],[.55,0]]);plate(1.18,2.1,yb(.36),.22,[[1.4,0],[1.7,.1],[1.95,-.1]]);plate(2.2,2.72,yb(.37),.22,[[2.46,0]]);
     {const [t0,t1,z0,z1]=SUV_TANK;part(mb=>{hdRBox(mb,Pt((t0+t1)/2,yb(.235),(z0+z1)/2-.01),[(t1-t0)/2+.01,.004,(z1-z0)/2-.01],.004,SK,2);for(let k=-3;k<=3;k++)hdRBox(mb,Pt((t0+t1)/2+k*.06,yb(.231),(z0+z1)/2-.01),[.006,.003,(z1-z0)/2-.04],.002,SK,1);},30);}}
   /* ================= the tank, the filler, the spare ================= */
-  if(o.tank!=='cell'){const [t0,t1,z0,z1]=SUV_TANK,top=yb(.465),bot=yb(.25),TC=[(t0+t1)/2,(top+bot)/2,(z0+z1)/2];
+  if(o.tank!=='cell'&&o.tank!=='inside'){const [t0,t1,z0,z1]=SUV_TANK,top=yb(.465),bot=yb(.25),TC=[(t0+t1)/2,(top+bot)/2,(z0+z1)/2];
     part(mb=>{hdRBox(mb,Pt(TC[0],TC[1],TC[2]-.01),[(t1-t0)/2-.02,(top-bot)/2,(z1-z0)/2-.03],.04,TANK,5);},35);
     /* its moulded ribs underneath, the seam round its middle, the pump's flange on top */
     part(mb=>{for(let k=-4;k<=4;k++)hdRBox(mb,Pt(TC[0]+k*.045,bot-.002,TC[2]-.01),[.006,.004,(z1-z0)/2-.08],.003,TANK,1);
@@ -451,6 +486,10 @@ function suvUnder2(car,o={}){
     part(mb=>{const c=Pt(3.55,yb(.47),-.36);hdRBox(mb,c,[.07,.04,.05],.015,TANK,3);hdTube(mb,[V3.add(c,[-.07,.01,0]),Pt(3.4,yb(.45),-.25),Pt(3.3,top-.005,-.2)],.004,6,HOSE,false,true);},30);}
   /* (a race build's fuel cell: an aluminium box in the spare's place under the cargo floor, on two straps, its braided
      lines forward along the right rail, the filler hose up to the flap) */
+  /* (tank 'inside': a race car's cell in the cargo area, its folder's; only its braided lines down through the floor
+     and forward along the right rail here) */
+  else if(o.tank==='inside')part(mb=>{for(const dz of [0,.016]){const p=[Pt(4.46,pan(4.46,.2)+.03,.2+dz),Pt(4.44,pan(4.44,.2)-.02,.2+dz)];for(let u=4.2;u>=1.75;u-=.25)p.push(Pt(u,RY(u)-.012,RZ(u)-RW-.03+dz*.5));p.push(Pt(1.45,yb(.55),.42));
+      hdTube(mb,suvPath(p,3,1),.005,8,SMC('#7d7f83',SM.SATIN),false,true);}},40);
   else{const u0=4.24,u1=4.76,top=pan(4.5,0)-.02,bot=yb(.33),zc=.27,C=Pt((u0+u1)/2,(top+bot)/2,0);
     part(mb=>{hdRBox(mb,C,[(u1-u0)/2,(top-bot)/2,zc],.012,SMC('#232427',SM.PAINTED),3);for(let k=-5;k<=5;k++)hdRBox(mb,V3.add(C,[k*.045,-(top-bot)/2-.001,0]),[.004,.002,zc-.02],.002,SMC('#2c2d30',SM.PAINTED),1);
       for(const du of [-.16,.16]){hdRBox(mb,V3.add(C,[du,-(top-bot)/2-.006,0]),[.02,.004,zc+.04],.003,STEEL,1);for(const e of [-1,1])cpHex(mb,V3.add(C,[du,-(top-bot)/2-.008,e*(zc+.03)]),[0,-1,0],.008,.006);}
@@ -471,7 +510,8 @@ function suvUnder2(car,o={}){
   /* ================= the nitrous's feed ================= */
   /* (from the bottle in the cargo area down through the floor, forward along the inside of the left rail, up behind the
      left wheelhouse into the bay) */
-  if(o.nos)part(mb=>{const p=[Pt(4.3,pan(4.3,-.46),-.46),Pt(4.28,pan(4.28,-.46)-.04,-.46)];for(let u=4.1;u>=1.7;u-=.2)p.push(Pt(u,RY(u)+.03,-(RZ(u)-RW-.008)));p.push(Pt(1.5,yb(.6),-.47),Pt(1.4,yb(.7),-.47));
+  /* (o.nosAt [u0,u1,z]: the bottle elsewhere on the floor, its line through the floor just ahead of its valve) */
+  if(o.nos)part(mb=>{const N=o.nosAt,F=N?[N[0]-.08,N[2]]:[4.3,-.46],p=[Pt(F[0],pan(F[0],F[1]),F[1]),Pt(F[0]-.02,pan(F[0]-.02,F[1])-.04,F[1])];for(let u=N?Math.floor((F[0]-.12)/.2)*.2+.1:4.1;u>=1.7;u-=.2)p.push(Pt(u,RY(u)+.03,-(RZ(u)-RW-.008)));p.push(Pt(1.5,yb(.6),-.47),Pt(1.4,yb(.7),-.47));
     hdTube(mb,suvPath(p,3,1),.005,8,SMC('#7d7f83',SM.SATIN),false,true);for(let u=3.9;u>1.8;u-=.4)hdRBox(mb,Pt(u,RY(u)+.03,-(RZ(u)-RW-.012)),[.008,.012,.008],.003,CLIP,2);},40);
   /* ================= the lines ================= */
   /* two brake lines and the fuel feed and return along the inside of the right rail, clipped to it; the handbrake's

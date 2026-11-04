@@ -10,7 +10,7 @@
    - The mast aerial on the right front fender, its base and its whip leaning back.
    - Rubber seals round the side glass.
    - (On the hood, so they lift with it: the washer jets at its back edge, suvHoodBits.)
-   o.noSensors, o.noAerial, o.noMarkers, o.noTowEye: a build that doesn't wear them.
+   o.noSensors, o.noAerial, o.noMarkers, o.noTowEye, o.noBadges: a build that doesn't wear them.
    ===================================================================================== */
 /* an oval badge on a surface (p, n): the chrome rim, the dark field, the raised chevron */
 function suvBadge(out,p,n,w=.07,h=.03){const M=cpFrame(p,n),ov=[];for(let k=0;k<40;k++){const a=k/40*TAU;ov.push([Math.cos(a)*w,Math.sin(a)*h]);}
@@ -20,7 +20,7 @@ function suvBadge(out,p,n,w=.07,h=.03){const M=cpFrame(p,n),ov=[];for(let k=0;k<
 function suvExtras2(out,car,o={}){
   const K=HDK,D=K.D,X=K.X,dy=K.dy,Y=y=>y+dy,L=D.L,G=D.G,PA=SV([1,1,1],MAT.PAINT),lk=D.look;
   /* ---------- the badges ---------- */
-  {const f=cpOn('F',0,Y(.908),.018);suvBadge(out,f.p,f.n,.075,.03);const r=cpOn('R',0,Y(1.105),.0008);suvBadge(out,r.p,r.n,.064,.026);}
+  if(!o.noBadges){const f=cpOn('F',0,Y(.908),.018);suvBadge(out,f.p,f.n,.075,.03);const r=cpOn('R',0,Y(1.105),.0008);suvBadge(out,r.p,r.n,.064,.026);}
   /* ---------- the side markers, over the game's painted ones ---------- */
   if(!o.noMarkers&&!lk.noMarkers)for(const s of [1,-1]){const vw=s>0?'SR':'SL',yc=D.cladY(.25);
     for(const [u0,u1,y0,y1,m] of [[.195,.335,yc+.045,yc+.09,HC.AMBERL],[L-.305,L-.165,D.cladY(L)-.125,D.cladY(L)-.08,HC.REDL]]){const P=hdResample(RR2(u0,u1,y0,y1,.01),.006),c=hdCen(P);
