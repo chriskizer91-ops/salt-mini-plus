@@ -64,6 +64,43 @@ seconds the first time you pick each one. The baked cars are unpacked from their
 `sh viewer/build.sh` rebuilds the page from `viewer/shell`, `viewer/src` and `models/`. Run `npm install` in
 `viewer/` once first (it installs three.js and esbuild).
 
+## The traffic test (`viewer/traffic.html`, `models/coupe-traffic/`)
+
+How few triangles a traffic car can have and still look right, tried on the Coupe. Salt Mini Plus is for the laptop;
+the car you drive stays the full Studio car, and traffic gets a cut-down one.
+
+- **The traffic Coupes** are the game's own Coupe brought down (`models/tools/traffic_lod.py`):
+  - about 25,000 triangles (23,825), 10,000 (9,956) and 5,000 (4,976), the four wheels counted in
+  - the hood is part of the body; no engine bay, no cabin, solid glass; the underside is one dark box with a liner
+    over each wheel
+  - the wheels don't turn: each is a plain tyre and a dished face, with the Studio wheel baked onto it
+  - the door shut lines are left off the mesh; the bake paints the Studio car's on
+  - the 25k one is the game's exact shape: merging its flat areas alone takes it from 32,000 to 20,000 triangles.
+    The 10k and 5k ones are brought down further by Blender's Decimate, the same on both sides
+- **Each comes three ways:** Plain (the game's own colours), and with the Studio or the Studio 2 surface baked on
+  (`models/tools/bake.py`, at the baked Coupe's picture size). A traffic car's lamps are painted on with the rest,
+  so the bake also writes where the head and tail lamps are (`GLOW=1`, the headlamps' lenses included), and the
+  page lights them from that.
+- **The page:** Studio (one car on the backdrop), Parked (your car beside the traffic car) and Road (the salt flat:
+  your car, and the traffic car 30, 100, 200 or 300 m off, coming at you or going away, from the game's Hood,
+  Chase and Far cameras, as Salt Mini has them). The left and right arrow keys step through the versions.
+  **Pictures 2048 / 1024 / 512** shows the baked cars at full, half and quarter picture size (96, 24 and 6 MB).
+  Top left: each car's triangles, draws and picture memory, and on the Road how many pixels the traffic car covers.
+- **The Studio 2 Coupe** (its underside built whole, its own engine bay, the exhaust out to four tips, the plate,
+  the high stop lamp, badges and markers) is now in the models (`models/src/cars/coupe`, `90` to `99`), from the
+  viewer it was sent in; `KIT.setAlt('2')` picks it. Every other car builds exactly as before.
+
+- **Still to improve:** the big grille comes out plain black in every baked Coupe (the 50k one too): the Studio
+  car's honeycomb sits behind it and doesn't reach the picture. The indicators and reversing lamps don't light on
+  the traffic cars.
+
+`sh viewer/build_traffic.sh` rebuilds the page; `sh models/tools/traffic_docs.sh` remakes its pictures and
+`models/coupe-traffic/numbers.json`.
+
+![Every version from the front three-quarter](models/coupe-traffic/docs/versions.webp)
+![Your car parked by the traffic car](models/coupe-traffic/docs/parked.webp)
+![The road from the Chase camera, 30, 100 and 200 m](models/coupe-traffic/docs/road.webp)
+
 ## What each car's folder holds (`models/<car>/`)
 
 | File | What it is |

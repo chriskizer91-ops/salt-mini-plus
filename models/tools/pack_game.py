@@ -43,6 +43,8 @@ for g, part in enumerate(('body', 'hood', 'hide')):
 P, N, U, G, _ = raw('wheel', True); pieces['wheel'].append((P, N, atlas_uv(U, 'wheel'), np.full(len(P), 32)))
 def pack(lst):
     P = np.concatenate([a[0] for a in lst]); N = np.concatenate([a[1] for a in lst]); U = np.concatenate([a[2] for a in lst]); M = np.concatenate([a[3] for a in lst])
+    # (a piece with nothing in it, as a traffic car's hood, which is part of its body: written empty)
+    if len(P) == 0: return {'v': 0, 't': 0}
     N = N / (np.linalg.norm(N, axis=1, keepdims=True) + 1e-9)
     key = np.c_[np.round(P * 2e4), np.round(N * 127), np.round(U * 65535), M].astype(np.int64)
     uq, inv = np.unique(key, axis=0, return_inverse=True); inv = inv.ravel()
@@ -71,6 +73,10 @@ def colour(tag, paint):
     return Image.fromarray(np.concatenate([c, a.clip(0, 255).astype(np.uint8)[..., None]], -1), 'RGBA')
 col = put(Image.new('RGBA', (W, H), (8, 8, 8, 0)), colour('skin', True), colour('wheel', False))
 nrm = put(Image.new('RGB', (W, H), (128, 255, 128)), L('skin_nrm').convert('RGB'), L('wheel_nrm').convert('RGB'))
+# (a traffic car baked with GLOW=1: where its head and tail lamps are, in the normals' alpha, so the page can light them)
+GLOW = os.path.exists(os.path.join(D, 'skin_glow.png'))
+if GLOW:
+    g = Image.new('L', (W, H), 0); g.paste(L('skin_glow').convert('L').resize((SK, SK), Image.LANCZOS), (0, 0)); nrm.putalpha(g)
 ormi = put(Image.new('RGBA', (W, H), (255, 128, 0, 0)), orm('skin', True), orm('wheel', False))
 def webp(im, q):
     # (exact: WebP otherwise throws away the colour under a fully clear alpha, and here the alpha is a mask, not see-through)
@@ -83,6 +89,6 @@ js = ('/* ======================================================================
       '   WebP. Materials as Baked SUV Test\'s: 32 baked, 33 tail and brake, 34 head, 35 amber, 36 reversing (baked and\n'
       '   a lamp), 2 and 3 the game\'s glass, 16 the dark underside. One file a car: BAKED_CARS[\'' + CAR + '\'].\n'
       '   ===================================================================================== */\n'
-      'var BAKED_CARS=BAKED_CARS||{};BAKED_CARS[' + json.dumps(CAR) + ']=' + json.dumps({'atlas': {'w': W, 'h': H, 'col': cs, 'nrm': ns, 'orm': os_}, 'parts': parts}) + ';\n')
+      'var BAKED_CARS=BAKED_CARS||{};BAKED_CARS[' + json.dumps(CAR) + ']=' + json.dumps({'atlas': {'w': W, 'h': H, 'col': cs, 'nrm': ns, 'orm': os_, **({'glow': 1} if GLOW else {})}, 'parts': parts}) + ';\n')
 open(OUT, 'w').write(js)
 print({k: (v['v'], v['t']) for k, v in parts.items()}, 'lamps', {m: int((MS == m).sum() // 3) for m in (33, 34, 35, 36)}, 'pictures KB', cn // 1024, nn_ // 1024, on // 1024, 'file KB', len(js) // 1024)

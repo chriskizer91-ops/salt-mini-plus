@@ -1,0 +1,13 @@
+{
+ "target": 25000,
+ "body": 19669,
+ "lamps": 244,
+ "glass": 1046,
+ "under": 178,
+ "wheel": 672,
+ "wheels": 2688,
+ "total": 23825,
+ "body_before": 32271,
+ "body_flattened": 19669,
+ "wheel_steps": 28
+}

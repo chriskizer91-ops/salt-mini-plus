@@ -106,7 +106,11 @@ def bake_mat(i):
     else: ce.inputs['Color'].default_value = col + [1]
     # (an emission shader standing by: the metal and the coat are baked as light, swapped in for those two bakes)
     em = nt.nodes.new('ShaderNodeEmission'); em.name = 'X'; em.inputs['Strength'].default_value = 1
-    m['metal'] = metal; m['coat'] = coat; m['paint'] = 1.0 if inv.get(i) in ('PAINT',) else 0.0; MATS[i] = m; return m
+    m['metal'] = metal; m['coat'] = coat; m['paint'] = 1.0 if inv.get(i) in ('PAINT',) else 0.0
+    # (where the head and tail lamps are, for a glow mask: GLOW=1. A traffic car's lamps are painted on with the rest, so
+    # the page lights them from this; the indicators and reversing lamps are left dark)
+    m['glow'] = 1.0 if inv.get(i) in GLOWING else 0.0; MATS[i] = m; return m
+GLOWING = ('HEAD', 'LED', 'HALO', 'TAIL', 'SM_REDL', 'SM_LAMPH', 'SM_REFR', 'SM_BULB', 'SM_REFLC', 'SM_LENSH')
 def as_emit(which):
     for m in MATS.values():
         nt = m.node_tree; o = nt.nodes['Material Output']; em = nt.nodes['X']; v = m[which]
@@ -223,11 +227,11 @@ def run(tag, low_name, high_name, size, extr, dist, margin):
         log('diag only'); sys.exit(0)
     log(tag, 'low', n, 'high', nh, 'triangles')
     imgs = {}
-    def one(key, kind, fill, colour, samples=1, emit=None, **kw):
+    def one(key, kind, fill, colour, samples=1, emit=None, extra=(), **kw):
         img = target(low, size, tag + '_' + key, fill, colour)
         if emit == 'colour': as_colour()
         elif emit: as_emit(emit)
-        bake(low, [high], kind, img, fill, extr, dist, samples, **kw)
+        bake(low, [high, *extra], kind, img, fill, extr, dist, samples, **kw)
         if emit: as_bsdf()
         save(img, os.path.join(OUT, '%s_%s.png' % (tag, key))); imgs[key] = img; log(tag, key, 'done')
     one('col', 'EMIT', (0.02, 0.02, 0.02, 1), True, emit='colour')
@@ -237,6 +241,13 @@ def run(tag, low_name, high_name, size, extr, dist, margin):
     one('rough', 'ROUGHNESS', (.5, .5, .5, 1), False)
     one('metal', 'EMIT', (0, 0, 0, 1), False, emit='metal')
     if tag == 'skin': one('coat', 'EMIT', (0, 0, 0, 1), False, emit='coat'); one('paint', 'EMIT', (0, 0, 0, 1), False, emit='paint')
+    if tag == 'skin' and os.environ.get('GLOW'):
+        # (the headlamps' lenses join the Studio car for this one: the lamp lit is the lens glowing, and the other
+        # bakes look through it)
+        lens = []
+        if 'high_lens' in man['pieces'] and man['pieces']['high_lens']['tris']: lens = [studio(*load('high_lens')[:4])]
+        one('glow', 'EMIT', (0, 0, 0, 1), False, emit='glow', extra=lens)
+        for o in lens: bpy.data.objects.remove(o)
     # (Salt Mini Plus: where two Studio surfaces lie close, a ray can still pass the near one and meet the back of the far
     # one: that pixel bakes a normal pointing into the car and a black occlusion, the speckle on the flares. Every
     # picture takes those pixels from the nearest pixel whose ray met its surface from the front, within a few pixels.)
@@ -252,8 +263,10 @@ def run(tag, low_name, high_name, size, extr, dist, margin):
         log(tag, 'refilled', int(fix.sum()), 'pixels met from behind (of', int(bad.sum()), ')')
     nn = write_mesh(low, os.path.join(OUT, tag + '.bin')); log(tag, 'mesh written', nn, 'triangles')
     bpy.data.objects.remove(low); bpy.data.objects.remove(high)
-run('skin', 'low_skin', 'high_body', SKIN, float(os.environ.get('CAGE', .03)), float(os.environ.get('RAY', .14)), .002)
-run('wheel', 'low_wheel', 'high_wheel', WHEEL, .02, .08, .003)
+# (ONLY=wheel or ONLY=skin: that one bake alone, the other's pictures and mesh left as an earlier run wrote them)
+ONLY = os.environ.get('ONLY', '')
+if ONLY in ('', 'skin'): run('skin', 'low_skin', 'high_body', SKIN, float(os.environ.get('CAGE', .03)), float(os.environ.get('RAY', .14)), .002)
+if ONLY in ('', 'wheel'): run('wheel', 'low_wheel', 'high_wheel', WHEEL, .02, .08, .003)
 for nm in ('low_glass', 'low_under'):
     P, N, C, M = facing(*load(nm)[:4]); plain(nm, P, N, os.path.join(OUT, nm[4:] + '.bin'), M)
 json.dump({'D': man['D'], 'build': B, 'skin': SKIN, 'wheel': WHEEL}, open(os.path.join(OUT, 'bake.json'), 'w'))

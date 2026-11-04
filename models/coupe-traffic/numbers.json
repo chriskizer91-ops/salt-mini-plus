@@ -1,0 +1,105 @@
+{
+ "game": {
+  "triangles": 50227,
+  "draws_page": 44,
+  "pictures_mb_2048": 0
+ },
+ "studio": {
+  "triangles": 479431,
+  "draws_page": 83,
+  "pictures_mb_2048": 0
+ },
+ "studio2": {
+  "triangles": 706516,
+  "draws_page": 95,
+  "pictures_mb_2048": 0
+ },
+ "baked": {
+  "triangles": 50177,
+  "draws_page": 11,
+  "pictures_mb_2048": 96
+ },
+ "t25000_plain": {
+  "triangles": 23825,
+  "draws_page": 19,
+  "pictures_mb_2048": 0,
+  "pieces": {
+   "body": 19669,
+   "lamps": 244,
+   "glass": 1046,
+   "under": 178,
+   "wheel": 672,
+   "wheels": 2688
+  },
+  "data_kb": 3749
+ },
+ "t25000_s1": {
+  "triangles": 23825,
+  "draws_page": 10,
+  "pictures_mb_2048": 96,
+  "data_kb": 2065
+ },
+ "t25000_s2": {
+  "triangles": 23825,
+  "draws_page": 10,
+  "pictures_mb_2048": 96,
+  "data_kb": 2307
+ },
+ "t10000_plain": {
+  "triangles": 9956,
+  "draws_page": 19,
+  "pictures_mb_2048": 0,
+  "pieces": {
+   "body": 8276,
+   "lamps": 244,
+   "glass": 298,
+   "under": 130,
+   "wheel": 252,
+   "wheels": 1008
+  },
+  "data_kb": 1581
+ },
+ "t10000_s1": {
+  "triangles": 9956,
+  "draws_page": 10,
+  "pictures_mb_2048": 96,
+  "data_kb": 1812
+ },
+ "t10000_s2": {
+  "triangles": 9956,
+  "draws_page": 10,
+  "pictures_mb_2048": 96,
+  "data_kb": 2053
+ },
+ "t5000_plain": {
+  "triangles": 4976,
+  "draws_page": 19,
+  "pictures_mb_2048": 0,
+  "pieces": {
+   "body": 4134,
+   "lamps": 146,
+   "glass": 122,
+   "under": 94,
+   "wheel": 120,
+   "wheels": 480
+  },
+  "data_kb": 794
+ },
+ "t5000_s1": {
+  "triangles": 4976,
+  "draws_page": 10,
+  "pictures_mb_2048": 96,
+  "data_kb": 1712
+ },
+ "t5000_s2": {
+  "triangles": 4976,
+  "draws_page": 10,
+  "pictures_mb_2048": 96,
+  "data_kb": 1976
+ },
+ "pictures_mb": {
+  "2048 x 3072": 96,
+  "1024 x 1536": 24,
+  "512 x 768": 6
+ }
+}
