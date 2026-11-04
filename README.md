@@ -64,6 +64,26 @@ seconds the first time you pick each one. The baked cars are unpacked from their
 `sh viewer/build.sh` rebuilds the page from `viewer/shell`, `viewer/src` and `models/`. Run `npm install` in
 `viewer/` once first (it installs three.js and esbuild).
 
+## Notes for the game: what's decided so far
+
+- **Laptop only.** Salt Mini Plus is made for the laptop (an MSI Cyborg 15: RTX 5060 with 8 GB, a 1920 x 1080
+  screen). Road Not Found stays the one that runs on the phone and the laptop.
+- **Your car comes two ways** (tried on the Coupe):
+  - **In the dyno bay: Studio 2.** Bonnet up, walk round it, look underneath: 706,516 triangles.
+  - **Driving: Studio 2 Drive.** The same car with its own engine bay taken out (the game's small one sits in its
+    place, so the space isn't empty from below or through the bonnet vents). The cabin stays, for the view through
+    the windows, and so does the whole underside, because cars roll: 644,600 triangles.
+- **Traffic: the 5k car with the Studio 2 surface baked on,** its pictures at 512 (6 MB for each kind of car, shared
+  by every copy of it): 4,976 triangles and 10 draws. Tried on the Coupe and judged plenty good.
+- **Traffic is only ever the basic cars,** the few picked for the game. The souped-up builds are never traffic, so
+  they get no traffic version.
+- **Not decided yet:**
+  - which cars the game has. The idea so far: the SUV, SUV Sleeper and SUV Rock & Mud, the Coupe and Coupe GT, and
+    maybe the Hatch, Hatch Group B, Wedge and Hypercar
+  - how far you can see: to be tried on the laptop
+  - how far the scenery is drawn. Ideas so far: no grass past about 100 m; trees still seen at 500 m, but a simpler
+    tree far off than up close, swapped as they come into view
+
 ## The traffic test (`viewer/traffic.html`, `models/coupe-traffic/`)
 
 How few triangles a traffic car can have and still look right, tried on the Coupe. Salt Mini Plus is for the laptop;
@@ -86,6 +106,8 @@ the car you drive stays the full Studio car, and traffic gets a cut-down one.
   Chase and Far cameras, as Salt Mini has them). The left and right arrow keys step through the versions.
   **Pictures 2048 / 1024 / 512** shows the baked cars at full, half and quarter picture size (96, 24 and 6 MB).
   Top left: each car's triangles, draws and picture memory, and on the Road how many pixels the traffic car covers.
+- **Studio 2 Drive** (`KIT.setAlt('2d')`, *Studio 2 Drive* on the page): Studio 2 for driving, its engine bay left
+  out and the game's small one in its place, the cabin and the underside kept: 644,600 triangles against 706,516.
 - **The Studio 2 Coupe** (its underside built whole, its own engine bay, the exhaust out to four tips, the plate,
   the high stop lamp, badges and markers) is now in the models (`models/src/cars/coupe`, `90` to `99`), from the
   viewer it was sent in; `KIT.setAlt('2')` picks it. Every other car builds exactly as before.
@@ -100,6 +122,7 @@ the car you drive stays the full Studio car, and traffic gets a cut-down one.
 ![Every version from the front three-quarter](models/coupe-traffic/docs/versions.webp)
 ![Your car parked by the traffic car](models/coupe-traffic/docs/parked.webp)
 ![The road from the Chase camera, 30, 100 and 200 m](models/coupe-traffic/docs/road.webp)
+![Studio 2 and Studio 2 Drive from underneath; Drive's cabin through the glass](models/coupe-traffic/docs/drive.webp)
 
 ## What each car's folder holds (`models/<car>/`)
 

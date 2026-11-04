@@ -5,7 +5,7 @@
 # usage: sh models/tools/traffic_docs.sh   (run from the repo's top; about ten minutes; SKIP_SHOTS=1 lays out the last run's again)
 set -e
 X=${W_DIR:-/tmp/smp-traffic-docs}; D=models/coupe-traffic/docs; mkdir -p $X $D
-S="game studio studio2 baked t25000_plain t25000_s1 t25000_s2 t10000_plain t10000_s1 t10000_s2 t5000_plain t5000_s1 t5000_s2"
+S="game studio studio2 studio2d baked t25000_plain t25000_s1 t25000_s2 t10000_plain t10000_s1 t10000_s2 t5000_plain t5000_s1 t5000_s2"
 A=""; for v in $S; do A="$A v_$v=scene:studio,v:$v"; done
 for v in studio2 baked t25000_s2 t5000_s2; do A="$A f_$v=scene:studio,v:$v,view:face t_$v=scene:studio,v:$v,view:tail"; done
 A="$A p_t25000_s2=scene:parked,v:t25000_s2,you:studio2 p_t5000_s2=scene:parked,v:t5000_s2,you:studio2"
@@ -33,7 +33,7 @@ def sheet(rows, out, cw=640, top=44, side=0, box=(.14, .2, .9, .86)):
             if not c: continue
             x = side + j * cw; g.paste(crop(c[0], box).resize((cw, ch), Image.LANCZOS), (x, y + top)); d.text((x + 14, y + 10), c[1], fill=(40, 40, 40), font=F(22))
     g.save(os.path.join(D, out + '.webp'), 'WEBP', quality=88, method=6, exact=True)
-sheet([('As it is', [(k, '%s · %s' % (t, n(k))) for k, t in (('v_game', 'Game'), ('v_studio', 'Studio'), ('v_studio2', 'Studio 2'), ('v_baked', 'Baked'))]),
+sheet([('As it is', [(k, '%s · %s' % (t, n(k))) for k, t in (('v_game', 'Game'), ('v_studio', 'Studio'), ('v_studio2', 'Studio 2'), ('v_studio2d', 'Studio 2 Drive'), ('v_baked', 'Baked'))]),
        *[('About %dk' % (L // 1000), [(k, '%s · %s' % (t, n(k))) for k, t in (('v_t%d_plain' % L, 'Plain'), ('v_t%d_s1' % L, 'Studio baked'), ('v_t%d_s2' % L, 'Studio 2 baked'))] + [None])
          for L in (25000, 10000, 5000)]], 'versions', side=150)
 sheet([('', [('f_studio2', 'Studio 2 (your car)'), ('f_baked', 'Baked on the game mesh'), ('f_t25000_s2', '25k Studio 2 baked'), ('f_t5000_s2', '5k Studio 2 baked')])], 'fronts', cw=560, box=(.0, .08, .8, .82))

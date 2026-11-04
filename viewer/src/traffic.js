@@ -1,7 +1,7 @@
 /* =====================================================================================
    SALT MINI PLUS · TRAFFIC TEST. How few triangles a traffic car can have and still look right, on the Coupe:
-   - the Coupe as it is: Game (the game's own, 50,475 triangles), Studio, Studio 2, and Baked (the game's own mesh
-     wearing the Studio surface);
+   - the Coupe as it is: Game (the game's own, 50,475 triangles), Studio, Studio 2 (the car in the dyno bay), Studio 2
+     Drive (the same without its engine bay, for driving), and Baked (the game's own mesh wearing the Studio surface);
    - three traffic Coupes cut down from the game's own (models/tools/traffic_lod.py): about 25,000, 10,000 and 5,000
      triangles; the wheels don't turn, the glass is solid, no cabin or engine bay, the lamps still light. Each three
      ways: Plain (the game's own colours), and with the Studio or the Studio 2 surface baked on (models/tools/bake.py).
@@ -18,9 +18,9 @@ const K=window.KIT,MAT=K.MAT,SM=K.SM,Q=new URLSearchParams(location.search),$=id
 const SHOTS=!!Q.get('shots'),ID='coupe';
 /* ---------- the versions ---------- */
 const LODS=[25000,10000,5000],SURF=[['plain','Plain'],['s1','Studio'],['s2','Studio 2']];
-const VERS=[['game','Game'],['studio','Studio'],['studio2','Studio 2'],['baked','Baked']];
+const VERS=[['game','Game'],['studio','Studio'],['studio2','Studio 2'],['studio2d','Studio 2 Drive'],['baked','Baked']];
 for(const t of LODS)for(const [s,n] of SURF)VERS.push([`t${t}_${s}`,`${t/1000}k ${n}`]);
-const YOURS=[['studio2','Studio 2'],['studio','Studio'],['game','Game']];
+const YOURS=[['studio2d','Studio 2 Drive'],['studio2','Studio 2'],['studio','Studio'],['game','Game']];
 const label=v=>(VERS.find(x=>x[0]===v)||[0,v])[1];
 const isTraffic=v=>v[0]==='t';
 
@@ -147,7 +147,7 @@ async function build(v){const k=v+'@'+(v==='baked'||(isTraffic(v)&&!v.endsWith('
     root.add(solidify(mergedMeshes([plainPiece(P.skin),plainPiece(P.glass),plainPiece(P.under)],'body',b)));
     placeWheels(root,D,b,mergedMeshes([plainPiece(P.wheel)],'wheel',b),null);
   }else{
-    K.setAlt&&K.setAlt(v==='studio2'?'2':'');K.setHD(v!=='game');const T=K.studioBuild(ID,v==='game'?1:.25);K.setAlt&&K.setAlt('');D=T.D;b=T.b;
+    K.setAlt&&K.setAlt(v==='studio2'?'2':v==='studio2d'?'2d':'');K.setHD(v!=='game');const T=K.studioBuild(ID,v==='game'?1:.25);K.setAlt&&K.setAlt('');D=T.D;b=T.b;
     const fixed=[T.body];for(const [nm,src] of Object.entries(T.hd||{}))if(src&&src.p&&nm!=='hood')fixed.push(src);if(T.under)fixed.push(T.under);
     root.add(mergedMeshes(fixed,'body',b),mergedMeshes([T.hood,T.hd&&T.hd.hood].filter(Boolean),'hood',b));
     const wF=mergedMeshes([T.wheel],'wheel',b),bF=T.brake?mergedMeshes([T.brake],'brake',b):null;placeWheels(root,D,b,wF,bF);
@@ -158,7 +158,7 @@ function count(o){let n=0,d=0;o.traverse(m=>{if(m.isMesh){n+=m.geometry.index?m.
 
 /* ---------- the scene's cars ---------- */
 const slotA=new THREE.Group(),slotB=new THREE.Group(),poolA=pool(),poolB=pool();scene.add(slotA,slotB,poolA,poolB);
-let scn=Q.get('scene')||'studio',vA=Q.get('v')||'t5000_s2',vB=Q.get('you')||'studio2',cam=Q.get('cam')||'chase',dist=+(Q.get('d')||100),coming=Q.get('dir')!=='going',lights=+(Q.get('lights')||1),paint=null;
+let scn=Q.get('scene')||'studio',vA=Q.get('v')||'t5000_s2',vB=Q.get('you')||'studio2d',cam=Q.get('cam')||'chase',dist=+(Q.get('d')||100),coming=Q.get('dir')!=='going',lights=+(Q.get('lights')||1),paint=null;
 let A=null,B=null;
 function place(){
   const L=4.6;studio.visible=scn!=='road';flat.visible=scn==='road';scene.background=scn==='road'?sky:new THREE.Color('#e6e5e2');scene.environment=scn==='road'?ENV.flat:ENV.studio;
@@ -175,6 +175,8 @@ function setShadow(r){Object.assign(key.shadow.camera,{left:-r,right:r,top:r,bot
 /* ---------- the cameras ---------- */
 const CG=[0,.5];  /* (where the game's camera hangs from: the car's centre, about half a metre up) */
 function setCam(){const a=camera.aspect;camera.near=.05;
+  /* (on the backdrop the camera may go all the way under, to see the underside; on the road it stays above the salt) */
+  controls.maxPolarAngle=scn==='road'?Math.PI*.495:Math.PI;
   if(scn!=='road'||cam==='look'){camera.fov=a<1?42:28;controls.enabled=true;
     const t=scn==='road'?slotA.position.clone().add(new THREE.Vector3(0,.7,0)):new THREE.Vector3(0,.7,0),
       p=scn==='studio'?new THREE.Vector3(5.2,1.5,4.3):scn==='parked'?new THREE.Vector3(6.4,2.4,6.2):t.clone().add(new THREE.Vector3(coming?5.5:-5.5,1.6,coming?-4.6:4.6));
@@ -225,7 +227,7 @@ function pop(id,btn){const open=$(id).hidden;closePops(id);$(id).hidden=!open;$(
 /* the traffic car's versions: the full Coupes, then each traffic size in its three surfaces */
 {const P=$('versA');const head=t=>{const h=document.createElement('div');h.className='grp';h.textContent=t;P.appendChild(h);};
   const add=(v,t)=>{const b=document.createElement('button');b.textContent=t;b.dataset.v=v;b.onclick=()=>{closePops();vA=v;show();};P.appendChild(b);};
-  head('The Coupe as it is');for(const [v,t] of VERS.slice(0,4))add(v,t);
+  head('The Coupe as it is');for(const [v,t] of VERS.slice(0,5))add(v,t);
   for(const L of LODS){head(`Traffic · about ${fmt(L)} triangles`);for(const [s,t] of SURF)add(`t${L}_${s}`,t);}}
 {const P=$('versB');for(const [v,t] of YOURS){const b=document.createElement('button');b.textContent=t;b.dataset.v=v;b.onclick=()=>{closePops();vB=v;show();};P.appendChild(b);}}
 $('ab').onclick=()=>pop('versA','ab');$('bb').onclick=()=>pop('versB','bb');$('paintb').onclick=()=>pop('paints','paintb');
@@ -252,6 +254,6 @@ window.VIEWER={THREE,scene,camera,controls,renderer,build,show,
   hold(h){held=h;},snap(){frame();return cv.toDataURL('image/png');},
   async set(o){if(o.scene)scn=o.scene;if(o.v)vA=o.v;if(o.you)vB=o.you;if(o.cam)cam=o.cam;if(o.d)dist=o.d;if(o.dir)coming=o.dir!=='going';if(o.pic)PIC=o.pic;if(o.lights!=null)lights=o.lights;await show();
     /* (the picture tool's own views round the car, in Studio: face, tail, side, rear34) */
-    const V={face:[[4.4,.9,1.6],[2.1,.55,0]],tail:[[-4.4,1.0,1.6],[-2.1,.6,0]],side:[[0,.9,8.5],[0,.6,0]],rear34:[[-5.2,1.6,4.3],[0,.7,0]],wheel:[[2.4,.45,2.6],[1.32,.36,.82]]}[o.view];
+    const V={face:[[4.4,.9,1.6],[2.1,.55,0]],tail:[[-4.4,1.0,1.6],[-2.1,.6,0]],side:[[0,.9,8.5],[0,.6,0]],rear34:[[-5.2,1.6,4.3],[0,.7,0]],under:[[2.6,-1.9,2.4],[0,.4,0]],cabin:[[1.6,1.9,2.4],[-.2,.9,0]],wheel:[[2.4,.45,2.6],[1.32,.36,.82]]}[o.view];
     if(V&&controls.enabled){camera.position.set(...V[0]);controls.target.set(...V[1]);controls.update();}},
   stats(){return {A:A&&{v:A.v,n:A.n,d:A.d,tex:A.tex},B:B&&{v:B.v,n:B.n,d:B.d},px:scn==='road'?pixels():null};}};

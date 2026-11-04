@@ -14,8 +14,16 @@ HD_CARS.coupe2={
   skip:{FACES:['coupe'],TAILS:['coupe'],FRONTS:['lip'],REARS:['coupeDiff'],HOODS:['coupe']},
   /* (the game's underbody and its four straight pipes are left off: the underside below is built whole) */
   noGame:{under:1,exhaust:1},
-  build(out){
-    const b=out.b,lk=b.look;
+  build(out){cp2Build(out,{});},
+  views:HD_CARS.coupe.views
+};
+/* THE COUPE'S STUDIO 2 FOR DRIVING (KIT.setAlt('2d')): the same car, the cabin and the whole underside kept (it shows
+   through the windows, and when the car rolls), its own engine bay left out: the game's own small one takes its
+   place, part of the underside, so the space under the bonnet isn't empty seen from below or through the vents.
+   Studio 2 itself is the car in the dyno bay, bonnet up. */
+HD_CARS.coupe2d={skip:HD_CARS.coupe2.skip,noGame:HD_CARS.coupe2.noGame,build(out){cp2Build(out,{drive:1});},views:HD_CARS.coupe.views};
+function cp2Build(out,o){
+    const b=out.b,lk=b.look,gameBay=out.bay;
     const W=cpWheel(lk.tyre);out.wheel=out.wheelR=W.spin;out.brake=out.brakeR=W.fixed;
     /* (the wheel houses run deeper in, for the wishbones and coilovers inside them) */
     const ar=new MB();hdArches(ar,out,{zi:.5});out.hd.arches=ar;
@@ -27,9 +35,10 @@ HD_CARS.coupe2={
     {const x=new MB();cpExtras(x,out);out.hd.extras=x;}
     out.bay=cpBay2(out);
     out.under=cpUnder(out);
+    /* (driving: Studio 2's bay is built as ever, so the rest comes out the same, then the game's own small bay is used
+       in its place) */
+    if(o.drive)out.bay={bay:gameBay.bay,engine:gameBay.engine,liner:new MB()};
     /* the bay is drawn all the time, as part of the body: with the bonnet shut it is what you see looking up past the
        cradle from underneath (only the pad under the bonnet still lifts with it) */
     hdPut(out.under,out.bay.bay);hdPut(out.under,out.bay.engine);out.bay.bay=new MB();out.bay.engine=new MB();
-  },
-  views:HD_CARS.coupe.views
-};
+}
