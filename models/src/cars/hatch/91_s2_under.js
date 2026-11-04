@@ -20,7 +20,8 @@
    - The tank in its straps under the rear seat, a saddle over the propshaft; the lines along the floor (two brake
      lines, the fuel's feed and return), the handbrake's cables to the rear calipers.
    o: the build's choices: skids (an aluminium guard under the sump, the gearbox and the subframe, one under the
-   tank), spring (the struts' springs' colour), exhaust 'straight' (a pipe in place of the centre box).
+   tank; skidU0 where the first starts, behind a stone guard of the build's own), spring and damper (the struts'
+   colours), exhaust 'straight' (a pipe in place of the centre box).
    ===================================================================================== */
 function htUnder2(car,o={}){
   const K=HDK,D=K.D,X=K.X,lk=D.look,L=D.L,LY=htLay(car,o),dy=LY.dy,yb=LY.yb,U=new MB(),G=D.G;
@@ -83,12 +84,12 @@ function htUnder2(car,o={}){
   for(const u of [.42,.9])part(mb=>{const pts=[];for(let k=0;k<=12;k++)pts.push(Pt(u,sfy+.002,-sfz+2*sfz*k/12));hdSweep(mb,pts,hdRRect(.024,.022,.007,3),FRAME,[0,1,0],true,true);},40);
   /* each side: the L-shaped lower arm (its front bush and the rear one), the ball joint; the knuckle and its steering
      arm, the strut (its damper up through the spring into the tower); the drive shaft out of the transaxle */
-  for(const s of [1,-1]){const Q=([u,y,z])=>Pt(u,y,s*z),bj=Q([uFa,yb(.19)+(R-.3),hubZ-.02]),fp=Q([uFa-.11,sfy+.01,sfz+.02]),rp=Q([uFa+.22,sfy+.01,sfz+.04]);
+  for(const s of [1,-1]){const Q=([u,y,z])=>Pt(u,y,s*z),bj=Q([uFa,.19+(R-.3),hubZ-.02]),fp=Q([uFa-.11,sfy+.01,sfz+.02]),rp=Q([uFa+.22,sfy+.01,sfz+.04]);
     cpBar(U,[fp,Q([uFa-.06,sfy+.005,(sfz+hubZ)/2]),bj],.02,.012,.006,ARM,[0,1,0],40);cpBar(U,[rp,Q([uFa+.1,sfy+.004,(sfz+hubZ)/2+.02]),bj],.018,.011,.006,ARM,[0,1,0],40);
     cpBush(U,fp,[1,0,0],.022,.05);cpBush(U,rp,[0,1,0],.03,.03);
     part(mb=>{ball(mb,bj,.022,14,FORGE);hdCyl(mb,bj,V3.add(bj,[0,.04,0]),.012,.01,12,FORGE);},30);
     /* the knuckle: a cast upright behind the hub, its arm back to the tie rod's end */
-    const kn=Q([uFa,R,hubZ-.035]);part(mb=>{hdRBox(mb,V3.add(kn,[0,-.04,0]),[.05,.09,.025],.015,CV,3);hdTube(mb,[V3.add(kn,[-.03,-.04,0]),Q([uFa+.1,yb(.36)+(R-.3),tw-.13])],.012,10,CV,false,true);},30);
+    const kn=Q([uFa,R,hubZ-.035]);part(mb=>{hdRBox(mb,V3.add(kn,[0,-.04,0]),[.05,.09,.025],.015,CV,3);hdTube(mb,[V3.add(kn,[-.03,-.04,0]),Q([uFa+.1,.36+(R-.3),tw-.13])],.012,10,CV,false,true);},30);
     /* the strut: from the knuckle up and in to the tower's mount */
     const sb=V3.add(kn,[0,.06,-s*.0]),top=Q([uFa+.03,archY(D,uFa+.03)+.035,.56]);
     cpCoilover(U,sb,top,{bodyL:V3.len(V3.sub(top,sb))*.55,s0:V3.len(V3.sub(top,sb))*.48,s1:V3.len(V3.sub(top,sb))*.9,rs:.052,turns:5,wire:.01,spring:SPR,body:DAMP});
@@ -128,7 +129,7 @@ function htUnder2(car,o={}){
      drive shaft */
   for(const s of [1,-1]){const Q=([u,y,z])=>Pt(u,y,s*z),hc=Q([uRa,R,hubZ-.035]);
     part(mb=>{hdRBox(mb,V3.add(hc,[0,-.03,0]),[.06,.085,.024],.015,CV,3);},30);
-    for(const du of [-.06,.06]){const a=Q([uRa+du,rfy-.005,rfz-.01]),bb=Q([uRa+du,yb(.2)+(R-.3),hubZ-.04]);cpBar(U,[a,V3.lerp(a,bb,.5),bb],.014,.014,.005,ARM,[0,1,0],40);cpBush(U,a,[1,0,0],.02,.04);cpBush(U,bb,[1,0,0],.02,.04);}
+    for(const du of [-.06,.06]){const a=Q([uRa+du,rfy-.005,rfz-.01]),bb=Q([uRa+du,.2+(R-.3),hubZ-.04]);cpBar(U,[a,V3.lerp(a,bb,.5),bb],.014,.014,.005,ARM,[0,1,0],40);cpBush(U,a,[1,0,0],.02,.04);cpBush(U,bb,[1,0,0],.02,.04);}
     {const a=Q([uRa-.3,legY(uRa-.3)-.06,RZ+.02]),bb=Q([uRa-.03,R-.04,hubZ-.05]);part(mb=>{hdCyl(mb,a,bb,.012,.012,12,ARM);},30);cpBush(U,a,[0,0,1],.022,.04);
       part(mb=>{hdRBox(mb,V3.add(a,[0,.035,0]),[.03,.035,.02],.004,FRAME,2);},30);}
     const sb=V3.add(hc,[0,.06,0]),top=Q([uRa+.02,archY(D,uRa+.02)+.03,.55]);
@@ -189,8 +190,8 @@ function htUnder2(car,o={}){
 
   /* ================= the guards (o.skids) ================= */
   if(o.skids){const SK=SMC('#b4b7bb',SM.BRUSH),y=yb(.165);
-    part(mb=>{const rows=[];for(let u=.04;u<=1.05+1e-6;u+=.02){const row=[];for(let z=-.46;z<=.461;z+=.023)row.push(Pt(u,y+.04*sm01((.16-u)/.12)+.03*sm01((u-.9)/.15),z));rows.push(row);}hdLoft(mb,rows,SK,false,true);},30);
-    part(mb=>{for(let k=0;k<6;k++)hdRBox(mb,Pt(.3+k*.12,y-.003,0),[.004,.003,.42],.002,SK,1);for(const [u,z] of [[.3,-.2],[.3,.2],[.62,0],[.85,-.25],[.85,.25]])hdCyl(mb,Pt(u,y-.001,z),Pt(u,y-.004,z),.028,.028,20,SMC('#111214',SM.PAINTED));
-      for(const u of [.1,.5,.95])for(const z of [-.43,.43])cpHex(mb,Pt(u,y-.002,z),[0,-1,0],.009,.005);},25);}
+    const g0=o.skidU0||.04;part(mb=>{const rows=[];for(let u=g0;u<=1.05+1e-6;u+=.02){const row=[];for(let z=-.46;z<=.461;z+=.023)row.push(Pt(u,y+.04*sm01((g0+.12-u)/.12)+.03*sm01((u-.9)/.15),z));rows.push(row);}hdLoft(mb,rows,SK,false,true);},30);
+    part(mb=>{for(let k=0;k<6;k++)if(.3+k*.12>g0+.02)hdRBox(mb,Pt(.3+k*.12,y-.003,0),[.004,.003,.42],.002,SK,1);for(const [u,z] of [[.3,-.2],[.3,.2],[.62,0],[.85,-.25],[.85,.25]].filter(([u])=>u>g0+.03))hdCyl(mb,Pt(u,y-.001,z),Pt(u,y-.004,z),.028,.028,20,SMC('#111214',SM.PAINTED));
+      for(const u of [g0+.06,.5,.95].filter(u=>u>=g0+.05))for(const z of [-.43,.43])cpHex(mb,Pt(u,y-.002,z),[0,-1,0],.009,.005);},25);}
   return U;
 }

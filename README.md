@@ -33,7 +33,7 @@ the game's own and Studio only: they have no baked version.
 | [SUV Rock & Mud](models/suv-rockmud/) | Done | 528,718 (+34,076 engine bay) | 790,531 | Studio only | 61,432 | Studio only | ![SUV Rock & Mud](models/suv-rockmud/docs/front34.webp) |
 | [SUV Race](models/suv-race/) | Done | 481,953 (+37,330 engine bay) | 764,065 | Studio only | 49,108 | Studio only | ![SUV Race](models/suv-race/docs/front34.webp) |
 | [Coupe GT](models/coupe-gt/) | Done | 430,719 (+31,390 engine bay) | To do | Studio only | 52,023 | Studio only | ![Coupe GT](models/coupe-gt/docs/front34.webp) |
-| [Hatch Group B](models/hatch-groupb/) | Done | 455,649 (+31,206 engine bay) | To do | Studio only | 52,579 | Studio only | ![Hatch Group B](models/hatch-groupb/docs/front34.webp) |
+| [Hatch Group B](models/hatch-groupb/) | Done | 455,649 (+31,206 engine bay) | 653,575 | Studio only | 52,579 | Studio only | ![Hatch Group B](models/hatch-groupb/docs/front34.webp) |
 | [Wedge](models/wedge/) | Done | 499,931 (+20,510 engine bay) | To do | Studio only | 45,696 | Studio only | ![Wedge](models/wedge/docs/front34.webp) |
 | [Wedge Night Runner](models/wedge-nightrunner/) | Done | 535,168 (+20,538 engine bay) | To do | Studio only | 48,735 | Studio only | ![Wedge Night Runner](models/wedge-nightrunner/docs/front34.webp) |
 | [Hypercar](models/hyper/) | Done | 602,807 (+20,430 engine bay) | To do | Studio only | 50,283 | Studio only | ![Hypercar](models/hyper/docs/front34.webp) |
@@ -70,6 +70,7 @@ and wheel positions are exactly the game's.
 | SUV Sleeper | 892,380 | 313,328 | 167,138 | 75,128 | 84,840 | 14,754 | 55,678 | 3,620 | 8.1 s | [front](models/suv-sleeper/docs/s2_front34.webp), [rear](models/suv-sleeper/docs/s2_rear34low.webp), [under](models/suv-sleeper/docs/s2_under.webp), [bay](models/suv-sleeper/docs/s2_bay.webp), [cabin](models/suv-sleeper/docs/s2_cabin.webp) |
 | SUV Rock & Mud | 790,531 | 328,949 | 147,774 | 66,300 | 84,840 | 12,468 | 34,490 | 3,060 | 9.4 s | [front](models/suv-rockmud/docs/s2_front34.webp), [rear](models/suv-rockmud/docs/s2_rear34low.webp), [under](models/suv-rockmud/docs/s2_under.webp), [bay](models/suv-rockmud/docs/s2_bay.webp), [cabin](models/suv-rockmud/docs/s2_cabin.webp) |
 | SUV Race | 764,065 | 279,211 | 162,371 | 75,916 | 87,291 | 15,452 | 32,336 | 3,620 | 8.4 s | [front](models/suv-race/docs/s2_front34.webp), [rear](models/suv-race/docs/s2_rear34low.webp), [under](models/suv-race/docs/s2_under.webp), [bay](models/suv-race/docs/s2_bay.webp), [cabin](models/suv-race/docs/s2_cabin.webp) |
+| Hatch Group B | 653,575 | 188,897 | 84,672 | 56,608 | 105,592 | 24,566 | 44,914 | 3,396 | 4.8 s | [front](models/hatch-groupb/docs/s2_front34.webp), [rear](models/hatch-groupb/docs/s2_rear34low.webp), [under](models/hatch-groupb/docs/s2_under.webp), [bay](models/hatch-groupb/docs/s2_bay.webp), [cabin](models/hatch-groupb/docs/s2_cabin.webp) |
 <!-- /S2TABLE -->
 
 ## The viewer

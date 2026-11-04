@@ -132,7 +132,7 @@ function htBay2(car,o={}){
     P(mb=>{hdCyl(mb,Pt(u,y,-zl+.05),Pt(u,y,zl-.05),.024,.024,16,ALU);for(const s of [1,-1])hdRBox(mb,Pt(u,y+.02,s*.2),[.022,.03,.03],.006,ALU,2);
       hdCyl(mb,Pt(u,y,-zl+.1),Pt(u-.03,y+.16,-zl+.06),.018,.018,14,ALU);hdCyl(mb,Pt(u-.03,y+.16,-zl+.06),Pt(u-.06,y+.24,-zl+.03),.012,.012,10,R0);},30);
     for(const s of [1,-1]){cpBoot(st,Pt(u,y,s*(zl-.05)),Pt(u,y,s*(zl+.06)),.026,.02,6);
-      const k=Pt(D.uFa+.1,yb(.36),s*(LY.tw-.13));P(mb=>{hdCyl(mb,Pt(u,y,s*(zl+.06)),k,.009,.009,10,R0);ball(mb,k,.016,12,R0);},30);}}
+      const k=Pt(D.uFa+.1,.36+(LY.R-.3),s*(LY.tw-.13));P(mb=>{hdCyl(mb,Pt(u,y,s*(zl+.06)),k,.009,.009,10,R0);ball(mb,k,.016,12,R0);},30);}}
   /* the prop rod along the radiator support */
   P(mb=>{const a=[X(uRad-.04),edge(uRad-.04)-.045,-(hz(uRad)-.12)],bb=[X(uRad-.04),edge(uRad-.04)-.045,hz(uRad)-.3];hdCyl(mb,a,bb,.0045,.0045,8,SMC('#2a2a2c',SM.ENGINE));});
 
