@@ -1,0 +1,39 @@
+{
+ "car": "hatchB",
+ "game": {
+  "triangles": 52579,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 455649,
+  "triangles_bay": 31206,
+  "by_piece": {
+   "body": 217810,
+   "lamp_head": 16864,
+   "lamp_tail": 8438,
+   "lamp_amber": 6724,
+   "lamp_reverse": 1366,
+   "under": 2693,
+   "hide": 56,
+   "hood": 8458,
+   "bay": 31206,
+   "wheel_fr": 44914,
+   "brake_fr": 3396,
+   "wheel_fl": 44914,
+   "brake_fl": 3396,
+   "wheel_rr": 44914,
+   "brake_rr": 3396,
+   "wheel_rl": 44914,
+   "brake_rl": 3396
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 88,
+  "draws_glb_traffic": 86,
+  "texture_mb": 0,
+  "glb_mb": 13.9,
+  "data_mb": 9.2
+ },
+ "baked": null
+}
