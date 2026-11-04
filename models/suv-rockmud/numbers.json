@@ -1,0 +1,39 @@
+{
+ "car": "crawler",
+ "game": {
+  "triangles": 61432,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 528718,
+  "triangles_bay": 34076,
+  "by_piece": {
+   "body": 331657,
+   "lamp_head": 13360,
+   "lamp_tail": 11298,
+   "lamp_amber": 5110,
+   "lamp_reverse": 1936,
+   "under": 4165,
+   "hide": 124,
+   "hood": 10868,
+   "bay": 34076,
+   "wheel_fr": 34490,
+   "brake_fr": 3060,
+   "wheel_fl": 34490,
+   "brake_fl": 3060,
+   "wheel_rr": 34490,
+   "brake_rr": 3060,
+   "wheel_rl": 34490,
+   "brake_rl": 3060
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 100,
+  "draws_glb_traffic": 98,
+  "texture_mb": 0,
+  "glb_mb": 15.7,
+  "data_mb": 12.5
+ },
+ "baked": null
+}
