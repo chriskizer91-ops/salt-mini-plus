@@ -1,0 +1,580 @@
+/* =====================================================================================
+   REDLINE COUNTY: SALT FLATS (the demo). Salt Mini (Salt Mini Flame Test's copy: the game's own physics, HUD, keys,
+   touch controls, cameras, the Digital Engine's sound, the Tune sheet, the presets, the flames and the dust), for the
+   stock Coupe only, with the pieces the game will have:
+   - your car on the road is the Coupe's Studio 2 Drive (Studio 2 with its engine bay left out: the cabin and the
+     underside kept);
+   - the menu is the dyno bay: the car stopped where it stands as the full Studio 2, the bonnet up, the engine shaking
+     on its mounts with the revs, the back wheels turning with them as on a dyno, the Tune sheet beside it;
+   - traffic: the 5k Coupe with the Studio 2 surface baked on (src/flats/traffic.js), one car every 600 m to begin with.
+   The road and the salt are Salt Mini's: a ten-mile road across a bare salt flat.
+   ===================================================================================== */
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {Sky} from 'three/addons/objects/Sky.js';
+import {makeMats} from './mats.js';
+import {makeTuner,makeSheet} from './tuner.js';
+import {makeFlames} from './flames.js';
+import {makeDust} from './dust.js';
+import {makeTraffic} from './traffic.js';
+
+const K=window.KIT,DR=window.DRIVE,UI=window.UI,Q=new URLSearchParams(location.search);
+const cv=document.getElementById('cv'),$=id=>document.getElementById(id);
+const COARSE=matchMedia('(pointer: coarse)').matches,HOVERLESS=matchMedia('(hover: none)').matches;
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance',preserveDrawingBuffer:!!Q.get('shots')});
+renderer.setPixelRatio(Math.min(devicePixelRatio,HOVERLESS?1.5:2));renderer.toneMapping=THREE.NeutralToneMapping;renderer.toneMappingExposure=.74;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(55,1,.25,6000);
+const {meshes,mergedMeshes}=makeMats(THREE,K);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+/* ---------- the save: the tune, the gearing, the driving level, the traction and handling, the steering, the camera ---------- */
+const SAVE_KEY='sf-flats',HAND0={rear:1,slide:1,steer:1};
+/* the Flame tune (the bay's button), what a real flame-thrower runs: a big turbo with anti-lag (it keeps the turbo
+   lit off the throttle by burning fuel in the hot side on purpose: bangs and fire on every lift), a straight pipe (no
+   cat, no muffler: nothing to cool the fire or catch it before the tip), a race cam (its overlap pushes unburnt
+   mixture into the pipe), the pops and crackle all the way up (the overrun fuel), a hard-cut limiter and a two-step
+   (every cut lights what's in the pipe). This page starts on it. */
+const FLAME_T={nos:3,fi:'turbo',tsize:2,boost:1.4,antilag:1,intake:2,ex:3,crackle:1,cam:2,redline:6800,limiter:'hard',launch:1,launchRpm:4500};
+const FLAME_WHY='A big turbo with anti-lag, a straight pipe (no cat, no muffler), a race cam, the pops and crackle all the way up, a hard-cut limiter and a two-step at 4,500 rpm. Fire when you lift off, at every cut of the limiter, on the two-step (brake and gas at a stop) and off the throttle with the anti-lag.';
+/* the bay's presets: each one a whole setup, the engine (the Tune sheet's own keys), the final drive and the Plus tune,
+   and the Drive tab's driving level, traction and handling. Each was found and checked by driving it on this page's
+   physics (README: Presets). */
+const HAND1={rear:1,slide:1,steer:1};
+const PRESETS=[
+  {id:'stock',name:'Stock',hud:'STOCK',T:{nos:3},fd:0,plus:0,trac:1,level:'middle',hand:HAND1,
+    why:'The car as it left the factory, with a 125-shot of nitrous fitted.'},
+  {id:'flame',name:'Flame',hud:'FLAME',T:FLAME_T,fd:0,plus:0,trac:1,level:'middle',hand:HAND1,why:FLAME_WHY},
+  {id:'drift',name:'Drift & donuts',hud:'DRIFT',T:{nos:3,layout:'V8',fi:'none',disp:7.4,redline:6800,cam:2,ex:3,crackle:.8,limiter:'hard'},fd:4.1,plus:0,trac:1,level:'real',hand:{rear:.8,slide:1.15,steer:1.4},
+    why:'A 7.4 big-block with a race cam (a lot of torque, all at once), short 4.10 gears to break the tyres loose, and no helpers (Help: Real), so nothing catches the slide. The tail lets go sooner (back-end grip 80%), slides are easier to hold (115%) and the wheels turn further at speed (140%). Floor it at full lock for donuts; countersteer to hold a drift.'},
+  {id:'top',name:'Top speed',hud:'TOP SPEED',T:{nos:4,layout:'V8',fi:'turbo',tsize:0,boost:3.5,disp:9,redline:10700,intake:2,ex:3,cam:3},fd:1.8,plus:6,trac:2,level:'middle',hand:HAND1,
+    why:'The fastest the physics allows: a 9-litre turbo at 3.5 bar to 10,700 rpm, the Plus tune at ×6 (about 20,000 hp), 1.80 gears and the ground at 200%. On the SUV, about 514 mph near mile 9½. Past that the tyres, not the engine, are the limit: more power goes no faster.'},
+  {id:'grip',name:'Grip',hud:'GRIP',T:{nos:3,layout:'V8',fi:'none',disp:6.2,cam:1},fd:4.88,plus:0,trac:2,level:'middle',hand:{rear:1.25,slide:1.25,steer:1},
+    why:'Smooth power and a firm hold: a 6.2 V8 with a street cam and no boost, 4.88 off-road gears, traction control on (Help: Middle), the ground at 200% (as the county plays) and grip up at both ends (125%). On the SUV, floored from a stop on the salt, the tyres slip about 1.5% (stock: about 3%), and 0 to 60 is about 6 seconds.'}];
+/* the factory cars, each driven on its own build (the game's physics, engine and sound for it) and drawn as the game
+   draws it (Game) or modelled for a close look (Studio: Salt Mini Plus's models, built here from their code) */
+/* (by body, then each of its builds that has a Studio model: the game's build ids, 32_builds and 37_newbuilds) */
+/* (the demo: the stock Coupe only; the others come in later) */
+const BODIES=[['Coupe',[['coupe','Stock']]]];
+const CARS=[],BODY_OF={},BUILD_NAME={};for(const [body,bs] of BODIES)for(const [id,bn] of bs){CARS.push([id,bn==='Stock'?body:body+' '+bn]);BODY_OF[id]=body;BUILD_NAME[id]=bn;}
+const CAR_NAME=Object.fromEntries(CARS);
+/* the HUD's name: the body for a stock car, the build's own name otherwise (SUV, SLEEPER, NIGHT RUNNER) */
+const hudName=id=>(BUILD_NAME[id]==='Stock'?BODY_OF[id]:BUILD_NAME[id]).toUpperCase();
+/* the versions a car has: the game's own, its Studio model, and a second Studio version where one has been made */
+/* (on the road the Studio 2 Drive; in the dyno bay the full Studio 2) */
+const VERS=[['studio2d','Studio 2 Drive'],['studio2','Studio 2']];
+const hasVer=(id,v)=>!!(K.HD_CARS&&K.HD_CARS[id+(v==='studio2d'?'2d':'2')]);
+const sameT=(a,b)=>{const ka=Object.keys(a),kb=Object.keys(b);return ka.length===kb.length&&ka.every(k=>a[k]===b[k]);};
+/* (a preset's engine as the sheet would make it on the car fitted: the torque goes with the displacement) */
+const presetT=p=>tuner.sheetT(p.raw||p.T);
+function presetMatch(){return PRESETS.find(p=>sameT(presetT(p),state.T)&&(p.fd||0)===(state.fd||0)&&(p.plus||0)===(state.plus||0)&&Math.abs(p.trac-state.trac)<1e-6&&p.level===state.level&&
+  Object.keys(HAND1).every(k=>Math.abs(p.hand[k]-state.hand[k])<1e-6))||null;}
+/* (the demo starts on the stock Coupe, its factory engine with the 125-shot: the Stock preset) */
+const state=(()=>{const d={car:'coupe',ver:'studio2d',tunes:{},T:{nos:3},fd:0,plus:0,level:'middle',trac:1,hand:Object.assign({},HAND0),steerMode:'slide',cam:0,traffic:600};
+  try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+    if(s&&typeof s==='object'){if(s.T&&typeof s.T==='object')d.T=s.T;if(s.fd>=1.5&&s.fd<=5)d.fd=s.fd;if(s.plus>=1&&s.plus<=12)d.plus=s.plus;if([0,600,300,150].includes(s.traffic))d.traffic=s.traffic;if(s.tunes&&typeof s.tunes==='object')d.tunes=s.tunes;if(DR.ASSISTS[s.level])d.level=s.level;
+      if(s.trac>=.5&&s.trac<=2)d.trac=s.trac;if(s.hand)for(const k in HAND0)if(s.hand[k]>=.5&&s.hand[k]<=2)d.hand[k]=s.hand[k];
+      if(['slide','tilt','buttons'].includes(s.steerMode))d.steerMode=s.steerMode;if(s.cam>=0&&s.cam<=3)d.cam=s.cam|0;}}catch(e){}return d;})();
+const save=()=>{try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch(e){}};
+
+/* ---------- the sky, the sun behind the truck as it heads down the road, and the light the sky gives ---------- */
+const sky=new Sky();sky.scale.setScalar(1000);const su=sky.material.uniforms;
+/* (drawn first and behind everything: the salt runs out past the sky's box) */
+sky.material.depthTest=false;sky.material.depthWrite=false;sky.renderOrder=-1;
+su.turbidity.value=3.2;su.rayleigh.value=1.25;su.mieCoefficient.value=.004;su.mieDirectionalG.value=.8;
+const SUN=new THREE.Vector3().setFromSphericalCoords(1,THREE.MathUtils.degToRad(46),THREE.MathUtils.degToRad(-118));su.sunPosition.value.copy(SUN);
+scene.add(sky);
+{const pm=new THREE.PMREMGenerator(renderer),s2=new THREE.Scene(),k=new Sky();k.scale.setScalar(1000);Object.assign(k.material.uniforms.sunPosition.value,SUN);
+  for(const n of ['turbidity','rayleigh','mieCoefficient','mieDirectionalG'])k.material.uniforms[n].value=su[n].value;s2.add(k);
+  /* (the salt under the sky picture: white, so the truck's flanks pick it up as they would out there) */
+  const g=new THREE.Mesh(new THREE.CircleGeometry(900,32),new THREE.MeshBasicMaterial({color:0xb9b4aa}));g.rotation.x=-Math.PI/2;g.position.y=-2;s2.add(g);
+  scene.environment=pm.fromScene(s2,.02).texture;scene.environmentIntensity=.55;}
+const sun=new THREE.DirectionalLight(0xfff3e2,2.2);sun.castShadow=true;const SMAP=HOVERLESS?1024:2048;sun.shadow.mapSize.set(SMAP,SMAP);
+Object.assign(sun.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:1,far:60});sun.shadow.bias=-.0004;sun.shadow.normalBias=.03;sun.shadow.radius=3;
+scene.add(sun,sun.target);scene.add(new THREE.HemisphereLight(0xc8d8f0,0xe2dccf,.3));
+const FOG=0xe3e5e6;scene.fog=new THREE.Fog(FOG,500,4600);
+
+/* ---------- the salt and the road ---------- */
+const MILE=1609.344,ROAD_X0=-250,ROAD_X1=10*MILE+400,ROAD_HW=5;
+const onRoad=(x,z)=>x>ROAD_X0&&x<ROAD_X1&&Math.abs(z)<ROAD_HW;
+/* the ground for the physics: flat; the road the game's blacktop, the salt the game's own salt (its 'strip') */
+/* (and the traffic: each car near you a box the body can't go through) */
+let TRAFFIC=null;
+const world=new DR.GroundWorld((x,z,o)=>{o.y=0;o.n[0]=0;o.n[1]=1;o.n[2]=0;o.surf=onRoad(x,z)?'asphalt':'strip';},{near:(x,z)=>TRAFFIC?TRAFFIC.near(x,z):[]},1e9);
+const TL=new THREE.TextureLoader(),TEX={};
+for(const [k,d] of Object.entries(window.GROUND_TEX)){const t=TL.load(d);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());TEX[k]=t;}
+/* the salt: one big square that follows the truck (moved a whole step at a time), the picture laid three sizes over
+   itself from where it lies in the world so it never repeats in an obvious way and never slides */
+const SALT_SIZE=9600,SALT_SNAP=480,SC=[7.5,31,260];
+const saltU={uO1:{value:new THREE.Vector4()},uO2:{value:new THREE.Vector2()}};
+const saltMat=new THREE.MeshStandardMaterial({map:TEX.salt,roughness:.93,metalness:0,polygonOffset:true,polygonOffsetFactor:2,polygonOffsetUnits:4});
+saltMat.onBeforeCompile=s=>{Object.assign(s.uniforms,saltU);
+  s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nvarying vec2 vLoc;').replace('#include <begin_vertex>','#include <begin_vertex>\nvLoc=position.xz;');
+  s.fragmentShader=s.fragmentShader.replace('#include <common>','#include <common>\nvarying vec2 vLoc;uniform vec4 uO1;uniform vec2 uO2;').replace('#include <map_fragment>',
+    `vec3 sa=texture2D(map,vLoc/${SC[0].toFixed(1)}+uO1.xy).rgb,sb=texture2D(map,vLoc/${SC[1].toFixed(1)}+uO1.zw).rgb,sc=texture2D(map,vLoc/${SC[2].toFixed(1)}+uO2).rgb;
+     diffuseColor.rgb*=sa*mix(.86,1.1,sb.r)*mix(.92,1.05,sc.g)*1.06;`);};
+saltMat.envMapIntensity=.45;
+/* (in 150 m squares: one giant triangle's depth comes out too rough near the camera, and the salt showed through the road) */
+const saltGeo=new THREE.PlaneGeometry(SALT_SIZE,SALT_SIZE,64,64);saltGeo.rotateX(-Math.PI/2);
+const salt=new THREE.Mesh(saltGeo,saltMat);salt.receiveShadow=true;scene.add(salt);
+const fr=v=>v-Math.floor(v);
+function saltFollow(x,z){const cx=Math.round(x/SALT_SNAP)*SALT_SNAP,cz=Math.round(z/SALT_SNAP)*SALT_SNAP;if(salt.position.x===cx&&salt.position.z===cz)return;
+  salt.position.set(cx,0,cz);saltU.uO1.value.set(fr(cx/SC[0]),fr(cz/SC[0]),fr(cx/SC[1]+.37),fr(cz/SC[1]+.61));saltU.uO2.value.set(fr(cx/SC[2]+.71),fr(cz/SC[2]+.13));}
+saltFollow(0,0);
+/* the road: blacktop in 400 m pieces (each its own picture coordinates, so nothing far down the road loses
+   precision), white edge lines, a yellow dashed centre line, a white bar at the start, the quarter mile and each mile */
+{const SEG=400,asph=new THREE.MeshStandardMaterial({map:TEX.asphalt,color:0x8c8c8c,roughness:.86,metalness:0,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2});
+  const paint=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.62,metalness:0,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4});
+  const TILE=3.2,W=new THREE.Color(0xe8e6df),Y=new THREE.Color(0xe0b43a);
+  for(let x0=ROAD_X0;x0<ROAD_X1;x0+=SEG){const x1=Math.min(x0+SEG,ROAD_X1),g=new THREE.PlaneGeometry(x1-x0,ROAD_HW*2,1,1);g.rotateX(-Math.PI/2);
+    const U=g.attributes.uv,P=g.attributes.position;for(let i=0;i<P.count;i++){const lx=P.getX(i),lz=P.getZ(i);U.setXY(i,(lx+(x1-x0)/2)/TILE+fr(x0/TILE),lz/TILE);}
+    const m=new THREE.Mesh(g,asph);m.position.set((x0+x1)/2,.012,0);m.receiveShadow=true;scene.add(m);
+    const pos=[],col=[],quad=(ax,az,bx,bz,c)=>{const y=.016;pos.push(ax,y,az, bx,y,az, bx,y,bz, ax,y,az, bx,y,bz, ax,y,bz);for(let k=0;k<6;k++)col.push(c.r,c.g,c.b);};
+    for(const s of [-1,1])quad(x0,s*(ROAD_HW-.35),x1,s*(ROAD_HW-.2),W);
+    for(let d=Math.ceil(x0/12)*12;d<x1;d+=12)quad(d,-.07,Math.min(d+3.5,x1),.07,Y);
+    for(const bx of [0,MILE/4,...Array.from({length:10},(_,i)=>(i+1)*MILE)])if(bx>=x0&&bx<x1)quad(bx-.3,-ROAD_HW+.2,bx+.3,ROAD_HW-.2,W);
+    const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));pg.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+    pg.computeVertexNormals();const pm=new THREE.Mesh(pg,paint);pm.receiveShadow=true;scene.add(pm);}}
+/* the signs: the start, the quarter mile, each mile, and the end, on posts by the right-hand side of the road */
+{const backM=new THREE.MeshStandardMaterial({color:0x8d9095,metalness:.6,roughness:.45}),post=new THREE.CylinderGeometry(.05,.05,2.2,10),postM=new THREE.MeshStandardMaterial({color:0x8a8d92,metalness:.7,roughness:.4});
+  const sign=(x,txt,sub,bg)=>{const c=document.createElement('canvas');c.width=256;c.height=160;const g=c.getContext('2d');
+    g.fillStyle=bg;g.fillRect(0,0,256,160);g.strokeStyle='#fff';g.lineWidth=8;g.strokeRect(10,10,236,140);g.fillStyle='#fff';g.textAlign='center';
+    g.font='700 64px system-ui,sans-serif';g.fillText(txt,128,sub?84:102);if(sub){g.font='600 30px system-ui,sans-serif';g.fillText(sub,128,128);}
+    const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;
+    const grp=new THREE.Group(),p=new THREE.Mesh(post,postM);p.position.y=1.1;p.castShadow=true;grp.add(p);
+    /* (the face toward the oncoming truck, a plain grey back) */
+    const b=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1),new THREE.MeshStandardMaterial({map:t,roughness:.5}));b.position.set(-.012,2.2,0);b.rotation.y=-Math.PI/2;b.castShadow=true;grp.add(b);
+    const bk=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1),backM);bk.position.set(.012,2.2,0);bk.rotation.y=Math.PI/2;grp.add(bk);
+    grp.position.set(x,0,ROAD_HW+2.5);scene.add(grp);};
+  sign(0,'START','','#1c5e2f');sign(MILE/4,'¼ MILE','','#1c4a7a');
+  for(let i=1;i<=10;i++)sign(i*MILE,String(i),i===1?'MILE':'MILES','#1c5e2f');
+  sign(ROAD_X1-30,'END','ROAD','#7a1c1c');}
+
+/* ---------- your car: the Studio 2 Drive on the road, the full Studio 2 in the dyno bay (each built once and kept) ---------- */
+let truck=null;const TRUCKS={};const carRoot=new THREE.Group();carRoot.matrixAutoUpdate=false;scene.add(carRoot);
+const FX=makeFlames(THREE,carRoot);
+const DUST=makeDust(THREE,scene,{max:COARSE?220:360});
+/* the car the physics is driving. Everything fixed to the body is merged, one mesh a material (the shell, the Studio's
+   parts, the underside); at each wheel a steering group holding the brake (it steers but doesn't roll) and the wheel
+   (it rolls too), following the physics'. On the road (Drive) the bonnet is part of the body. In the bay the bonnet
+   (with the pad under it) is on its hinge to lift, and the engine is a piece of its own, to shake on its mounts. */
+function buildTruck(which){const t0=performance.now(),id=state.car,bayV=which==='bay';
+  K.setHD(true);if(K.setAlt)K.setAlt(bayV?'2':'2d');if(K.keepEngine)K.keepEngine(bayV);
+  let T;try{T=K.studioBuild(id,.25);}finally{K.setHD(true);if(K.setAlt)K.setAlt('');if(K.keepEngine)K.keepEngine(false);}const b=T.b,D=T.D,body=new THREE.Group();
+  const fixed=[T.body];for(const [nm,src] of Object.entries(T.hd||{}))if(src&&src.p&&nm!=='hood')fixed.push(src);if(T.under)fixed.push(T.under);
+  body.add(mergedMeshes(fixed,'body',b));
+  const hoodM=mergedMeshes([T.hood,T.hd&&T.hd.hood].filter(Boolean),'hood',b),has=x=>x&&x.p&&x.p.length;let hood=null,engine=null;
+  if(bayV){hood=new THREE.Group();hood.matrixAutoUpdate=false;hood.add(hoodM);if(T.bay&&has(T.bay.liner))hood.add(mergedMeshes([T.bay.liner],'liner',b));body.add(hood);
+    if(T.bay&&has(T.bay.engine)){engine=new THREE.Group();engine.matrixAutoUpdate=false;const em=mergedMeshes([T.bay.engine],'engine',b);engine.add(em);body.add(engine);
+      /* (it rocks about the crank, along the car: the middle of the engine, on the car's centre line) */
+      const bb=new THREE.Box3().setFromObject(em),c=bb.getCenter(new THREE.Vector3());engine.userData.pivot=new THREE.Vector3(c.x,bb.min.y+(bb.max.y-bb.min.y)*.35,0);}}
+  else body.add(hoodM,mergedMeshes([T.hide],'hide',b));
+  const wF=mergedMeshes([T.wheel],'wheel',b),wR=T.wheelR===T.wheel?wF:mergedMeshes([T.wheelR],'wheel',b);
+  const bF=T.brake?mergedMeshes([T.brake],'brake',b):null,bR=T.brakeR?(T.brakeR===T.brake?bF:mergedMeshes([T.brakeR],'brake',b)):bF;
+  const root=new THREE.Group(),wheels=[];root.add(body);
+  for(const w of car.wheels){const steer=new THREE.Group(),spin=new THREE.Group();steer.matrixAutoUpdate=spin.matrixAutoUpdate=false;
+    spin.add((w.front?wF:wR).clone());steer.add(spin);const br=w.front?bF:bR;if(br)steer.add(br.clone());root.add(steer);wheels.push({steer,spin});}
+  let tris=0,draws=0;root.traverse(m=>{if(m.isMesh){if(m.castShadow!==false)m.castShadow=!(m.material&&m.material.transparent);tris+=m.geometry.index?m.geometry.index.count/3:m.geometry.attributes.position.count/3;draws++;}});
+  return {root,wheels,D,b,tris,draws,id,ver:bayV?'studio2':'studio2d',ms:performance.now()-t0,hood,engine,hinge:D.hood.hinge,hoodOpen:D.hoodOpen||1};}
+function showTruck(which){const t=TRUCKS[which]||(TRUCKS[which]=buildTruck(which));if(truck===t)return;if(truck)truck.root.removeFromParent();truck=t;carRoot.add(t.root);FX.setTips(t.D.tips,t.root);place();}
+/* the dyno bay's life: the bonnet up, the engine shaking with the revs (a quick shudder at idle that smooths out as it
+   revs, and the whole engine rocking over on its mounts against the torque as it's revved), the back wheels turned by
+   the engine in fourth, as on a dyno's rollers */
+const BAYA={hood:0,t:0,roll:0,wAng:0};const BM1=new THREE.Matrix4(),BM2=new THREE.Matrix4();
+function bayAnim(dt){if(!truck)return;BAYA.t+=dt;const want=bay.open?1:0;BAYA.hood+=(want-BAYA.hood)*Math.min(1,dt*2.6);if(Math.abs(want-BAYA.hood)<1e-3)BAYA.hood=want;
+  if(truck.hood){const [hx,hy]=truck.hinge,k=BAYA.hood,a=k*k*(3-2*k)*truck.hoodOpen;truck.hood.matrix.makeTranslation(hx,hy,0).multiply(BM1.makeRotationZ(a)).multiply(BM2.makeTranslation(-hx,-hy,0));}
+  const e=VOICE.spec||(car&&car.pt.e),rpm=bay.open&&car&&car.pt.running?(bay.rpm||0):0;
+  /* (a little more than a real engine on its mounts, so it can be seen from the bay's camera: about 2.5 mm of shudder
+     at idle and 2.5 degrees of rock flat out) */
+  if(truck.engine&&e){const on=rpm>50,f=Math.min(rpm/60*2,22),idleK=clamp(1.3-rpm/e.redline*1.4,.3,1.3),amp=on?.0019*idleK:0,w=2*Math.PI*f*BAYA.t;
+    BAYA.roll+=((on?bay.pad*.044:0)-BAYA.roll)*Math.min(1,dt*(bay.pad>0?5:3));
+    const y=amp*(Math.sin(w)+.55*Math.sin(1.37*w+1.3)),roll=BAYA.roll+amp*3.2*Math.sin(.5*w+.4),pv=truck.engine.userData.pivot;
+    truck.engine.matrix.makeTranslation(pv.x,pv.y+y,pv.z).multiply(BM1.makeRotationX(roll)).multiply(BM2.makeTranslation(-pv.x,-pv.y,-pv.z));}
+  if(bay.open&&e)BAYA.wAng+=rpm*2*Math.PI/60/(((e.gears&&e.gears[3])||1)*(e.fd||3.73))*dt;}
+
+/* ---------- the physics: the game's own, set up as SUV has it, on the traction and handling chosen ---------- */
+const SURFS=['asphalt','strip','concrete','dirt','gravel','trail','grass','rock','mud','ruts','water'];
+let car=null,E=null,od=false;
+/* traction is the ground's (the game's developer panel): every surface times the setting; 100% is no change at all,
+   exactly as SUV drives. The handling knobs are the car's, each from its own setup */
+function applyTraction(){world.grip=Math.abs(state.trac-1)<1e-6?null:Object.fromEntries(SURFS.map(s=>[s,state.trac]));
+  if(!car)return;const h=state.hand,off=Object.keys(HAND0).some(k=>Math.abs(h[k]-1)>1e-6);car.tune=off?Object.assign({},h):null;if(off||car._tuned)car.applyTune();car._tuned=off;}
+/* (at the start in the right-hand lane, 2.5 m right of the yellow line, as the traffic going your way drives) */
+function spawn(at){const p=at||{x:0,z:2.5,yaw:0};DUST.clear();E=DR.tunedEngine(state.T,state.fd||0,state.plus||0,state.car);car=DR.makeCar(DR.index(state.car),world);car.setAssists(state.level);
+  applyTraction();car.place([p.x,.6,p.z],p.yaw);car.pt.start();od=false;voiceCfg(E);}
+function setOD(on){const pt=car.pt;if(!(pt.e.conv&&!pt.e.cvt&&pt.e.nG>2))return false;od=on;pt.maxG=on?pt.e.nG-1:0;if(on&&pt.gear>pt.maxG&&pt.shiftT<=0)pt.shift(-1);return true;}
+
+/* ---------- the keys (the game's), and the touch controls (the game's 64_touch) ---------- */
+const KEYS={thr:['ArrowUp','KeyW'],brk:['ArrowDown','KeyS'],left:['ArrowLeft','KeyA'],right:['ArrowRight','KeyD'],hb:['Space'],nos:['ShiftLeft','ShiftRight','KeyN'],
+  up:['KeyE','KeyX'],down:['KeyQ','KeyZ'],cam:['KeyC'],stats:['KeyF'],reset:['KeyR'],menu:['Escape','KeyP'],low:['KeyL'],lockers:['KeyK'],ign:['KeyI'],horn:['KeyH'],od:['KeyO'],trac:['KeyT'],rear:['KeyG']};
+const INPUT={down:new Set(),pressed:new Set(),steer:0,thr:0,brk:0};
+const typing=t=>t&&(t.tagName==='SELECT'||t.tagName==='TEXTAREA'||(t.tagName==='INPUT'&&t.type!=='range'));
+addEventListener('keydown',e=>{if(typing(e.target)||e.metaKey||e.ctrlKey||e.altKey)return;wakeAudio();
+  if(!e.repeat){INPUT.down.add(e.code);INPUT.pressed.add(e.code);}if(e.code.startsWith('Arrow')||e.code==='Space')e.preventDefault();});
+addEventListener('keyup',e=>INPUT.down.delete(e.code));
+addEventListener('blur',()=>INPUT.down.clear());
+const keyOn=k=>KEYS[k].some(c=>INPUT.down.has(c)),keyHit=k=>KEYS[k].some(c=>INPUT.pressed.has(c));
+const pedalMap=p=>p<=0?0:1-Math.pow(1-clamp(p,0,1),2.2);
+const TOUCH={on:false,steer:0,steerActive:false,thr:0,brk:0,hb:0,tilt0:null,rear:false,lets:[]};
+const TOUCH_KEY={reset:'KeyR',cam:'KeyC',nos:'KeyN',low:'KeyL',lock:'KeyK',od:'KeyO',horn:'KeyH'};
+const buzz=ms=>{try{if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}};
+function enableTouch(){if(TOUCH.on)return;TOUCH.on=true;document.body.classList.add('touch');UI.setRes(2);syncTouch();}
+function touchLetGo(){for(const f of TOUCH.lets)f();}
+function syncTouch(){$('touch').hidden=!(TOUCH.on&&!bay.open);if(!car)return;const e=car.pt.e,c=car.c.diff.can;
+  $('tNos').hidden=!e.nosKw;$('tLow').hidden=!c.low;$('tLock').hidden=!c.r;$('tOD').hidden=!e.conv;
+  $('tOD').classList.toggle('lit',!!od);$('tRear').classList.toggle('lit',!!TOUCH.rear);$('tLow').classList.toggle('lit',!!car.low);$('tLock').classList.toggle('lit',!!car.locked);
+  $('steerZone').dataset.mode=state.steerMode;$('steerBtns').hidden=state.steerMode!=='buttons';$('steerHint').textContent=state.steerMode==='tilt'?'TILT TO STEER':'SLIDE TO STEER';}
+function bindTouch(){
+  if(COARSE)enableTouch();addEventListener('touchstart',enableTouch,{passive:true,once:true});
+  {const b=$('tRear');b.addEventListener('pointerdown',e=>{e.preventDefault();TOUCH.rear=!TOUCH.rear;b.classList.toggle('lit',TOUCH.rear);buzz(8);});b.addEventListener('contextmenu',e=>e.preventDefault());}
+  for(const b of document.querySelectorAll('#touch .tb[data-k]')){const k=TOUCH_KEY[b.dataset.k];
+    const on=e=>{e.preventDefault();wakeAudio();try{b.setPointerCapture(e.pointerId);}catch(_){}INPUT.down.add(k);INPUT.pressed.add(k);b.classList.add('on');buzz(8);setTimeout(syncTouch,60);},
+      off=e=>{e.preventDefault();INPUT.down.delete(k);b.classList.remove('on');};
+    b.addEventListener('pointerdown',on);for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,off);b.addEventListener('contextmenu',e=>e.preventDefault());}
+  /* the pedals: how high the thumb sits on the pedal is how hard it presses */
+  const pedal=(id,set,min)=>{const el=$(id),fill=el.querySelector('i');let pid=null;
+    const at=e=>{const r=el.getBoundingClientRect(),k=clamp((r.bottom-e.clientY)/(r.height*.82),0,1);const v=min+(1-min)*k;set(v);fill.style.height=(v*100).toFixed(0)+'%';};
+    el.addEventListener('pointerdown',e=>{e.preventDefault();wakeAudio();pid=e.pointerId;try{el.setPointerCapture(pid);}catch(_){}el.classList.add('on');at(e);});
+    el.addEventListener('pointermove',e=>{if(e.pointerId===pid)at(e);});
+    const up=e=>{if(e.pointerId!==pid)return;pid=null;set(0);fill.style.height='0%';el.classList.remove('on');};
+    TOUCH.lets.push(()=>{if(pid!==null){try{el.releasePointerCapture(pid);}catch(_){}}pid=null;set(0);fill.style.height='0%';el.classList.remove('on');});
+    for(const ev of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(ev,up);el.addEventListener('contextmenu',e=>e.preventDefault());};
+  pedal('tGas',v=>TOUCH.thr=v,.12);pedal('tBrk',v=>TOUCH.brk=v,.3);
+  const hb=$('tHb');
+  hb.addEventListener('pointerdown',e=>{e.preventDefault();try{hb.setPointerCapture(e.pointerId);}catch(_){}TOUCH.hb=1;hb.classList.add('on');buzz(15);});
+  for(const ev of ['pointerup','pointercancel','lostpointercapture'])hb.addEventListener(ev,()=>{TOUCH.hb=0;hb.classList.remove('on');});
+  TOUCH.lets.push(()=>{TOUCH.hb=0;hb.classList.remove('on');});
+  /* steering: slide from wherever the thumb lands */
+  const z=$('steerZone'),knob=$('steerKnob');let sid=null,x0=0;
+  const span=()=>Math.max(70,Math.min(130,innerWidth*.11));
+  const show=(v,x)=>{knob.style.transform=`translateX(${(v*span()).toFixed(1)}px)`;if(x!==undefined)$('steerTrack').style.left=(x-z.getBoundingClientRect().left)+'px';};
+  z.addEventListener('pointerdown',e=>{if(state.steerMode!=='slide')return;e.preventDefault();wakeAudio();sid=e.pointerId;x0=e.clientX;try{z.setPointerCapture(sid);}catch(_){}TOUCH.steerActive=true;TOUCH.steer=0;z.classList.add('on');show(0,x0);});
+  z.addEventListener('pointermove',e=>{if(e.pointerId!==sid)return;const d=(e.clientX-x0)/span(),v=Math.sign(d)*Math.pow(Math.min(1,Math.abs(d)),1.15);TOUCH.steer=v;show(v);});
+  const sup=e=>{if(e.pointerId!==sid)return;sid=null;TOUCH.steer=0;TOUCH.steerActive=false;z.classList.remove('on');show(0);};
+  for(const ev of ['pointerup','pointercancel','lostpointercapture'])z.addEventListener(ev,sup);
+  TOUCH.lets.push(()=>{if(sid!==null){try{z.releasePointerCapture(sid);}catch(_){}}sid=null;TOUCH.steer=0;TOUCH.steerActive=false;z.classList.remove('on');show(0);});
+  for(const [id,dir] of [['tLeft',-1],['tRight',1]]){const b=$(id);
+    b.addEventListener('pointerdown',e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId);}catch(_){}INPUT.down.add(dir<0?'ArrowLeft':'ArrowRight');b.classList.add('on');});
+    for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>{INPUT.down.delete(dir<0?'ArrowLeft':'ArrowRight');b.classList.remove('on');});}
+  /* tilt: the phone's roll, measured from how it was held when tilt was switched on */
+  addEventListener('deviceorientation',e=>{if(state.steerMode!=='tilt'||e.beta==null)return;
+    const ang=(screen.orientation&&screen.orientation.angle)||window.orientation||0,raw=ang===90?e.beta:ang===270||ang===-90?-e.beta:e.gamma;
+    if(TOUCH.tilt0===null)TOUCH.tilt0=raw;let d=raw-TOUCH.tilt0;if(Math.abs(d)<1.5)d=0;TOUCH.steer=clamp(d/24,-1,1);show(TOUCH.steer);});
+}
+async function enableTilt(){TOUCH.tilt0=null;try{if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')await DeviceOrientationEvent.requestPermission();}catch(e){}}
+/* the keys and the touch controls into one input, as the game's pollInput (the gas on W is all or nothing, as SUV has it) */
+function pollInput(dt){
+  const out={steer:0,thr:0,brk:0,hb:0,nos:false,lock:false};
+  const tgt=(keyOn('right')?1:0)-(keyOn('left')?1:0),rate=tgt===0?6:Math.sign(tgt)!==Math.sign(INPUT.steer)&&INPUT.steer!==0?8:3.2;
+  INPUT.steer+=clamp(tgt-INPUT.steer,-rate*dt,rate*dt);
+  let pth=0;for(let d=1;d<=9;d++)if(INPUT.down.has('Digit'+d)||INPUT.down.has('Numpad'+d))pth=Math.max(pth,d/10);
+  INPUT.thr+=clamp((keyOn('thr')?1:pth)-INPUT.thr,-8*dt,6*dt);INPUT.brk+=clamp((keyOn('brk')?1:0)-INPUT.brk,-10*dt,8*dt);
+  out.steer=INPUT.steer;out.thr=INPUT.thr;out.brk=INPUT.brk;out.hb=keyOn('hb')?1:0;out.nos=keyOn('nos');out.rear=keyOn('rear');
+  for(const k of ['up','down','cam','reset','menu','low','lockers','ign','od','trac','stats'])out[k]=keyHit(k);
+  if(TOUCH.on){if(TOUCH.steerActive||state.steerMode==='tilt')out.steer=TOUCH.steer;if(TOUCH.thr>0)out.thr=Math.max(out.thr,pedalMap(TOUCH.thr));if(TOUCH.brk>0)out.brk=Math.max(out.brk,TOUCH.brk);if(TOUCH.hb)out.hb=1;}
+  INPUT.pressed.clear();return out;
+}
+/* the bottle: the physics empties it while it fires (eight seconds a bottle); it fills again, about twelve seconds
+   from empty, while the button is off */
+function nosStep(dt,inp){const pt=car.pt;if(!pt.e.nosKw)return;if(!inp.nos)pt.nos=Math.min(1,pt.nos+dt/12);}
+
+/* ---------- the engine's sound: the Digital Engine (the game's 17_audio), heard from the bay's spot behind ---------- */
+const VOICE={spec:null,port:null,popT:0,flame:0,flameL:0};
+let audioBusy=false;
+/* a browser plays sound only after a tap or a key: the first one starts it (and any later one, if it was stopped) */
+/* A phone lets sound start only once a finger has come off the glass: pressing the gas counts for nothing until
+   it's let go. So this runs on releases as well as presses, and never waits on the start: a start the phone
+   holds back is simply asked for again on the next touch (waiting on it once left a phone silent for good). */
+async function wakeAudio(){const a=UI.ENG.audio;if(a&&a.ctx.state==='running'&&VOICE.port)return;
+  if(a&&a.ctx.state!=='running')a.ctx.resume().catch(()=>{});
+  if(audioBusy)return;audioBusy=true;
+  try{await UI.initAudio();const A=UI.ENG.audio;if(A.ctx.state!=='running')A.ctx.resume().catch(()=>{});if(!VOICE.port&&car){VOICE.spec=E||car.pt.e;UI.voiceNode(VOICE);}}
+  catch(e){console.warn('sound: '+(e&&e.message||e));}audioBusy=false;}
+for(const t of ['pointerup','touchend','click'])addEventListener(t,wakeAudio,{capture:true,passive:true});
+let cfgT=0;
+function voiceCfg(e,live){VOICE.spec=e;if(!VOICE.port)return;const now=performance.now();if(live&&now-cfgT<100)return;cfgT=now;VOICE.port.post({t:'cfg',cfg:DR.SIM.dspCfg(e)});}
+function soundUpdate(dt){
+  if(!UI.ENG.audio||!VOICE.port||!car)return;const pt=car.pt;
+  let geo={dist:(VOICE.spec&&VOICE.spec.behindDist)||3,pan:0,rear:1},lis=0,dop=1;if(CAMV[state.cam]==='Hood'&&!bay.open)geo={dist:3.2,pan:0,rear:.3};
+  /* Cinematic: heard from where the camera stands (the lab's Trackside), louder and brighter close by, with the
+     pitch the truck's speed toward or away from it gives (up coming in, down going away) */
+  if(CAMV[state.cam]==='Cinematic'&&!bay.open&&!rearOn&&cine.ok){const toC=cine.p.clone().sub(CP),d=toC.length(),u=toC.clone().divideScalar(Math.max(d,1e-3)),
+      F=new THREE.Vector3(car.M[0],car.M[3],car.M[6]),camR=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
+    geo={dist:clamp(d*.6,2,60),pan:clamp(-u.dot(camR)*.9,-1,1),rear:clamp(.5-.5*u.dot(F),0,1)*.6+.4};lis=2;
+    const vr=car.v[0]*u.x+car.v[1]*u.y+car.v[2]*u.z;dop=clamp(343/(343-vr),.65,1.45);}
+  const ep=pt.soundParams(lis,car.speed,geo);if(dop!==1)ep.rpm*=dop;ep.horn=!bay.open&&keyOn('horn')?1:0;ep.jake=pt.jakeOn?3:0;
+  /* in the bay the truck stands still and the engine is the rev pad's: up toward the redline while it's held, back
+     to idle when it's let go, in the engine as tuned */
+  if(bay.open){const e=VOICE.spec||pt.e,top=e.redline*.985;if(bay.rpm==null)bayRev(0);ep.rpm=bay.rpm;ep.load=bay.pad;ep.cutFrac=bay.pad>.97&&bay.rpm>top*.985?.6:0;
+    ep.boost=e.fiBoost?e.fiBoost*bay.pad*clamp((bay.rpm/e.redline-.35)/.4,0,1):0;ep.nos=0;ep.speed=0;ep.twostep=0;ep.antilag=0;ep.jake=0;}
+  for(const ev of pt.takeEvents())VOICE.port.post({t:'ev',ev});
+  VOICE.port.post({t:'p',p:ep});
+}
+
+/* ---------- the flames: how much fire the engine as built can throw, and when it throws it ---------- */
+/* how open each exhaust (the Tune sheet's System, by its place in the list) leaves the way out: a muffler and a cat
+   cool and catch it, a straight pipe or an open header lets it out at the tip */
+const EX_OPEN=[.12,.3,.55,1,.9,.7,.85,1,.3,.9,.6,.4,.5,.2,.3,.1,.5,.8,.3];
+/* 0 to 1: the pipe's openness times how much unburnt fuel reaches it (the pops and crackle, the cam, the anti-lag).
+   The stock truck comes out about 0.05: no fire to speak of. The Flame tune is 1. */
+function flameReady(e){const open=EX_OPEN[e.ex|0]??.5,rich=Math.max(e.crackle||0,(e.cam|0)/3*.8,e.antilag?1:0);return clamp(open*(.35+.65*rich),0,1);}
+const FL={k:0,len:1,burst:0,rev:0,hi:0,lifted:false,thrPrev:0,rpmPrev:0,gear:1,cutMax:0,two:false,al:false,overrun:0,crT:0,cuT:0,S:0,t:0};
+/* inside each physics step: the limiter's cut, the two-step, the anti-lag (each lasts only a step or two) */
+function flTrack(){const pt=car.pt,e=pt.e;if(pt.cutFrac>FL.cutMax)FL.cutMax=pt.cutFrac;if(pt.twostep)FL.two=true;if(e.antilag&&e.turbo&&pt.thr<.2&&pt.running)FL.al=true;}
+/* the bay's revs: up toward the redline while the pad is held, back to idle when it's let go (the sound hears these) */
+function bayRev(dt){const pt=car.pt,e=VOICE.spec||pt.e,top=e.redline*.985;if(bay.rpm==null)bay.rpm=pt.running?(pt.rpmOut||e.idle):0;
+  const tgt=pt.running?e.idle+(top-e.idle)*bay.pad:0;bay.rpm+=(tgt-bay.rpm)*Math.min(1,dt*(bay.pad>0?4.5:2.6));}
+function flameStep(dt){if(!car)return;const pt=car.pt,e=VOICE.spec||pt.e,S=FL.S=flameReady(e),cr=e.crackle||0;FL.t+=dt;
+  let rpm,thr,cut,two,al,shift=false;
+  if(bay.open){rpm=bay.rpm==null?e.idle:bay.rpm;thr=bay.pad;cut=bay.pad>.97&&rpm>e.redline*.97?1:0;two=false;al=!!(e.antilag&&e.turbo)&&thr<.2&&rpm>e.idle*1.25;}
+  else{rpm=pt.running?pt.rpm:0;thr=pt.thr;cut=FL.cutMax;two=FL.two;al=FL.al;shift=pt.gear>FL.gear;FL.gear=pt.gear;}
+  const r=clamp((rpm-e.idle)/Math.max(1,e.redline-e.idle),0,1),burst=v=>{if(v>FL.burst){FL.burst=v;FL.len=.65+.65*Math.random();}};
+  if(pt.running||bay.open){
+    /* lifting off high in the revs: the overrun's fuel lights in the pipe, then crackles on for a moment */
+    /* (the engine eases its own throttle shut over a fifth of a second, so a lift is: off now, on hard a moment ago) */
+    FL.hi=Math.max(thr,FL.hi-dt*1.5);if(thr>.5)FL.lifted=false;
+    if(!FL.lifted&&thr<.2&&FL.hi>.55&&r>.35){burst(S*(.6+.6*r)*(.55+.45*cr));FL.overrun=.35+.9*cr;FL.lifted=true;}
+    if(FL.overrun>0){FL.overrun-=dt;if(thr<.15&&r>.2){FL.crT-=dt;if(FL.crT<=0){burst(S*(.25+.7*Math.random())*cr);FL.crT=.04+.14*Math.random();}}}
+    /* the anti-lag off the throttle: it burns fuel in the hot side on purpose, so the pipe keeps spitting */
+    if(al){FL.crT-=dt;if(FL.crT<=0){const up=rpm>e.idle*1.3;burst(S*(up?.5+.7*Math.random():.1+.12*Math.random()));FL.crT=up?.03+.09*Math.random():.6+1*Math.random();}}
+    /* (at idle it only spits now and then, as a rally car sitting with its anti-lag on) */
+    /* the limiter and the two-step: every cut sends unburnt mixture into the pipe */
+    if(cut>.2||two){FL.cuT-=dt;if(FL.cuT<=0){burst(S*(two?1:e.limiter==='hard'?.85:.35)*(.7+.6*Math.random()));FL.cuT=two?.03+.05*Math.random():.05+.08*Math.random();}}
+    /* a shift up under power: the cut while the gear changes */
+    if(shift&&r>.4&&FL.thrPrev>.5)burst(S*(.45+.55*r));}
+  /* a blip: the revs climbing fast high up (the bay, the two-step, the tyres spinning) */
+  const rise=clamp((rpm-FL.rpmPrev)/Math.max(dt,1e-3)/(e.redline*2),0,1),want=thr>.4?S*.6*rise*clamp((r-.45)/.4,0,1):0;
+  FL.rev+=(want-FL.rev)*(1-Math.exp(-dt*14));FL.burst*=Math.exp(-dt*7);
+  /* and a bang in the sound (the Digital Engine's pops) throws one of its own */
+  FL.k=Math.max(FL.rev,FL.burst,(VOICE.flame||0)*Math.max(S,.12));
+  FL.thrPrev=thr;FL.rpmPrev=rpm;FL.cutMax=0;FL.two=false;FL.al=false;
+  FX.update(FL.t,FL.k,FL.len,car.speed);}
+/* ---------- the Car tab: the one car, and what each of its versions is ---------- */
+function syncCarTab(){for(const id of ['carChips','buildChips','verChips'])$(id).hidden=true;const w=$('carWhy');if(!w)return;
+  const d=TRUCKS.drive,y=TRUCKS.bay,k=t=>t?Math.round(t.tris).toLocaleString('en-US')+' triangles, '+t.draws+' draws':'…';
+  w.textContent=`The stock Coupe. On the road it's the Studio 2 Drive (${k(d)}): Studio 2 with its engine bay left out, the cabin and the underside kept. `+
+    `Here in the dyno bay it's the full Studio 2 (${k(y)}): the bonnet up, the engine shaking with the revs, the back wheels turning with them. `+
+    (TRAFFIC&&TRAFFIC.ready?`The traffic is the 5k Coupe with the Studio 2 surface baked on (${Math.round(TRAFFIC.tris).toLocaleString('en-US')} triangles a car, pictures ${TRAFFIC.pic[0]} x ${TRAFFIC.pic[1]}, ${Math.round(TRAFFIC.mb)} MB for all of them): ${TRAFFIC.n} cars, ${TRAFFIC.draws} draws.`:'');}
+
+/* a preset: the whole setup at once, then every sheet and the note brought up to date */
+function applyPreset(p){state.T=presetT(p);state.fd=p.fd||0;state.plus=p.plus||0;state.trac=p.trac;state.level=p.level;state.hand=Object.assign({},p.hand);
+  applyTraction();if(car)car.setAssists(state.level);const l=$('levelWhy');if(l)l.textContent=LEVEL_WHY[state.level]||'';tuner.refresh(true);driveSheet.sync();save();}
+/* the chip lit for the preset that's fitted (none once anything is changed by hand), and its note */
+function presetNote(){const pm=presetMatch(),w=$('presetWhy'),ev=state.car==='ev';
+  for(const b of $('presets').children)b.hidden=ev&&b.dataset.id!=='stock';
+  if(ev&&w&&!pm){w.textContent='The EV runs on its electric motor, which the engine presets don\'t fit: Stock puts it back as it left the factory.';}
+  for(const b of $('presets').children)b.setAttribute('aria-pressed',String(!!pm&&b.dataset.id===pm.id));
+  if(w&&!(ev&&!pm))w.textContent=pm?(ev&&pm.id==='stock'?'The EV as it left the factory. It runs on its electric motor, which the engine presets don\'t fit.':pm.id==='stock'?DR.desc(state.car)+' With a 125-shot of nitrous fitted.':pm.why):'Your own setup. Pick a preset to start from one of these.';}
+
+/* ---------- the cameras: the game's Chase, Far and Hood, the rear view, Cinematic, and free round the truck in the bay ---------- */
+/* Cinematic: a camera standing still by the road ahead of the truck, turning to follow it as it comes and goes by
+   and zooming to keep it framed (wide close up, long lens far off), the way a camera crew shoots a car. Each shot
+   runs about fourteen seconds whatever the speed. Once the truck is well past, the next camera is set up further on, on the other side most of the time, at another
+   height. Stopped, it stands a little way off to one side. Its sound is heard from where it stands. */
+const cine={p:new THREE.Vector3(),dir:new THREE.Vector3(1,0,0),look:new THREE.Vector3(),fov:30,ok:false,side:1,d:10};
+const CINE_H=[.6,1.2,1.8,3.2,6];
+function cineSpot(){const v=car.speed,dir=FW.clone();if(v>2){const vv=new THREE.Vector3(car.v[0],0,car.v[2]);if(vv.lengthSq()>1)dir.copy(vv.normalize());}
+  const right=new THREE.Vector3(-dir.z,0,dir.x);cine.side=Math.random()<.75?-cine.side:cine.side;
+  const ahead=v<2?0:clamp(v*8.2,60,1050)*(.8+Math.random()*.4),lat=(v<2?11:7+Math.random()*11)*cine.side,h=CINE_H[(Math.random()*CINE_H.length)|0];
+  cine.p.copy(CP).addScaledVector(dir,ahead).addScaledVector(right,lat);cine.p.y=h;cine.dir.copy(dir);cine.look.copy(CP).addScaledVector(UP,.8);cine.ok=true;cine.cut=true;cine.n=(cine.n||0)+1;}
+function cineStep(dt,cut){
+  if(!cine.ok||cut)cineSpot();
+  const rel=CP.clone().sub(cine.p),along=rel.dot(cine.dir),d=rel.length(),v=car.speed;
+  /* the truck well past (or gone somewhere else, or parked far off): the next camera */
+  if(along>clamp(v*6,60,800)||d>2500||v<2&&d>70)cineSpot();
+  const k=cine.cut?1:1-Math.exp(-dt*7);cine.look.lerp(CP.clone().addScaledVector(UP,.8),k);
+  cine.d=cine.p.distanceTo(cine.look);
+  /* the zoom: the truck about a quarter of the frame's height, whatever the distance */
+  const want=clamp(2*Math.atan(3.6/Math.max(cine.d,1))*180/Math.PI,1.2,55);cine.fov=cine.cut?want:cine.fov+(want-cine.fov)*(1-Math.exp(-dt*1.5));cine.cut=false;
+  camera.position.copy(cine.p);camera.lookAt(cine.look);}
+const CAMV=['Chase','Far','Hood','Cinematic'];
+const orbit=new OrbitControls(camera,cv);orbit.enabled=false;orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI*.495;orbit.minDistance=2.5;orbit.maxDistance=40;
+const chase={off:new THREE.Vector3(-7.2,2.3,0),l:new THREE.Vector3()};
+const tmpM=new THREE.Matrix4(),cgM=new THREE.Matrix4(),CP=new THREE.Vector3(),FW=new THREE.Vector3(),UP=new THREE.Vector3(0,1,0),RY=new THREE.Matrix4(),SZ=new THREE.Matrix4(),RZ=new THREE.Matrix4();
+const CU=new THREE.Vector3(),CF=new THREE.Vector3();
+function place(){const M=car.M,p=car.p,cg=car.cg;
+  tmpM.set(M[0],M[1],M[2],p[0],M[3],M[4],M[5],p[1],M[6],M[7],M[8],p[2],0,0,0,1);cgM.makeTranslation(-cg[0],-cg[1],0);carRoot.matrix.multiplyMatrices(tmpM,cgM);carRoot.matrixWorldNeedsUpdate=true;
+  if(!truck)return;car.wheels.forEach((w,k)=>{const Wh=truck.wheels[k];if(!Wh)return;const s=w.hp[2]<0?-1:1,st=w.front?car.steer:0;
+    Wh.steer.matrix.makeTranslation(w.hp[0]+cg[0],w.hp[1]-w.len+cg[1],w.hp[2]).multiply(RY.makeRotationY(-st)).multiply(SZ.makeScale(1,1,s));
+    /* (in the dyno bay the driven wheels turn with the engine) */
+    Wh.spin.matrix.makeRotationZ(-(bay.open&&car.pt.drv&&car.pt.drv.includes(k)?w.ang+BAYA.wAng:w.ang));});}
+let fovK=0,baseFov=55,rearOn=false,lastMode='';
+function camStep(dt){const M=car.M;CP.set(car.p[0],car.p[1],car.p[2]);FW.set(M[0],0,M[6]);if(FW.lengthSq()<1e-4)FW.set(1,0,0);FW.normalize();
+  const mode=bay.open?'Look':rearOn?'Rear':CAMV[state.cam],cut=mode!==lastMode;lastMode=mode;
+  /* the offset is kept round the truck, so the camera never falls behind however fast it goes */
+  const back=mode==='Far'?-12:-7.2,lift=mode==='Far'?3.8:2.3,want=mode==='Rear'?FW.clone().multiplyScalar(6.8).addScaledVector(UP,2.2):FW.clone().multiplyScalar(back).addScaledVector(UP,lift);
+  if(cut)chase.off.copy(want);else chase.off.lerp(want,1-Math.exp(-dt*4));
+  chase.l.copy(CP).addScaledVector(UP,.9);
+  /* a little wider the faster it goes, and a touch more on nitrous */
+  const mph=car.speed*2.237;fovK+=((Math.min(mph,320)/320)*12+(car.pt.nosOn?5:0)-fovK)*(1-Math.exp(-dt*2.5));
+  if(mode==='Look'){orbit.target.lerp(chase.l,1-Math.exp(-dt*8));orbit.update();}
+  else if(mode==='Hood'){CF.set(M[0],M[3],M[6]).normalize();CU.set(M[1],M[4],M[7]).normalize();
+    camera.position.copy(CP).addScaledVector(CF,.35).addScaledVector(CU,1.08);camera.up.copy(CU);camera.lookAt(CP.clone().addScaledVector(CF,30).addScaledVector(CU,.7));camera.up.set(0,1,0);}
+  else if(mode==='Cinematic')cineStep(dt,cut);
+  else if(mode==='Rear'){camera.position.copy(CP).add(chase.off);camera.lookAt(CP.clone().addScaledVector(FW,-8).addScaledVector(UP,.6));}
+  else{camera.position.copy(CP).add(chase.off);camera.lookAt(chase.l);}
+  /* (on the long lens the near plane moves out with the truck, so the road and the salt keep their depth apart a quarter of a mile off) */
+  camera.fov=mode==='Cinematic'?cine.fov:baseFov+(mode==='Look'?0:fovK);camera.near=mode==='Cinematic'?clamp(cine.d*.12,.25,120):.25;camera.updateProjectionMatrix();
+  /* the sun's shadow and the salt follow the truck */
+  sun.position.copy(CP).addScaledVector(SUN,30);sun.target.position.copy(CP);sky.position.copy(camera.position);saltFollow(CP.x,CP.z);frameView();}
+
+/* ---------- the HUD: the game's dots over the picture (its FS_HUDDOT, 55_post), its words on their own canvas ---------- */
+const hudScene=new THREE.Scene(),hudCam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+let hudTex=null,hudBuf=null;
+const hudMat=new THREE.ShaderMaterial({uniforms:{uHud:{value:null},uRect:{value:new THREE.Vector4()},uRes:{value:new THREE.Vector2()}},
+  vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',
+  fragmentShader:`uniform sampler2D uHud;uniform vec4 uRect;uniform vec2 uRes;
+void main(){
+  vec2 p=(gl_FragCoord.xy-uRect.xy)/uRect.zw;vec3 add=vec3(0.);float a=0.;
+  if(p.x>=0.&&p.y>=0.&&p.x<=1.&&p.y<=1.){vec2 cell=p*uRes,id=floor(cell),f=fract(cell)-.5;vec4 hu=texture2D(uHud,vec2((id.x+.5)/uRes.x,1.-(id.y+.5)/uRes.y));
+    if(hu.a>0.){float fw=max(fwidth(cell.x),fwidth(cell.y)),d=length(f),dm=1.-smoothstep(.42-fw*.6,.42+fw*.6,d),far=smoothstep(.38,.95,fw),
+      m=mix(dm*(.82+.4*(1.-smoothstep(0.,.42,d))),.62,far);
+      add+=min(hu.rgb*1.15,vec3(1.))*m*hu.a;a=hu.a*.82;}}
+  gl_FragColor=vec4(add,a);}`,
+  transparent:true,depthTest:false,depthWrite:false,blending:THREE.CustomBlending,blendSrc:THREE.OneFactor,blendDst:THREE.OneMinusSrcAlphaFactor,blendEquation:THREE.AddEquation});
+hudScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),hudMat));
+const DB=new THREE.Vector2();
+function hudDraw(){
+  const pm=presetMatch(),label=hudName(state.car)+(pm?(pm.id==='stock'&&BUILD_NAME[state.car]!=='Stock'?'':' '+pm.hud):' CUSTOM'),x=car.p[0];
+  const place=x<-5?'BEHIND THE START':x>ROAD_X1?'PAST THE END OF THE ROAD':Math.abs(car.p[2])>ROAD_HW+1?'OUT ON THE SALT · MILE '+(x/MILE).toFixed(2):'SALT FLATS ROAD · MILE '+(x/MILE).toFixed(2);
+  UI.miniHud({car,touch:TOUCH.on,label,place,level:state.level,levelName:DR.ASSISTS[state.level].name,trac:state.trac,od,rear:rearOn,popT:VOICE.popT});
+  if(hudBuf!==UI.HB8){hudBuf=UI.HB8;if(hudTex)hudTex.dispose();hudTex=new THREE.DataTexture(hudBuf,UI.BW,UI.BH,THREE.RGBAFormat,THREE.UnsignedByteType);
+    hudTex.magFilter=hudTex.minFilter=THREE.NearestFilter;hudTex.generateMipmaps=false;hudTex.colorSpace=THREE.NoColorSpace;hudMat.uniforms.uHud.value=hudTex;}
+  hudTex.needsUpdate=true;
+  const R=UI.RECT,dpr=renderer.getPixelRatio();renderer.getDrawingBufferSize(DB);
+  hudMat.uniforms.uRect.value.set(Math.round(R.x*dpr),DB.y-Math.round(R.y*dpr)-Math.round(R.h*dpr),Math.round(R.w*dpr),Math.round(R.h*dpr));hudMat.uniforms.uRes.value.set(UI.BW,UI.BH);
+  renderer.autoClear=false;renderer.render(hudScene,hudCam);renderer.autoClear=true;}
+
+/* ---------- the numbers (F): the frame, the CPU's share, the GPU's own time where the browser says ---------- */
+const gl=renderer.getContext(),TQ=gl.getExtension('EXT_disjoint_timer_query_webgl2');
+const GPU=(()=>{const e=gl.getExtension('WEBGL_debug_renderer_info');return e?gl.getParameter(e.UNMASKED_RENDERER_WEBGL):'';})();
+const PERF={on:false,ft:[],js:[],gpu:null,gq:[],t0:0,last:0};
+function gpuBegin(){if(!TQ||!PERF.on)return null;const q=gl.createQuery();gl.beginQuery(TQ.TIME_ELAPSED_EXT,q);return q;}
+function gpuEnd(q){if(!q)return;gl.endQuery(TQ.TIME_ELAPSED_EXT);PERF.gq.push(q);
+  while(PERF.gq.length){const o=PERF.gq[0];if(!gl.getQueryParameter(o,gl.QUERY_RESULT_AVAILABLE))break;PERF.gq.shift();
+    if(!gl.getParameter(TQ.GPU_DISJOINT_EXT)){const ms=gl.getQueryParameter(o,gl.QUERY_RESULT)/1e6;PERF.gpu=PERF.gpu==null?ms:PERF.gpu*.9+ms*.1;}gl.deleteQuery(o);}}
+function perfShow(frameMs,jsMs){PERF.ft.push(frameMs);PERF.js.push(jsMs);if(PERF.ft.length>60){PERF.ft.shift();PERF.js.shift();}
+  const now=performance.now();if(now-PERF.last<500)return;PERF.last=now;const n=PERF.ft.length,avg=PERF.ft.reduce((a,b)=>a+b,0)/n,w=Math.max(...PERF.ft),js=PERF.js.reduce((a,b)=>a+b,0)/n;
+  $('stat').textContent=Math.round(1000/avg)+' FPS';
+  const el=$('perf');el.hidden=!PERF.on||bay.open;if(!PERF.on)return;const i=renderer.info.render;
+  el.textContent=[`${Math.round(1000/avg)} FPS   frame ${avg.toFixed(1)} ms   worst ${w.toFixed(1)}`,`CPU ${js.toFixed(1)} ms   GPU ${PERF.gpu!=null?PERF.gpu.toFixed(1)+' ms':'not reported'}`,
+    `render ${DB.x}×${DB.y}   ${Math.round(i.triangles/1000)}k tris   ${i.calls} draws`,`car ${Math.round((truck?truck.tris:0)/1000)}k tris   traffic ${TRAFFIC?TRAFFIC.drawn+' of '+TRAFFIC.n+' cars drawn':'off'}   sound ${UI.ENG.audio?UI.ENG.audio.worklet?'worklet':'main thread':'off'}`,
+    String(GPU).replace(/^ANGLE \(/,'').slice(0,58)].join('\n');}
+
+/* ---------- the bay (the menu): the truck stopped where it stands, the camera round it, the sheets beside it ---------- */
+const bay={open:false,at:null,pad:0,rpm:null,tab:'tune'};
+const tuner=makeTuner({DR,box:$('tuneRows'),chart:$('dyno'),stats:$('dynoStats'),state,onEngine:(e,final)=>{voiceCfg(e,!final);if(final)save();presetNote();}});
+/* (each preset's engine as the sheet would make it: the torque goes with the displacement) */
+for(const p of PRESETS)p.raw=p.T;tuner.setCar(state.car);
+const pct=v=>Math.round(v*100)+'%';
+const LEVEL_WHY={real:'The truck as it is: ABS and the automatic, nothing catching it. It slides, it spins, it rolls.',
+  middle:'A steering helper, stability control and traction control step in when it starts to get away from you. Still rolls if you really try.',
+  kids:'Everything helps: it holds the road, it won\'t roll over, and it\'s quick to get going.'};
+const DRIVE_ROWS=[
+  {h:'Driving'},
+  {k:'level',l:'Help',t:'seg',opts:()=>['real','middle','kids'].map(id=>[id,DR.ASSISTS[id].name])},
+  {h:'Traction'},
+  {k:'trac',l:'Traction',t:'range',rng:()=>[.5,2,.05],fmt:pct,why:"The ground's grip, every surface at once (the game's developer panel; T steps it 100, 150, 200%). 100% is how SUV drives; the county plays at 200%."},
+  {k:'rear',l:'Back-end grip',t:'range',rng:()=>[.7,1.4,.01],fmt:pct,why:'The rear tyres, from their own grip. Up: the tail holds and the truck pushes wide. Down: the tail steps out sooner.'},
+  {k:'slide',l:'Grip once sliding',t:'range',rng:()=>[.8,1.25,.01],fmt:pct,why:'How much grip a tyre keeps once it breaks loose. Up makes slides gentler and easier to catch.'},
+  {k:'steer',l:'Steering at speed',t:'range',rng:()=>[.7,2,.01],fmt:pct,why:'How far full steering turns the wheels at speed. Up turns harder and slides sooner.'},
+  {h:'Traffic'},
+  {k:'traffic',l:'Traffic',t:'seg',opts:()=>[[0,'Off'],[600,'1 / 600 m'],[300,'1 / 300 m'],[150,'1 / 150 m']],why:'How many cars on the road: one every 600 m of road (both lanes) to begin with, or more, or none. Each is the 5k Coupe with the Studio 2 surface baked on.'},
+  {h:'Steering on a phone'},
+  {k:'steerMode',l:'Steering',t:'seg',opts:()=>[['slide','Slide'],['tilt','Tilt'],['buttons','Buttons']]},
+  {h:'Sound'},
+  {k:'vol',l:'Volume',t:'range',rng:()=>[0,1,.01],fmt:pct},
+  {k:'body',l:'Speaker',t:'seg',opts:()=>[['full','Fuller'],['phone','Phone speaker'],['lab','As the lab']],why:'A little more low end for headphones or a laptop (Fuller), the low mids lifted for a phone\'s own speaker, or flat as the Digital Engine lab has it.'},
+];
+const driveSheet=makeSheet($('driveRows'),DRIVE_ROWS,{ctx:()=>state,
+  get:r=>r.k==='vol'?UI.ENG.vol:r.k==='body'?UI.ENG.body:r.k in HAND0?state.hand[r.k]:state[r.k],
+  set:(r,v,final)=>{if(r.k==='vol')UI.setVolume(v);else if(r.k==='body')UI.setBody(v);else if(r.k in HAND0)state.hand[r.k]=v;else state[r.k]=v;
+    if(r.k==='trac'||r.k in HAND0)applyTraction();if(r.k==='steerMode'){if(v==='tilt')enableTilt();syncTouch();}if(r.k==='trac')tuner.refresh(false);
+    if(r.k==='level'){const l=$('levelWhy');if(l)l.textContent=LEVEL_WHY[v]||'';}
+    if(r.k==='traffic'&&TRAFFIC&&TRAFFIC.ready){TRAFFIC.fill(v,{x:car.p[0]});syncCarTab();}
+    driveSheet.sync();presetNote();if(final)save();}});
+/* (the level's description under its row) */
+{const r=DRIVE_ROWS.find(q=>q.k==='level'),p=document.createElement('p');p.className='why';p.id='levelWhy';p.textContent=LEVEL_WHY[state.level];r.row.appendChild(p);}
+function bayTab(t){bay.tab=t;for(const b of $('mTabs').children)b.setAttribute('aria-selected',String(b.dataset.t===t));
+  for(const el of document.querySelectorAll('#menu .tab'))el.hidden=el.dataset.tab!==t;$('revPad').hidden=t!=='tune';if(t==='tune')tuner.drawChart(tuner.E);}
+for(const b of $('mTabs').children)b.addEventListener('click',()=>bayTab(b.dataset.t));
+function bayToggle(){bay.open?bayClose():bayOpen();}
+function bayOpen(){if(bay.open||!car)return;bay.open=true;touchLetGo();INPUT.down.clear();rearOn=false;
+  bay.at={x:car.p[0],z:car.p[2],yaw:Math.atan2(-car.M[6],car.M[0])};bay.rpm=null;bay.pad=0;
+  /* the truck brought to rest where it stands, the camera to a front three-quarter view round it */
+  spawn(bay.at);for(let i=0;i<360;i++)car.step(1/240,{steer:0,thr:0,brk:0,hb:1,nos:false});
+  /* (the full Studio 2 in: built the first time the bay opens, which takes a moment) */
+  if(!TRUCKS.bay){const L=$('loading');L.textContent='Bringing the Studio 2 into the dyno bay';L.hidden=false;requestAnimationFrame(()=>setTimeout(()=>{showTruck('bay');L.hidden=true;syncCarTab();},20));}else showTruck('bay');place();
+  orbit.enabled=true;const f=FW.set(car.M[0],0,car.M[6]).normalize(),r=new THREE.Vector3(-f.z,0,f.x),d=cv.clientWidth<=700?1.75:1;
+  /* (a front three-quarter view from above, looking down into the bay under the open bonnet) */
+  orbit.target.set(car.p[0],car.p[1]+.2,car.p[2]).addScaledVector(f,.8);
+  camera.position.copy(orbit.target).addScaledVector(f,3.9*d).addScaledVector(r,2.5*d).add(new THREE.Vector3(0,2.1*d,0));orbit.update();
+  UI.txtClear();$('perf').hidden=true;$('menu').hidden=false;syncTouch();tuner.refresh(false);driveSheet.sync();bayTab(bay.tab);}
+function bayClose(){if(!bay.open)return;bay.open=false;bay.pad=0;$('menu').hidden=true;save();BAYA.hood=0;BAYA.wAng=0;showTruck('drive');
+  /* the truck built again with the engine as tuned, where it stood */
+  spawn(bay.at);orbit.enabled=false;syncTouch();}
+/* the rev pad: hold it and the engine (as tuned) climbs toward the redline */
+{const rp=$('revPad'),on=v=>e=>{e.preventDefault();if(v)wakeAudio();bay.pad=v;rp.classList.toggle('on',!!v);};
+  rp.addEventListener('pointerdown',on(1));for(const ev of ['pointerup','pointercancel','pointerleave'])rp.addEventListener(ev,on(0));rp.addEventListener('contextmenu',e=>e.preventDefault());}
+/* with the bay open the picture is shifted so the truck sits in the part of the screen the card leaves free (left of
+   it on a wide screen, above it on a narrow one) */
+function frameView(){const w=cv.clientWidth,h=cv.clientHeight;
+  if(!bay.open){if(camera.view&&camera.view.enabled)camera.clearViewOffset();return;}
+  const narrow=w<=700,sx=narrow?0:Math.min(260,w*.2),sy=narrow?h*.3:0;
+  if(!camera.view||!camera.view.enabled||camera.view.offsetX!==sx||camera.view.offsetY!==sy||camera.view.fullWidth!==w||camera.view.fullHeight!==h)camera.setViewOffset(w,h,sx,sy,w,h);}
+
+/* ---------- one frame of driving (the game's step) ---------- */
+let acc=0;const STEP=1/240;
+function step(dt){
+  const inp=pollInput(dt),pt=car.pt;
+  if(inp.menu){bayToggle();return;}
+  if(bay.open)return;
+  if(inp.cam){state.cam=(state.cam+1)%CAMV.length;save();UI.say(CAMV[state.cam]+' camera',1.2);}
+  if(inp.reset){spawn();UI.say('Back to the start',1.2);return;}
+  if(inp.up)pt.shift(1);if(inp.down)pt.shift(-1);
+  if(inp.low)UI.say(DR.setLow(car,!car.low)?(car.low?'Low range':'High range'):'No low range on this car',1.4);
+  if(inp.lockers)UI.say(DR.setLockers(car,!car.locked)?(car.locked?'Lockers on':'Lockers off'):'No lockers on this car',1.4);
+  if(inp.od)UI.say(setOD(!od)?(od?'Overdrive off':'Overdrive on'):'No overdrive button on this box',1.4);
+  if(inp.trac){const S=[1,1.5,2],i=S.findIndex(v=>Math.abs(v-state.trac)<.01);state.trac=S[(i+1)%S.length];applyTraction();save();UI.say('Traction '+pct(state.trac),1.4);}
+  if(inp.ign){if(pt.st==='off'||pt.st==='stopping'){pt.start();wakeAudio();}else pt.stop();}
+  if(inp.stats){PERF.on=!PERF.on;UI.say(PERF.on?'Performance readout':'Numbers off',1.2);}
+  rearOn=!!(inp.rear||TOUCH.rear);
+  let drive=inp;
+  /* brake and gas together at a standstill: a line lock for a burnout (a launch-control box holds on its trans-brake) */
+  if(!pt.e.launch&&inp.brk>.5&&inp.thr>.3&&car.speed<3&&!car.rev&&pt.running)drive=Object.assign({},inp,{brk:0,lock:true});
+  if((inp.thr>.1||inp.brk>.1)&&pt.st==='off')pt.start();
+  acc+=dt;let n=0;while(acc>=STEP&&n<30){car.step(STEP,drive);flTrack();acc-=STEP;n++;}if(n>=30)acc=0;nosStep(dt,drive);
+  if(car.p[1]<-20)spawn();
+}
+let last=performance.now(),held=false;
+function frame(now){const dt=Math.min(.1,(now-last)/1000),frameMs=now-last;last=now;const t0=performance.now();
+  UI.APP.t+=dt;
+  if(car){step(dt);if(TRAFFIC&&TRAFFIC.ready)TRAFFIC.step(dt,{x:car.p[0],z:car.p[2],vx:car.v[0]});bayAnim(dt);VOICE.flame=Math.max(0,VOICE.flame-dt*9);place();camStep(dt);if(TRAFFIC)TRAFFIC.draw(camera.position.x,camera.position.z);if(bay.open)bayRev(dt);soundUpdate(dt);flameStep(dt);if(!bay.open)DUST.emit(dt,car.wheels,car.v);DUST.step(dt);}
+  if(bay.open)orbit.update();
+  const q=gpuBegin();renderer.render(scene,camera);if(car&&!bay.open)hudDraw();gpuEnd(q);
+  if(!bay.open)UI.txtFlush();
+  perfShow(frameMs,performance.now()-t0);syncTouchLazy(now);}
+let syncT=0;function syncTouchLazy(now){if(now-syncT>400){syncT=now;syncTouch();}}
+function loop(now){if(!held)frame(now);requestAnimationFrame(loop);}
+function resize(){const w=cv.clientWidth,h=cv.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;baseFov=w<h?70:55;camera.fov=baseFov;camera.updateProjectionMatrix();
+  UI.hudLayout();if(bay.open)tuner.drawChart(tuner.E);}
+addEventListener('resize',resize);
+
+/* ---------- start ---------- */
+UI.setRes(COARSE?2:3);UI.txtFonts();resize();bindTouch();
+$('menuBtn').addEventListener('click',()=>{wakeAudio();bayToggle();});$('bayDone').onclick=bayClose;
+{const box=$('presets');for(const p of PRESETS){const b=document.createElement('button');b.type='button';b.textContent=p.name;b.dataset.id=p.id;b.setAttribute('aria-pressed','false');b.onclick=()=>applyPreset(p);box.appendChild(b);}}
+cv.addEventListener('pointerdown',wakeAudio);
+/* the truck is built after the first picture is up (it takes a moment: a few hundred thousand triangles) */
+spawn();place();camStep(1);renderer.render(scene,camera);
+setTimeout(()=>{showTruck('drive');place();$('loading').hidden=true;syncTouch();syncCarTab();requestAnimationFrame(loop);
+  /* the traffic: its pictures read, then the cars on the road */
+  TRAFFIC=makeTraffic(THREE,scene,{K,road:{x0:ROAD_X0,x1:ROAD_X1}});TRAFFIC.init().then(()=>{TRAFFIC.fill(state.traffic,{x:car.p[0]});syncCarTab();}).catch(e=>console.error('traffic: '+e.message));},40);
+window.MINI={THREE,scene,camera,renderer,state,spawn,bayOpen,bayClose,bayTab,tuner,TOUCH,VOICE,wakeAudio,get car(){return car;},get truck(){return truck;},hold(h){held=h;},
+  step(t,inp){/* (the tools' drive: t seconds of the given input, the traffic and the bay with it, then a frame) */const n=Math.round(t/STEP);for(let i=0;i<n;i++){car.step(STEP,inp||{steer:0,thr:0,brk:0,hb:0});if(i%24===0){nosStep(STEP*24,inp||{});if(TRAFFIC&&TRAFFIC.ready)TRAFFIC.step(STEP*24,{x:car.p[0],z:car.p[2],vx:car.v[0]});bayAnim(STEP*24);}}place();camStep(1);},
+  snap(){place();camStep(.05);if(TRAFFIC)TRAFFIC.draw(camera.position.x,camera.position.z);renderer.render(scene,camera);if(!bay.open){hudDraw();UI.txtFlush();}return cv.toDataURL('image/png');},
+  set rear(v){rearOn=v;},get TRAFFIC(){return TRAFFIC;},TRUCKS,BAYA,showTruck,CARS,get cine(){return cine;},PERF,GPU,get E(){return car&&car.pt.e;},FL,FX,bay,DUST,PRESETS,presetMatch,applyPreset,
+  /* (the tools' drive with the flames: t seconds of the input at 60 frames a second, the flames stepped with it) */
+  fx(t,inp,opt={}){const f=1/60,n=Math.round(t/f),I=inp||{steer:0,thr:0,brk:0,hb:0};for(let i=0;i<n;i++){const x=typeof I==='function'?I(i*f):I;
+    if(bay.open){bay.pad=x.pad||0;bayRev(f);bayAnim(f);}else{for(let j=0;j<4;j++){car.step(STEP,x);flTrack();}nosStep(f,x);DUST.emit(f,car.wheels,car.v);}VOICE.flame=Math.max(0,VOICE.flame-f*9);flameStep(f);DUST.step(f);}
+    place();camStep(opt.cam?1/60:1);return {k:+FL.k.toFixed(3),S:+FL.S.toFixed(3),rpm:Math.round(bay.open?bay.rpm:car.pt.rpm),gear:car.pt.gear,mph:Math.round(car.speed*2.237),two:car.pt.twostep};}};

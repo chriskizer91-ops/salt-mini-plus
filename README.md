@@ -1,8 +1,9 @@
 # Salt Mini Plus
 
 Salt Mini Plus is Redline County's physics and logic on a salt flat with a long road and a few traffic cars about
-600 m apart. This repo will hold the game later. For now it holds the traffic cars' models (`models/`) and a page to
-look at them (`viewer/`).
+600 m apart. It holds the traffic cars' models (`models/`), a page to look at them (`viewer/`), and the first cut of the
+game, the **Salt Flats demo** (`game/`, see `game/README.md`): the salt flat and its road, the stock Coupe as Studio 2
+Drive on the road and the full Studio 2 in the dyno bay, and light traffic of 5k Coupes.
 
 Each car comes three ways:
 
@@ -85,6 +86,7 @@ models build exactly the same.
   by every copy of it): 4,976 triangles and 10 draws. Tried on the Coupe and judged plenty good.
 - **Traffic is only ever the basic cars,** the few picked for the game. The souped-up builds are never traffic, so
   they get no traffic version.
+- **The demo starts with the lightest traffic:** one car every 600 m (the Drive tab can set more, or none).
 - **Not decided yet:**
   - which cars the game has. The idea so far: the SUV, SUV Sleeper and SUV Rock & Mud, the Coupe and Coupe GT, and
     maybe the Hatch, Hatch Group B, Wedge and Hypercar

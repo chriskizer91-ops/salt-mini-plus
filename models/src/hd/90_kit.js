@@ -19,6 +19,9 @@ function hdWrap(){if(FACES.__hd)return;FACES.__hd=1;const f=FACES.classic,t=TAIL
 let HD_CUR=null;
 /* (Salt Mini Plus: a second Studio version of a car, HD_CARS[id+HD_ALT], chosen with KIT.setAlt) */
 let HD_ALT='';
+/* (and the engine kept as a piece of its own, out of the underside, where a car's Studio 2 merges it in: the game's
+   dyno bay shakes it with the revs; KIT.keepEngine) */
+let HD_KEEP_ENGINE=false;
 function studioBuild(id,lod){hdWrap();HDS_MEMO.clear();HD_CUR=HD_ON&&(HD_ALT&&HD_CARS[id+HD_ALT]||HD_CARS[id])||null;
   const i=BUILDS.findIndex(b=>b.id===id),b=BUILDS[i];KIT_OUT.length=0;
   const t0=performance.now();BODY_LOD=lod;let s;try{s=buildSUV(b.look,b);}finally{BODY_LOD=1;}
@@ -27,4 +30,4 @@ function studioBuild(id,lod){hdWrap();HDS_MEMO.clear();HD_CUR=HD_ON&&(HD_ALT&&HD
   if(typeof hdBuild==='function')hdBuild(out);
   out.ms=performance.now()-t0;return out;
 }
-window.KIT={setHD:v=>{HD_ON=!!v;},setAlt:v=>{HD_ALT=v||'';},studioBuild,hdk:()=>HDK,BUILDS,PAINTS,MAT,SM,HD_CARS,CARS:typeof CARS!=='undefined'?CARS:[]};
+window.KIT={setHD:v=>{HD_ON=!!v;},setAlt:v=>{HD_ALT=v||'';},keepEngine:v=>{HD_KEEP_ENGINE=!!v;},studioBuild,hdk:()=>HDK,BUILDS,PAINTS,MAT,SM,HD_CARS,CARS:typeof CARS!=='undefined'?CARS:[]};

@@ -40,5 +40,6 @@ function cp2Build(out,o){
     if(o.drive)out.bay={bay:gameBay.bay,engine:gameBay.engine,liner:new MB()};
     /* the bay is drawn all the time, as part of the body: with the bonnet shut it is what you see looking up past the
        cradle from underneath (only the pad under the bonnet still lifts with it) */
-    hdPut(out.under,out.bay.bay);hdPut(out.under,out.bay.engine);out.bay.bay=new MB();out.bay.engine=new MB();
+    /* (KIT.keepEngine: the engine left a piece of its own, out.bay.engine, for the dyno bay to shake) */
+    hdPut(out.under,out.bay.bay);out.bay.bay=new MB();if(!HD_KEEP_ENGINE){hdPut(out.under,out.bay.engine);out.bay.engine=new MB();}
 }
