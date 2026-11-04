@@ -2,6 +2,9 @@
    SALT MINI PLUS · THE MODELS. Any of the traffic cars three ways, on a plain studio backdrop:
    - Game: the car exactly as Road Not Found builds it (the game's builders at the game's resolution).
    - Studio: the same car with the Studio detail (models/src/hd and models/src/cars/<car>), the body four times finer.
+   - Studio 2: where a car has one (HD_CARS[id+'2'], KIT.setAlt('2')), the Studio car with the rest of it built again:
+     its underside whole, its own engine bay, the road-car bits. The underside and the bay are pieces of their own, and
+     the bay is drawn all the time (it shows from underneath and through the grille), so the hood only lifts.
    - Baked: the game's own mesh again, wearing the Studio car's detail as three pictures (models/<car>/*_baked_data.js).
    The Studio and Game cars are built here, from the code, when first shown; the baked ones are unpacked.
    Drag to turn, pinch or scroll to come closer, double-tap a part to swing round it. Hood, paint (the traffic's
@@ -111,18 +114,22 @@ async function build(id,v){const k=id+'/'+v;if(CACHE[k])return CACHE[k];
     const w=bakedGroup(B.parts.wheel,tx);placeWheels(root,D,b,w,w,null,null);
     for(const sp of D.spares||[]){const c=w.clone();c.position.set(sp.p[0],sp.p[1],sp.p[2]);if(sp.face==='back')c.rotation.y=-Math.PI/2;else if(sp.p[2]<0)c.scale.z=-1;root.add(c);}
   }else{
-    K.setHD(v==='studio');T=K.studioBuild(id,v==='studio'?.25:1);D=T.D;b=T.b;
-    /* everything fixed to the body, merged a material: the shell, and the Studio's parts (src/hd, src/cars) */
-    const fixed=[T.body];for(const [nm,src] of Object.entries(T.hd||{}))if(src&&src.p&&nm!=='hood')fixed.push(src);if(T.under)fixed.push(T.under);
+    const st=v!=='game';K.setHD(st);if(K.setAlt)K.setAlt(v==='studio2'?'2':'');
+    try{T=K.studioBuild(id,st?.25:1);}finally{if(K.setAlt)K.setAlt('');}D=T.D;b=T.b;
+    /* everything fixed to the body, merged a material: the shell, and the Studio's parts (src/hd, src/cars); Studio 2's
+       underside is a piece of its own, as the game would draw it (so it can be left out) */
+    const fixed=[T.body];for(const [nm,src] of Object.entries(T.hd||{}))if(src&&src.p&&nm!=='hood')fixed.push(src);if(T.under&&v!=='studio2')fixed.push(T.under);
     root.userData.body=mergedMeshes(fixed,'body',b);
+    if(T.under&&v==='studio2'){root.userData.under=mergedMeshes([T.under],'under',b);root.add(root.userData.under);}
     root.userData.hood=mergedMeshes([T.hood,T.hd&&T.hd.hood].filter(Boolean),'hood',b);root.userData.hide=mergedMeshes([T.hide],'hide',b);
     const wF=mergedMeshes([T.wheel],'wheel',b),wR=T.wheelR===T.wheel?wF:mergedMeshes([T.wheelR],'wheel',b);
     const bF=T.brake?mergedMeshes([T.brake],'brake',b):null,bR=T.brakeR?(T.brakeR===T.brake?bF:mergedMeshes([T.brakeR],'brake',b)):bF;
     placeWheels(root,D,b,wF,wR,bF,bR);
     for(const sp of D.spares||[]){const w=(sp.rear?wR:wF).clone();w.position.set(sp.p[0],sp.p[1],sp.p[2]);if(sp.face==='back')w.rotation.y=-Math.PI/2;else if(sp.p[2]<0)w.scale.z=-1;root.add(w);}
   }
-  /* the engine bay, shown with the hood up (the baked car's is the game's own, as in Baked SUV Test's shed) */
-  const bay=T.bay;root.userData.bay=mergedMeshes([bay.bay,bay.engine].filter(Boolean),'bay',b);root.userData.bay.visible=false;
+  /* the engine bay, shown with the hood up (the baked car's is the game's own, as in Baked SUV Test's shed); Studio 2's
+     all the time */
+  const bay=T.bay;root.userData.bay=mergedMeshes([bay.bay,bay.engine].filter(Boolean),'bay',b);root.userData.bay.visible=v==='studio2';
   const ln=mergedMeshes([bay.liner].filter(Boolean),'liner',b);
   const hood=new THREE.Group();hood.add(root.userData.hood,ln);hood.matrixAutoUpdate=false;root.userData.hoodG=hood;
   root.add(root.userData.body,hood,root.userData.hide,root.userData.bay);
@@ -133,11 +140,11 @@ async function build(id,v){const k=id+'/'+v;if(CACHE[k])return CACHE[k];
 let hoodA=0,hoodT=0;
 function hoodStep(){if(!cur)return;const d=hoodT-hoodA;hoodA=Math.abs(d)<1e-3?hoodT:hoodA+d*.12;const [hx,hy]=cur.D.hood.hinge,a=(hoodA*hoodA*(3-2*hoodA))*(cur.D.hoodOpen||1.0);
   cur.root.userData.hoodG.matrix.makeTranslation(hx,hy,0).multiply(new THREE.Matrix4().makeRotationZ(a)).multiply(new THREE.Matrix4().makeTranslation(-hx,-hy,0));
-  cur.root.userData.bay.visible=hoodA>.001;cur.root.userData.hide.visible=hoodA<=.001;}
+  const s2=cur.v==='studio2';cur.root.userData.bay.visible=s2||hoodA>.001;cur.root.userData.hide.visible=!s2&&hoodA<=.001;}
 
 /* ---------- the views, from the car's own measures (SUV Studio's, scaled to the car) ---------- */
 function views(){const D=cur.D,b=cur.b,L=D.L,s=L/4.92,h=D.Hr/1.79,fx=D.X(D.uFa),rx=fx-(D.uRa-D.uFa),tw=b.look.track/2,R=b.look.tyre.R,nose=D.X(0),tail=D.X(L);
-  const C=K.HD_CARS[cur.b.id]&&K.HD_CARS[cur.b.id].views||{};
+  const E=cur.v==='studio2'&&K.HD_CARS[cur.b.id+'2']||K.HD_CARS[cur.b.id],C=E&&E.views||{};
   const V={front34:{p:[5.6*s,1.55*h,4.6*s],t:[.15*s,.8*h,0]},rear34:{p:[-5.4*s,1.7*h,4.8*s],t:[-.1*s,.85*h,0]},side:{p:[0,1.0*h,8.2*s],t:[0,.85*h,0]},
     front:{p:[8.2*s,1.0*h,0],t:[0,.8*h,0]},rear:{p:[-8.2*s,1.1*h,0],t:[0,.85*h,0]},top:{p:[.01,9.5*s,0],t:[0,.6,0]},
     wheel:{p:[fx+1.1,R+.2,tw+1.6],t:[fx-.12,R+.02,tw]},face:{p:[nose+3.0*s,D.Hr*.52+.25,1.25*s],t:[nose,D.Hr*.48,0]},tail:{p:[tail-3.0*s,D.Hr*.6+.25,1.25*s],t:[tail,D.Hr*.56,0]},
@@ -150,7 +157,8 @@ function setView(v){const V=VIEWS[v]||VIEWS.front34,a=camera.aspect;camera.fov=a
 
 /* ---------- switching ---------- */
 async function show(id,v,keepView){
-  $('loading').hidden=false;$('loading').firstElementChild.textContent=`Building the ${ALL.find(c=>c[0]===id)[1]}${v==='studio'?' (Studio)':v==='baked'?' (baked)':''}…`;
+  if(!hasVer(id,v))v='studio';
+  $('loading').hidden=false;$('loading').firstElementChild.textContent=`Building the ${ALL.find(c=>c[0]===id)[1]}${v==='studio'?' (Studio)':v==='studio2'?' (Studio 2)':v==='baked'?' (baked)':''}…`;
   await new Promise(r=>setTimeout(r,30));let c;try{c=await build(id,v);}catch(e){console.error(e);$('loading').firstElementChild.textContent='Could not build it: '+e.message;return;}
   if(!c){v='studio';c=await build(id,v);}
   const same=cur&&cur.b.id===id;car.clear();cur=c;carId=id;ver=v;car.add(c.root);
@@ -158,9 +166,15 @@ async function show(id,v,keepView){
   hoodA=hoodT=hoodT;hoodStep();applyPaint();applyLights();
   if(!keepView||!same)setView(Q.get('view')||'front34');
   for(const b of document.querySelectorAll('#vers button'))b.classList.toggle('on',b.dataset.v===ver);$('carb').textContent=ALL.find(x=>x[0]===id)[1];
-  /* (a car with no baked version shows no Baked button at all) */
-  for(const b of document.querySelectorAll('#vers button'))b.hidden=b.dataset.v==='baked'&&!(window.BAKED_CARS&&window.BAKED_CARS[id]);
+  /* (a car with no baked version shows no Baked button at all, one with no Studio 2 no Studio 2 button) */
+  for(const b of document.querySelectorAll('#vers button'))b.hidden=!hasVer(id,b.dataset.v);
+  /* (on a phone: the version's own button and its list) */
+  $('verb').textContent=VNAME[ver];$('verpop').replaceChildren(...['game','studio','studio2','baked'].filter(x=>hasVer(id,x)).map(x=>{const b=document.createElement('button');
+    b.textContent=VNAME[x];b.classList.toggle('on',x===ver);b.onclick=()=>{closePops();show(carId,x,true);};return b;}));
   hud();$('loading').hidden=true;}
+/* whether a car comes in a version: Game and Studio always, Baked and Studio 2 where they're made */
+const VNAME={game:'Game',studio:'Studio',studio2:'Studio 2',baked:'Baked'};
+function hasVer(id,v){return v==='baked'?!!(window.BAKED_CARS&&window.BAKED_CARS[id]):v==='studio2'?!!K.HD_CARS[id+'2']:true;}
 function applyPaint(){if(!cur)return;const h=paint||cur.b.paint;PAINT_U.value.set(h);
   cur.root.traverse(m=>{if(m.isMesh&&m.userData.mat===MAT.PAINT&&m.material.color)m.material.color.set(h);});
   for(const s of document.querySelectorAll('#paints .sw'))s.classList.toggle('on',s.dataset.h===h);}
@@ -171,7 +185,7 @@ function applyLights(){if(!cur)return;const L=lights;cur.root.traverse(m=>{if(!m
 function lampOf(id){return ({[MAT.HEAD]:'head',[MAT.LED]:'head',[MAT.HALO]:'head',[MAT.TAIL]:'tail',[MAT.AMBER]:'amber',[MAT.REV]:'rev',
   [SM.LAMPH]:'head',[SM.LENSH]:'head',[SM.REDL]:'tail',[SM.AMBERL]:'amber',[SM.LENSR]:'rev'})[id]||0;}
 function hud(){if(!cur)return;const t=countTris(cur.root);
-  $('stats').innerHTML=`<b>${ALL.find(c=>c[0]===carId)[1]} · ${({game:'Game',studio:'Studio',baked:'Baked'})[ver]}</b> · ${Math.round(t.n).toLocaleString('en-US')} triangles · ${t.d} draws`;}
+  $('stats').innerHTML=`<b>${ALL.find(c=>c[0]===carId)[1]} · ${VNAME[ver]}</b> · ${Math.round(t.n).toLocaleString('en-US')} triangles · ${t.d} draws`;}
 
 /* ---------- the loop (held by the picture tool) ---------- */
 let held=false;
@@ -196,12 +210,12 @@ addEventListener('resize',resize);
 
 /* ---------- the buttons: the car, the version, the hood, the paint; on a wide screen the lights and the reset too (on a
    phone they are in More) ---------- */
-function closePops(except){for(const id of ['cars','paints','more'])if(id!==except)$(id).hidden=true;for(const b of ['carb','paintb','moreb'])$(b).classList.remove('on');}
+function closePops(except){for(const id of ['cars','paints','more','verpop'])if(id!==except)$(id).hidden=true;for(const b of ['carb','paintb','moreb','verb'])$(b).classList.remove('on');}
 function pop(id,btn){const open=$(id).hidden;closePops(id);$(id).hidden=!open;$(btn).classList.toggle('on',open);}
 /* (the traffic's cars first, then the other builds under a small heading of their own) */
 let headed=false;for(const [id,name,other] of READY){if(other&&!headed){headed=true;const h=document.createElement('div');h.className='grp';h.textContent='Other builds';$('cars').appendChild(h);}
-  const b=document.createElement('button');b.textContent=name;b.onclick=()=>{closePops();show(id,ver==='baked'&&!(window.BAKED_CARS&&window.BAKED_CARS[id])?'studio':ver);};$('cars').appendChild(b);}
-$('carb').onclick=()=>pop('cars','carb');$('paintb').onclick=()=>pop('paints','paintb');$('moreb').onclick=()=>pop('more','moreb');
+  const b=document.createElement('button');b.textContent=name;b.onclick=()=>{closePops();show(id,hasVer(id,ver)?ver:'studio');};$('cars').appendChild(b);}
+$('carb').onclick=()=>pop('cars','carb');$('verb').onclick=()=>pop('verpop','verb');$('paintb').onclick=()=>pop('paints','paintb');$('moreb').onclick=()=>pop('more','moreb');
 document.querySelectorAll('#vers button').forEach(b=>b.onclick=()=>{closePops();show(carId,b.dataset.v,true);});
 $('hood').onclick=()=>{hoodT=hoodT<.5?1:0;$('hood').classList.toggle('on',hoodT>.5);};
 const nextLights=()=>{lights=(lights+1)%4;applyLights();};$('lights').onclick=nextLights;
@@ -210,7 +224,7 @@ const resetView=()=>{fly=null;setView('front34');};$('reset').onclick=resetView;
   add('','Factory');sw.firstChild.style.background='conic-gradient(#7a1418 0 25%,#ece9e2 0 50%,#6a625b 0 75%,#b9a98a 0)';sw.firstChild.onclick=()=>{paint=null;applyPaint();};
   for(const h of TRF_PAINT)add(h,h);}
 {const m=$('more');const add=(t,f)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{f();};m.appendChild(b);return b;};
-  for(const [v,t] of [['front34','Front ¾'],['rear34','Rear ¾'],['side','Side'],['wheel','Wheel'],['face','Face'],['tail','Tail'],['cabin','Cabin']])add(t,()=>{closePops();setView(v);});
+  for(const [v,t] of [['front34','Front ¾'],['rear34','Rear ¾'],['side','Side'],['wheel','Wheel'],['face','Face'],['tail','Tail'],['cabin','Cabin'],['under','Under']])add(t,()=>{closePops();setView(v);});
   add('Paint',()=>{pop('paints','moreb');});add('Lights',()=>{nextLights();});add('Reset',()=>{closePops();resetView();});}
 
 resize();show(carId,ver).then(()=>{$('loading').hidden=true;});loop();

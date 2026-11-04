@@ -17,7 +17,8 @@ button.on{background:#222;color:#fff;border-color:#222}
 .seg{display:flex;border-radius:999px;background:rgba(255,255,255,.62);border:1px solid rgba(127,127,127,.35);padding:2px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .seg button{border:none;background:transparent;padding:6px 12px;backdrop-filter:none;-webkit-backdrop-filter:none}
 .seg button.on{background:#222;color:#fff}
-#carb::after{content:" ▾";opacity:.6}
+#carb::after,#verb::after{content:" ▾";opacity:.6}
+button{white-space:nowrap}
 /* the car list and the paints open above the bar, one at a time */
 .pop .grp{flex-basis:100%;text-align:center;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#77756f;margin-top:4px}
 .pop{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(64px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:min(560px,94vw);
@@ -30,8 +31,10 @@ button.on{background:#222;color:#fff;border-color:#222}
 #loading span{background:rgba(255,255,255,.75);padding:8px 14px;border-radius:999px}
 /* a phone held upright: the stats under the title, the extras (views, lights) tucked into the More list */
 @media (max-width:620px){#top{flex-direction:column;gap:3px;align-items:flex-start}#stats{text-align:left}#hint{top:calc(58px + env(safe-area-inset-top))}
-  #ui{gap:6px;flex-wrap:nowrap}button{padding:7px 11px}.seg button{padding:6px 9px}.wide{display:none!important}}
-@media (min-width:621px){#moreb{display:none!important}}
+  #ui{gap:6px;flex-wrap:nowrap}button{padding:7px 11px}.seg button{padding:6px 9px}.wide{display:none!important}
+  /* (the versions in a list of their own, under one button that says which is showing) */
+  #vers{display:none!important}#carb{max-width:38vw;overflow:hidden;text-overflow:ellipsis}}
+@media (min-width:621px){#moreb,#verb{display:none!important}}
 </style></head><body>
 <canvas id="cv"></canvas>
 <div id="top"><div id="title">Salt Mini Plus · Models</div><div id="stats"></div></div>
@@ -40,9 +43,11 @@ button.on{background:#222;color:#fff;border-color:#222}
 <div id="cars" class="pop" hidden></div>
 <div id="paints" class="pop" hidden></div>
 <div id="more" class="pop" hidden></div>
+<div id="verpop" class="pop" hidden></div>
 <div id="ui">
  <button id="carb">Pickup</button>
- <div class="seg" id="vers"><button data-v="game">Game</button><button data-v="studio">Studio</button><button data-v="baked">Baked</button></div>
+ <div class="seg" id="vers"><button data-v="game">Game</button><button data-v="studio">Studio</button><button data-v="studio2">Studio 2</button><button data-v="baked">Baked</button></div>
+ <button id="verb">Studio</button>
  <button id="hood">Hood</button><button id="paintb" class="wide">Paint</button>
  <button id="lights" class="wide">Lights</button><button id="reset" class="wide">Reset</button>
  <button id="moreb" aria-label="More">•••</button>

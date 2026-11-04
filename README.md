@@ -51,15 +51,23 @@ up. The baked pictures' memory includes their mipmaps.
   closer. Double-tap a part to swing round it.
 - **The bar along the bottom:**
   - the car's name: pick a car
-  - **Game / Studio / Baked**: switch between the three versions
+  - **Game / Studio / Studio 2 / Baked**: switch between the versions. Studio 2 shows where a car has one (so far the
+    Coupe): the Studio car with the rest of it built again, its underside whole, its own engine bay and the road-car
+    bits. Its underside and bay are pieces of their own, and the bay is drawn with the hood shut too (it shows from
+    underneath)
   - **Hood**: open or close the hood
   - **Paint**: the traffic's sixteen colours, plus the car's own factory colour
   - **Lights**: steps through head and tail lamps, then the brake lamps, then the indicators and reversing lamps
-- **On the phone:** to keep the screen clear, Paint, Lights, the camera views and Reset are under **•••**.
+- **On the phone:** to keep the screen clear, the versions are one button that says which is showing (tap it for the
+  others), and Paint, Lights, the camera views (Under among them) and Reset are under **•••**.
 - **Top right:** the car, the version, its triangle count and its draw calls.
 
 The Studio cars are built in the page from the code, the same way SUV Studio builds its truck. That takes a few
 seconds the first time you pick each one. The baked cars are unpacked from their pictures.
+
+`node models/tools/same_check.js [repo] > prints.json` builds every car in every version and fingerprints every
+part's arrays (positions, normals, colours, materials); `--compare a.json b.json` says whether two copies of the
+models build exactly the same.
 
 `sh viewer/build.sh` rebuilds the page from `viewer/shell`, `viewer/src` and `models/`. Run `npm install` in
 `viewer/` once first (it installs three.js and esbuild).
