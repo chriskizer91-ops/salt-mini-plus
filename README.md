@@ -34,7 +34,7 @@ the game's own and Studio only: they have no baked version.
 | [SUV Race](models/suv-race/) | Done | 481,953 (+37,330 engine bay) | 764,065 | Studio only | 49,108 | Studio only | ![SUV Race](models/suv-race/docs/front34.webp) |
 | [Coupe GT](models/coupe-gt/) | Done | 430,719 (+31,390 engine bay) | 653,405 | Studio only | 52,023 | Studio only | ![Coupe GT](models/coupe-gt/docs/front34.webp) |
 | [Hatch Group B](models/hatch-groupb/) | Done | 455,649 (+31,206 engine bay) | 653,575 | Studio only | 52,579 | Studio only | ![Hatch Group B](models/hatch-groupb/docs/front34.webp) |
-| [Wedge](models/wedge/) | Done | 499,931 (+20,510 engine bay) | To do | Studio only | 45,696 | Studio only | ![Wedge](models/wedge/docs/front34.webp) |
+| [Wedge](models/wedge/) | Done | 499,931 (+20,510 engine bay) | 590,493 | Studio only | 45,696 | Studio only | ![Wedge](models/wedge/docs/front34.webp) |
 | [Wedge Night Runner](models/wedge-nightrunner/) | Done | 535,168 (+20,538 engine bay) | To do | Studio only | 48,735 | Studio only | ![Wedge Night Runner](models/wedge-nightrunner/docs/front34.webp) |
 | [Hypercar](models/hyper/) | Done | 602,807 (+20,430 engine bay) | To do | Studio only | 50,283 | Studio only | ![Hypercar](models/hyper/docs/front34.webp) |
 | [Hypercar Track](models/hyper-track/) | Done | 537,951 (+20,458 engine bay) | To do | Studio only | 48,841 | Studio only | ![Hypercar Track](models/hyper-track/docs/front34.webp) |
@@ -72,6 +72,7 @@ and wheel positions are exactly the game's.
 | SUV Race | 764,065 | 279,211 | 162,371 | 75,916 | 87,291 | 15,452 | 32,336 | 3,620 | 8.4 s | [front](models/suv-race/docs/s2_front34.webp), [rear](models/suv-race/docs/s2_rear34low.webp), [under](models/suv-race/docs/s2_under.webp), [bay](models/suv-race/docs/s2_bay.webp), [cabin](models/suv-race/docs/s2_cabin.webp) |
 | Coupe GT | 653,405 | 216,372 | 213,531 | in the underside | 62,070 | 24,264 | 30,672 | 3,620 | 8.4 s | [front](models/coupe-gt/docs/s2_front34.webp), [rear](models/coupe-gt/docs/s2_rear34low.webp), [under](models/coupe-gt/docs/s2_under.webp), [bay](models/coupe-gt/docs/s2_bay.webp), [cabin](models/coupe-gt/docs/s2_cabin.webp) |
 | Hatch Group B | 653,575 | 188,897 | 84,672 | 56,608 | 105,592 | 24,566 | 44,914 | 3,396 | 4.8 s | [front](models/hatch-groupb/docs/s2_front34.webp), [rear](models/hatch-groupb/docs/s2_rear34low.webp), [under](models/hatch-groupb/docs/s2_under.webp), [bay](models/hatch-groupb/docs/s2_bay.webp), [cabin](models/hatch-groupb/docs/s2_cabin.webp) |
+| Wedge | 590,493 | 221,971 | 60,442 | 21,358 | 51,082 | 20,216 | 50,684 | 3,172 | 4.8 s | [front](models/wedge/docs/s2_front34.webp), [rear](models/wedge/docs/s2_rear34low.webp), [under](models/wedge/docs/s2_under.webp), [bay](models/wedge/docs/s2_bay.webp), [cabin](models/wedge/docs/s2_cabin.webp) |
 <!-- /S2TABLE -->
 
 ## The viewer

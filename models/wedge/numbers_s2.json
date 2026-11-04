@@ -1,0 +1,33 @@
+{
+ "car": "wedge",
+ "studio": {
+  "triangles": 499931,
+  "triangles_bay_up": 520441,
+  "by_piece": {
+   "body": 216112,
+   "hood": 18960,
+   "hide": 107,
+   "cabin": 45362,
+   "under": 3966,
+   "bay": 20510,
+   "wheel": 50684,
+   "brake": 3172
+  },
+  "build_ms": 4700
+ },
+ "studio2": {
+  "triangles": 590493,
+  "triangles_bay_up": 590493,
+  "by_piece": {
+   "body": 221971,
+   "hood": 20216,
+   "hide": 0,
+   "cabin": 51082,
+   "under": 60442,
+   "bay": 21358,
+   "wheel": 50684,
+   "brake": 3172
+  },
+  "build_ms": 4794
+ }
+}

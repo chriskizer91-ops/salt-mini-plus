@@ -8,14 +8,18 @@
    - The ignition: a distributor at the back of each bank, six red leads from it to the plugs between the humps.
    - The exhaust: six pipes off each bank's outer side into a collector, back to the silencer across the tail.
    - The gearbox behind it, ribbed; two coolant hoses out to the side radiators behind the intakes.
+   o.noFloor: the room without its floor (Studio 2: the underside's own below); o.tt: the Night Runner's twin turbos
+   (Studio 2: a turbo on each bank's pipe ahead of the silencer, its wastegate, the charge pipe forward to an
+   intercooler behind the flank's intake and back over the vee to a hat over the carburettors, blown through).
    ===================================================================================== */
-function wdV12(out,car){
+function wdV12(out,car,o={}){
   const K=HDK,D=K.D,X=K.X,topY=K.topY,LIN=HC.LINER;
   const ALU=SMC('#8c8f94',SM.ENGINE),RED=SMC('#a3201a',SM.ENGINE),ZN=SMC('#b5b2aa',SM.ENGINE),EXH=SMC('#6e665d',SM.CAST),SIL=SMC('#9b9892',SM.BRUSH),
     LEAD=SMC('#a61c16',SM.HOSE),CAP=SMC('#151516',SM.PLASTIC),HOSE=SMC('#141414',SM.HOSE),CH=MM.CHROME;
   const uF=2.52,uT=3.96,yFl=.19+D.dy,zW=.6;
   /* ---------- the room ---------- */
-  hdPart(out,mb=>{const rows=[];for(let u=uF;u<=uT+1e-6;u+=.04){const row=[];for(let j=0;j<=12;j++){const z=-zW+2*zW*j/12;row.push([X(u),yFl,z]);}rows.push(row);}hdLoft(mb,rows,LIN,false,true);},30);
+  /* (o.noFloor, Studio 2's: the room open underneath, its underside building what is under the engine) */
+  if(!o.noFloor)hdPart(out,mb=>{const rows=[];for(let u=uF;u<=uT+1e-6;u+=.04){const row=[];for(let j=0;j<=12;j++){const z=-zW+2*zW*j/12;row.push([X(u),yFl,z]);}rows.push(row);}hdLoft(mb,rows,LIN,false,true);},30);
   for(const s of [1,-1])hdPart(out,mb=>{const rows=[];for(let u=uF;u<=uT+1e-6;u+=.04)rows.push([[X(u),yFl,s*zW],[X(u),topY(u,zW)-.004,s*zW]]);hdLoft(mb,rows,LIN,false,s>0);},30);
   hdPart(out,mb=>{const rows=[];for(let k=0;k<=12;k++){const z=-zW+2*zW*k/12;rows.push([[X(uT),yFl,z],[X(uT),topY(uT,Math.abs(z))-.004,z]]);}hdLoft(mb,rows,LIN,false,true);},30);
   /* ---------- the engine ---------- */
@@ -51,4 +55,19 @@ function wdV12(out,car){
   /* ---------- the gearbox behind it, ribbed; the silencer across the tail ---------- */
   hdPart(out,mb=>{hdRBox(mb,[X(3.58),yC-.04,0],[.16,.1,.13],.03,ALU,3);for(const u of [3.47,3.58,3.69])hdRBox(mb,[X(u),yC-.04,0],[.008,.105,.135],.006,ALU,2);},30);
   hdPart(out,mb=>{hdRBox(mb,[X(3.84),yC-.07,0],[.075,.075,.5],.04,SIL,4);for(const s of [1,-1])hdCyl(mb,[X(3.75),yC-.07,s*.32],[X(3.77),yC-.07,s*.32],.034,.034,16,SIL);},35);
+  /* ---------- (o.tt) the twin turbos ---------- */
+  if(o.tt){const IRON=SMC('#4a433c',SM.CAST),CA=SMC('#a3a6ab',SM.CAST),SILI=SMC('#1b3a8a',SM.HOSE),r0=.06,hat=[X(um),yC+.41,0];
+    for(const s of [1,-1]){const tc=[X(3.62),yC+.02,s*.4],cc=[tc[0],tc[1],s*.4];
+      hdPart(out,mb=>{ball(mb,tc,r0*1.05,18,IRON);hdCyl(mb,[tc[0]+.04,tc[1],tc[2]],[tc[0]-.03,tc[1],tc[2]],r0,r0,24,IRON);hdTube(mb,[[X(3.6),yC-.08,s*.34],[X(3.61),yC-.04,s*.38],[tc[0],tc[1]-r0*.8,tc[2]]],.026,12,EXH,false,true);
+        const c2=[tc[0]+.08,tc[1]+.02,tc[2]];ball(mb,c2,r0*.95,18,CA);hdCyl(mb,[c2[0]+.035,c2[1],c2[2]],[c2[0]-.03,c2[1],c2[2]],r0*.98,r0*.98,24,CA);
+        const wg=[tc[0]-.02,tc[1]+r0+.03,tc[2]-s*.03];hdCyl(mb,wg,V3.add(wg,[0,.03,0]),.022,.022,16,SMC('#2a2b2e',SM.PAINTED));},35);
+      /* the charge pipe forward along the room's wall to the intercooler behind the intake, and on to the hat */
+      const ic=[X(2.72),yC+.06,s*(zW-.06)];
+      hdPart(out,mb=>{hdRBox(mb,ic,[.1,.09,.025],.01,SMC('#2a2b2d',SM.ENGINE),2);for(let k=-6;k<=6;k++)hdRBox(mb,V3.add(ic,[k*.014,0,-s*.026]),[.002,.085,.002],.001,SMC('#3a3b3d',SM.ENGINE),1);
+        hdTube(mb,suvPath([[tc[0]+.08,tc[1]+.02+r0,tc[2]],[X(3.45),yC+.2,s*.45],[X(3.0),yC+.18,s*(zW-.06)],V3.add(ic,[-.1,.05,0])],4,2),.028,14,CA,false,true);
+        hdTube(mb,suvPath([V3.add(ic,[.1,.05,0]),[X(2.66),yC+.3,s*.4],[X(uA+.12),yC+.4,s*.16],[hat[0]+(uB-uA)/2-.04,hat[1],s*.06]],4,2),.03,14,CA,false,true);
+        for(const t of [.3,.7])hdCyl(mb,V3.lerp([X(3.45),yC+.2,s*.45],[X(3.0),yC+.18,s*(zW-.06)],t),V3.add(V3.lerp([X(3.45),yC+.2,s*.45],[X(3.0),yC+.18,s*(zW-.06)],t),[.012,0,0]),.032,.032,14,SILI);},35);}
+    /* the hat: a long box over the carburettors' trumpets, its ribs, the blow-off valve */
+    hdPart(out,mb=>{hdRBox(mb,hat,[(uB-uA)/2-.02,.03,.075],.025,CA,4);for(let k=-4;k<=4;k++)hdRBox(mb,[hat[0]+k*.07,hat[1]+.03,0],[.005,.004,.06],.002,CA,1);
+      hdCyl(mb,[hat[0]+.1,hat[1]+.03,.05],[hat[0]+.1,hat[1]+.06,.05],.02,.018,16,CA);hdCyl(mb,[hat[0]+.1,hat[1]+.06,.05],[hat[0]+.1,hat[1]+.07,.05],.014,.012,16,SMC('#b0201c',SM.PAINTED));},35);}
 }
