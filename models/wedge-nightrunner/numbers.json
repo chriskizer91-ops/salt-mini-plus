@@ -1,0 +1,39 @@
+{
+ "car": "wedgeNR",
+ "game": {
+  "triangles": 48735,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 535168,
+  "triangles_bay": 20538,
+  "by_piece": {
+   "body": 261126,
+   "lamp_head": 1596,
+   "lamp_tail": 11332,
+   "lamp_amber": 3428,
+   "lamp_reverse": 3776,
+   "under": 3850,
+   "hide": 103,
+   "hood": 23093,
+   "bay": 20538,
+   "wheel_fr": 53096,
+   "brake_fr": 3620,
+   "wheel_fl": 53096,
+   "brake_fl": 3620,
+   "wheel_rr": 53096,
+   "brake_rr": 3620,
+   "wheel_rl": 53096,
+   "brake_rl": 3620
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 100,
+  "draws_glb_traffic": 98,
+  "texture_mb": 0,
+  "glb_mb": 16.7,
+  "data_mb": 11.0
+ },
+ "baked": null
+}
