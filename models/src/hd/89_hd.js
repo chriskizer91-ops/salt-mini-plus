@@ -8,7 +8,8 @@ const HD_CARS={};
 function hdBuild(out){
   const lk=out.b.look;
   if(!HD_ON)return;
-  if(HD_CARS[out.b.id]){HD_CARS[out.b.id].build(out);return;}
+  /* (the entry being built: the car's own, or its second Studio version, HD_CUR) */
+  const hc=HD_CUR||HD_CARS[out.b.id];if(hc){hc.build(out);return;}
   /* the wheel, modelled for a close look (71_wheel) */
   if(lk.tyre.tyre==='hwy'&&lk.tyre.style==='six'){out.wheel=hdWheel(lk.tyre,out.b);out.wheelR=out.wheel;}
   /* the face and tail in three dimensions (72_face), in a part list of their own */

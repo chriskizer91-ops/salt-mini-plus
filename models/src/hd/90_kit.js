@@ -17,7 +17,9 @@ function hdWrap(){if(FACES.__hd)return;FACES.__hd=1;const f=FACES.classic,t=TAIL
     const g=T[k];T[k]=K=>{HDK=K;const C=HD_ON&&HD_CUR&&HD_CUR.skip&&HD_CUR.skip[nm];if(C&&C.includes(k)){if(HD_CUR.keep&&HD_CUR.keep[nm+'.'+k])HD_CUR.keep[nm+'.'+k](K);return;}g(K);};}}
 /* the build whose Studio detail is being made (its entry in HD_CARS), or null */
 let HD_CUR=null;
-function studioBuild(id,lod){hdWrap();HDS_MEMO.clear();HD_CUR=HD_ON&&HD_CARS[id]||null;
+/* (Salt Mini Plus: a second Studio version of a car, HD_CARS[id+HD_ALT], chosen with KIT.setAlt) */
+let HD_ALT='';
+function studioBuild(id,lod){hdWrap();HDS_MEMO.clear();HD_CUR=HD_ON&&(HD_ALT&&HD_CARS[id+HD_ALT]||HD_CARS[id])||null;
   const i=BUILDS.findIndex(b=>b.id===id),b=BUILDS[i];KIT_OUT.length=0;
   const t0=performance.now();BODY_LOD=lod;let s;try{s=buildSUV(b.look,b);}finally{BODY_LOD=1;}
   const w=buildWheel(b.look.tyre),wr=b.look.tyreR?buildWheel(b.look.tyreR):w,by=buildBay(b,s.D);
@@ -25,4 +27,4 @@ function studioBuild(id,lod){hdWrap();HDS_MEMO.clear();HD_CUR=HD_ON&&HD_CARS[id]
   if(typeof hdBuild==='function')hdBuild(out);
   out.ms=performance.now()-t0;return out;
 }
-window.KIT={setHD:v=>{HD_ON=!!v;},studioBuild,hdk:()=>HDK,BUILDS,PAINTS,MAT,SM,HD_CARS,CARS:typeof CARS!=='undefined'?CARS:[]};
+window.KIT={setHD:v=>{HD_ON=!!v;},setAlt:v=>{HD_ALT=v||'';},studioBuild,hdk:()=>HDK,BUILDS,PAINTS,MAT,SM,HD_CARS,CARS:typeof CARS!=='undefined'?CARS:[]};

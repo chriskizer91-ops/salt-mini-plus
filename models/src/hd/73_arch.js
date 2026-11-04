@@ -25,7 +25,7 @@ function hdArches(out,car,opt={}){
   const q={p:[],n:[],c:[],m:[]};for(const t of keep){for(let k=0;k<9;k++){q.p.push(src.p[t*9+k]);q.n.push(src.n[t*9+k]);}for(let k=0;k<12;k++)q.c.push(src.c[t*12+k]);for(let k=0;k<3;k++)q.m.push(src.m[t*3+k]);}
   Object.assign(src,q);}
   const LIN=HC.LINER;
-  for(const ua of [D.uFa,D.uRa])for(const s of [1,-1]){const Ar=ua===D.uRa?D.archB:A,zi=D.plan(ua)*.7,n=72;
+  for(const ua of [D.uFa,D.uRa])for(const s of [1,-1]){const Ar=ua===D.uRa?D.archB:A,zi=opt.zi!=null?opt.zi:D.plan(ua)*.7,n=72;
     hdPart(out,mb=>{const rings=[];
       for(let k=0;k<=n;k++){const ph=-.02+(PI+.04)*k/n,[u,y]=archPt(D,ua,ph,.012),zo=Math.max(zi+.05,K.sideZ(u,Math.min(y,D.belt(u)-.05))-.012);
         /* across the liner: the outer edge, a soft round, then straight in to the inner wall */

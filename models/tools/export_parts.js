@@ -1,5 +1,5 @@
 /* A car written out for Blender (tools/studio_glb.py, cycles_render.py, bake.py), exactly as the viewer builds it.
-   usage: node models/tools/export_parts.js <car> <out-dir>
+   usage: node models/tools/export_parts.js <car> <out-dir>   (ALT=2: the car's Studio 2, where it has one)
    - <out-dir>/studio: the Studio car in its pieces, as the .glb has them: the body (with the face, tail, cabin and
      trim fixed to it), the four lamps by what they do (head, tail and brake, amber, reversing), the underside, what
      the hood hides, the hood (about its hinge), the engine bay, and for each wheel what turns and what only steers
@@ -12,6 +12,8 @@
 const fs=require('fs'),path=require('path');
 const [id,outDir]=process.argv.slice(2);if(!id||!outDir){console.log('usage: node export_parts.js <car> <out-dir>');process.exit(1);}
 const K=require('./kit.js')(),MAT=K.MAT,SM=K.SM;
+/* (ALT=2: the car's second Studio version, KIT.setAlt) */
+if(process.env.ALT&&K.setAlt)K.setAlt(process.env.ALT);
 /* ---------- the Studio car ---------- */
 K.setHD(true);const T=K.studioBuild(id,.25),b=T.b,D=T.D,look=b.look;
 const S=path.join(outDir,'studio');fs.mkdirSync(S,{recursive:true});
@@ -79,6 +81,8 @@ bm.D={uC:G.D.uC,uFa:G.D.uFa,uRa:G.D.uRa,R:G.b.look.tyre.R,track:G.b.look.track,p
 const clear=m=>m===MAT.GLASS||m===MAT.GLASSL||m===SM.LENS||m===SM.TINT||m===SM.LENSH||m===SM.LENSR;
 const hi=[[T.body,(t,m)=>!clear(m)],[T.hood,(t,m)=>!clear(m)],[T.hide,(t,m)=>!clear(m)],[T.under,(t,m)=>!clear(m)]];
 for(const [nm,src] of Object.entries(T.hd))if(src&&src.p&&nm!=='cabin')hi.push([src,(t,m)=>!clear(m)]);
-write('high_body',hi);write('high_wheel',[[T.wheel,(t,m)=>!clear(m)],[T.brake,(t,m)=>!clear(m)]]);
+write('high_body',hi);
+/* (the headlamps' clear lenses at the front, for the glow mask only, GLOW=1 in bake.py: a lit headlamp is its lens) */
+write('high_lens',hi.map(([src])=>[src,(t,m)=>m===SM.LENSH&&(src.p[t*9]+src.p[t*9+3]+src.p[t*9+6])/3>0]));write('high_wheel',[[T.wheel,(t,m)=>!clear(m)],[T.brake,(t,m)=>!clear(m)]]);
 bm.build=man.build;bm.id=id;fs.writeFileSync(path.join(B,'manifest.json'),JSON.stringify(bm,null,1));
 console.log(id,'bake-in:',JSON.stringify(Object.fromEntries(Object.entries(bm.pieces).map(([k,v])=>[k,v.tris]))));

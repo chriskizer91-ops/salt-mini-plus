@@ -25,7 +25,7 @@ function hdCabinGen(out,car,o){
   /* ---------- the floor: carpet from the toe board to the back, the tunnel down the middle ---------- */
   hdPart(out,mb=>{const rows=[];
     for(let u=u0;u<=uEnd+1e-6;u+=.04){const toe=sm01((G.cowl+.34-u)/.28),y=yF+toe*(o.toe||.22),rise=o.rearRise?sm01((u-o.rearRise[0])/.06)*o.rearRise[1]:0,zz=zw(u)-.01,row=[];
-      for(let j=0;j<=14;j++){const z=-zz+2*zz*j/14,tun=u<(o.tunnelEnd||pil[0]+.5)?(o.tunnel||.11)*Math.exp(-Math.pow(z/.13,2)):0;row.push([X(u),y+rise+tun,z]);}rows.push(row);}
+      for(let j=0;j<=14;j++){const z=-zz+2*zz*j/14,tun=u<(o.tunnelEnd||pil[0]+.5)?(o.tunnel||.11)*Math.exp(-Math.pow(z/(o.tunnelW||.13),2)):0;row.push([X(u),y+rise+tun,z]);}rows.push(row);}
     hdLoft(mb,rows,CARP,false,true);},40);
   /* ---------- the door panels and the quarter trims, from the floor to the window sill ---------- */
   const uArmEnd=o.doors===2?(D.B.doorR||pil[0]):pil[1]+.1;
@@ -106,6 +106,10 @@ function hdCabinGen(out,car,o){
     if(o.console==='big'){hdPart(out,mb=>{hdRBox(mb,[X((a+b)/2),yF+.15,0],[(b-a)/2,.15,.12],.03,CHAR,4);hdRBox(mb,[X(b-.18),yF+.32,0],[.18,.03,.11],.025,VIN,4);
         for(const zz of [-.05,.05])hdCyl(mb,[X(a+.14),yF+.305,zz],[X(a+.14),yF+.24,zz],.037,.035,24,BLK,false);hdRBox(mb,[X(a+.14),yF+.25,0],[.045,.004,.095],.004,BLK,1);},40);}
     else if(o.console==='small')hdPart(out,mb=>{hdRBox(mb,[X((a+b)/2-.1),yF+.12,0],[(b-a)/2-.1,.1,.1],.03,CHAR,4);},40);
+    else if(o.console==='tunnel')hdPart(out,mb=>{const hw=.1,top=yF+(o.consoleTop||.22),tw=o.tunnelW||.13,th=o.tunnel||.11,tun=z=>yF+th*Math.exp(-Math.pow(z/tw,2))-.004,R=[];
+      for(let k=0;k<=12;k++){const u=a+(b-.2-a)*k/12,ring=[];for(let j=0;j<=8;j++){const z=-hw+2*hw*j/8;ring.push([X(u),tun(z),z]);}
+        for(let j=0;j<=6;j++){const q=j/6*PI/2;ring.push([X(u),top-.03+Math.sin(q)*.03,hw-.03+Math.cos(q)*.03]);}for(let j=0;j<=6;j++){const q=PI/2+j/6*PI/2;ring.push([X(u),top-.03+Math.sin(q)*.03,-hw+.03+Math.cos(q)*.03]);}R.push(ring);}
+      hdLoft(mb,R,CHAR,true);hdCap(mb,R[0],CHAR,true);hdCap(mb,R[12],CHAR,false);},40);
     if(o.shifter==='auto')hdPart(out,mb=>{const p=X(a+.25);hdRBox(mb,[p,yF+.3,0],[.06,.006,.04],.004,BLK,1);hdCyl(mb,[p,yF+.3,0],[p,yF+.37,0],.008,.008,10,SAT);ball(mb,[p,yF+.39,0],.026,18,VIN);},40);
     if(o.shifter==='manual'){const p=X(a+.22),yb=yF+.24;
       hdPart(out,mb=>{hdRev(mb,[[.06,0],[.052,.02],[.036,.05],[.022,.08],[.014,.1]],24,SV([.02,.02,.02],MAT.RUBBER));},40,null,M4.mul(M4T(p,yb,0),M4RX(-PI/2)));
