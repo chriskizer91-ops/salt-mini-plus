@@ -1,0 +1,33 @@
+{
+ "car": "hatch",
+ "studio": {
+  "triangles": 430908,
+  "triangles_bay_up": 462086,
+  "by_piece": {
+   "body": 153252,
+   "hood": 7350,
+   "hide": 65,
+   "cabin": 63856,
+   "under": 2769,
+   "bay": 31178,
+   "wheel": 47844,
+   "brake": 3060
+  },
+  "build_ms": 4288
+ },
+ "studio2": {
+  "triangles": 597831,
+  "triangles_bay_up": 597831,
+  "by_piece": {
+   "body": 163639,
+   "hood": 8918,
+   "hide": 0,
+   "cabin": 79620,
+   "under": 84938,
+   "bay": 57100,
+   "wheel": 47844,
+   "brake": 3060
+  },
+  "build_ms": 4347
+ }
+}

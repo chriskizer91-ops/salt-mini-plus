@@ -135,7 +135,8 @@ function hdCabinGen(out,car,o){
   if(o.rear==='bench')seat([X(o.seatR),yF+(o.seatYR!=null?o.seatYR:o.seatY-.03),0],o.rearW||1.42,.2,o.rearHead!=null?o.rearHead:3,0);
   else if(o.rear==='two')for(const s of [1,-1])seat([X(o.seatR),yF+o.seatY-.05,s*.33],.48,.22,1,1);
   /* the belts: webbing down from each pillar's top past the seat */
-  for(const s of [1,-1])for(const u of o.doors===4?[pil[0],pil[1]]:[o.beltU||pil[0]])hdPart(out,mb=>{const zt=secKeys(D,u).P[10][0]-.05,yt2=K.topY(u,zt)-.12;
+  /* (o.noBelts: a car whose harnesses are its own) */
+  if(!o.noBelts)for(const s of [1,-1])for(const u of o.doors===4?[pil[0],pil[1]]:[o.beltU||pil[0]])hdPart(out,mb=>{const zt=secKeys(D,u).P[10][0]-.05,yt2=K.topY(u,zt)-.12;
     const pts=[[X(u)+.02,yt2,s*(zt-.02)],[X(u)+.05,yF+.62,s*(zt-.1)],[X(u)+.09,yF+.36,s*(zt-.12)]];hdSweep(mb,pts,[[-.024,-.0012],[.024,-.0012],[.024,.0012],[-.024,.0012]],SV(lin('#1a1a1b'),MAT.FABRIC),[0,0,1],true,true);
     hdRBox(mb,[X(u)+.02,yt2+.01,s*(zt-.02)],[.02,.03,.012],.006,BLK,2);},40);
   /* ---------- behind the seats ---------- */

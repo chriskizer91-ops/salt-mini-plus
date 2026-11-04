@@ -23,7 +23,7 @@ the game's own and Studio only: they have no baked version.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [SUV](models/suv/) | Done | 484,359 (+3,000 engine bay) | 808,095 | 51,408 | 51,586 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![SUV](models/suv/docs/front34.webp) |
 | [Pickup](models/pickup/) | Done | 545,652 (+31,712 engine bay) | To do | 53,950 | 54,356 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Pickup](models/pickup/docs/front34.webp) |
-| [Hatch](models/hatch/) | Done | 430,908 (+31,178 engine bay) | To do | 46,655 | 46,833 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Hatch](models/hatch/docs/front34.webp) |
+| [Hatch](models/hatch/) | Done | 430,908 (+31,178 engine bay) | 597,831 | 46,655 | 46,833 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Hatch](models/hatch/docs/front34.webp) |
 | [Wagon](models/wagon/) | Done | 532,457 (+33,666 engine bay) | To do | 52,006 | 52,334 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Wagon](models/wagon/docs/front34.webp) |
 | [EV](models/ev/) | Done | 498,744 (+23,526 engine bay) | To do | 55,314 | 55,432 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![EV](models/ev/docs/front34.webp) |
 | [Trail (4x4)](models/trail/) | Done | 492,105 (+27,684 engine bay) | To do | 50,181 | 50,799 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Trail (4x4)](models/trail/docs/front34.webp) |
@@ -65,6 +65,7 @@ and wheel positions are exactly the game's.
 | Car | Whole car | Body | Underside | Engine bay | Cabin | Hood | One wheel | One brake | Build | Pictures |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | SUV | 808,095 | 249,956 | 209,125 | 63,374 | 82,440 | 12,224 | 44,684 | 3,060 | 9.2 s | [front](models/suv/docs/s2_front34.webp), [rear](models/suv/docs/s2_rear34low.webp), [under](models/suv/docs/s2_under.webp), [bay](models/suv/docs/s2_bay.webp), [cabin](models/suv/docs/s2_cabin.webp) |
+| Hatch | 597,831 | 163,639 | 84,938 | 57,100 | 79,620 | 8,918 | 47,844 | 3,060 | 4.3 s | [front](models/hatch/docs/s2_front34.webp), [rear](models/hatch/docs/s2_rear34low.webp), [under](models/hatch/docs/s2_under.webp), [bay](models/hatch/docs/s2_bay.webp), [cabin](models/hatch/docs/s2_cabin.webp) |
 | Coupe | 707,820 | 208,109 | 210,839 | in the underside | 45,478 | 16,538 | 53,094 | 3,620 | 6.5 s | [front](models/coupe/docs/s2_front34.webp), [rear](models/coupe/docs/s2_rear34low.webp), [under](models/coupe/docs/s2_under.webp), [bay](models/coupe/docs/s2_bay.webp), [cabin](models/coupe/docs/s2_cabin.webp) |
 | SUV Sleeper | 892,380 | 313,328 | 167,138 | 75,128 | 84,840 | 14,754 | 55,678 | 3,620 | 8.1 s | [front](models/suv-sleeper/docs/s2_front34.webp), [rear](models/suv-sleeper/docs/s2_rear34low.webp), [under](models/suv-sleeper/docs/s2_under.webp), [bay](models/suv-sleeper/docs/s2_bay.webp), [cabin](models/suv-sleeper/docs/s2_cabin.webp) |
 | SUV Rock & Mud | 790,531 | 328,949 | 147,774 | 66,300 | 84,840 | 12,468 | 34,490 | 3,060 | 9.4 s | [front](models/suv-rockmud/docs/s2_front34.webp), [rear](models/suv-rockmud/docs/s2_rear34low.webp), [under](models/suv-rockmud/docs/s2_under.webp), [bay](models/suv-rockmud/docs/s2_bay.webp), [cabin](models/suv-rockmud/docs/s2_cabin.webp) |
