@@ -29,7 +29,7 @@ the game's own and Studio only: they have no baked version.
 | [Trail (4x4)](models/trail/) | Done | 492,105 (+27,684 engine bay) | To do | 50,181 | 50,799 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Trail (4x4)](models/trail/docs/front34.webp) |
 | [Coupe](models/coupe/) | Done | 480,718 (+31,334 engine bay) | 707,820 | 50,361 | 50,475 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Coupe](models/coupe/docs/front34.webp) |
 | [Muscle](models/muscle/) | Done | 420,615 (+30,160 engine bay) | To do | 58,121 | 58,395 | 1024 x 1536, 24.0 MB / 2048 x 3072, 96.0 MB | ![Muscle](models/muscle/docs/front34.webp) |
-| [SUV Sleeper](models/suv-sleeper/) | Done | 603,760 (+36,306 engine bay) | To do | Studio only | 51,654 | Studio only | ![SUV Sleeper](models/suv-sleeper/docs/front34.webp) |
+| [SUV Sleeper](models/suv-sleeper/) | Done | 603,760 (+36,306 engine bay) | 892,380 | Studio only | 51,654 | Studio only | ![SUV Sleeper](models/suv-sleeper/docs/front34.webp) |
 | [SUV Rock & Mud](models/suv-rockmud/) | Done | 528,718 (+34,076 engine bay) | To do | Studio only | 61,432 | Studio only | ![SUV Rock & Mud](models/suv-rockmud/docs/front34.webp) |
 | [SUV Race](models/suv-race/) | Done | 481,953 (+37,330 engine bay) | To do | Studio only | 49,108 | Studio only | ![SUV Race](models/suv-race/docs/front34.webp) |
 | [Coupe GT](models/coupe-gt/) | Done | 430,719 (+31,390 engine bay) | To do | Studio only | 52,023 | Studio only | ![Coupe GT](models/coupe-gt/docs/front34.webp) |
@@ -66,6 +66,7 @@ and wheel positions are exactly the game's.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | SUV | 808,095 | 249,956 | 209,125 | 63,374 | 82,440 | 12,224 | 44,684 | 3,060 | 9.2 s | [front](models/suv/docs/s2_front34.webp), [rear](models/suv/docs/s2_rear34low.webp), [under](models/suv/docs/s2_under.webp), [bay](models/suv/docs/s2_bay.webp), [cabin](models/suv/docs/s2_cabin.webp) |
 | Coupe | 707,820 | 208,109 | 210,839 | in the underside | 45,478 | 16,538 | 53,094 | 3,620 | 6.5 s | [front](models/coupe/docs/s2_front34.webp), [rear](models/coupe/docs/s2_rear34low.webp), [under](models/coupe/docs/s2_under.webp), [bay](models/coupe/docs/s2_bay.webp), [cabin](models/coupe/docs/s2_cabin.webp) |
+| SUV Sleeper | 892,380 | 313,328 | 167,138 | 75,128 | 84,840 | 14,754 | 55,678 | 3,620 | 8.1 s | [front](models/suv-sleeper/docs/s2_front34.webp), [rear](models/suv-sleeper/docs/s2_rear34low.webp), [under](models/suv-sleeper/docs/s2_under.webp), [bay](models/suv-sleeper/docs/s2_bay.webp), [cabin](models/suv-sleeper/docs/s2_cabin.webp) |
 <!-- /S2TABLE -->
 
 ## The viewer
@@ -76,8 +77,8 @@ and wheel positions are exactly the game's.
   closer. Double-tap a part to swing round it.
 - **The bar along the bottom:**
   - the car's name: pick a car
-  - **Game / Studio / Studio 2 / Baked**: switch between the versions. Studio 2 shows where a car has one (so far the
-    Coupe and the SUV Stock): the Studio car with the rest of it built again, its underside whole, its own engine bay and the road-car
+  - **Game / Studio / Studio 2 / Baked**: switch between the versions. Studio 2 shows where a car has one (the Studio 2
+    table below): the Studio car with the rest of it built again, its underside whole, its own engine bay and the road-car
     bits. Its underside and bay are pieces of their own, and the bay is drawn with the hood shut too (it shows from
     underneath)
   - **Hood**: open or close the hood

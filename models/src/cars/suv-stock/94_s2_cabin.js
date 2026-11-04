@@ -8,7 +8,8 @@
      the buckles on their stalks beside the seats; the rear's from the C pillars;
    - the pedals: the brake and the accelerator on their arms, the footrest, the parking brake's pedal and release;
    - the wheelhouses' carpeted humps in the cargo area, its tie-down hooks, the cargo cover's cassette, the cargo lamp
-     and the power socket; the trims on the B and C pillars.
+     and the power socket; the trims on the B and C pillars;
+   - (o.nos: the nitrous bottle on the cargo floor's left in its two clamps, its valve, gauge and feed line.)
    ===================================================================================== */
 function suvCabin2(out,car,o={}){
   const K=HDK,D=K.D,G=D.G,X=K.X,L=D.L,dy=D.dy;
@@ -108,7 +109,7 @@ function suvCabin2(out,car,o={}){
   seat([X(uHR),yF+.33,0],1.42,.26,3,0);
   /* the cargo floor's sill plate at the tailgate */
   hdPart(out,mb=>{const u=G.be-.07;hdRBox(mb,[X(u),cy(u,0)+.012,0],[.025,.02,zw(u)-.02],.008,SAT,2);},40);
-  suvCabinFinish(out,car,{yF,zw,cy,uHF,uHR,STONE,STONED,CHAR,CHARV,CARP,SAT,BLK});
+  suvCabinFinish(out,car,{yF,zw,cy,uHF,uHR,STONE,STONED,CHAR,CHARV,CARP,SAT,BLK,nos:o.nos});
 }
 /* the pieces the Studio's cabin leaves out */
 function suvCabinFinish(out,car,c){
@@ -152,6 +153,17 @@ function suvCabinFinish(out,car,c){
     for(const s of [1,-1])hdRBox(mb,[X(u),y,s*(zw(u)-.035)],[.04,.035,.008],.006,BLK,2);},40);}
   hdPart(out,mb=>{const u=4.4,z=-(zw(u)-.012),y=D.belt(u)-.12;hdRBox(mb,[X(u),y,z],[.04,.015,.005],.004,SMC('#e8e6df',SM.PLASTIC),2);
     const u2=4.2,y2=D.belt(u2)-.25,z2=zw(u2)-.012;hdCyl(mb,[X(u2),y2,z2],[X(u2),y2,z2-.012],.016,.016,18,BLK);hdCyl(mb,[X(u2),y2,z2-.012],[X(u2),y2,z2-.014],.011,.011,18,SMC('#0a0a0b',SM.PLASTIC));},40);
+  /* ---------- the nitrous bottle: blue, lying on the cargo floor's left on a plate in two clamps, the valve and its gauge
+     at the front, the braided feed down through the floor ---------- */
+  if(c.nos){const u0=4.16,u1=4.66,z=-.5,r=.088,y=cy(4.4,z)+r+.012,A=[X(u1),y,z],B=[X(u0),y,z];
+    hdPart(out,mb=>{cpRev(mb,A,B,[[0,0],[r*.5,0],[r*.92,.03],[r,.07],[r,.44],[r*.85,.48],[.03,.5],[.022,.5]],SMC('#1d4fb8',SM.PAINTED),36,40);},40);
+    hdPart(out,mb=>{hdCyl(mb,B,V3.add(B,[.03,0,0]),.02,.02,16,SMC('#c9a24a',SM.BRUSH));hdRBox(mb,V3.add(B,[.045,0,0]),[.015,.02,.014],.004,SMC('#c9a24a',SM.BRUSH),2);
+      hdCyl(mb,V3.add(B,[.045,.02,0]),V3.add(B,[.045,.05,0]),.006,.006,10,SMC('#c9a24a',SM.BRUSH));hdCyl(mb,V3.add(B,[.045,.055,-.012]),V3.add(B,[.045,.055,.012]),.022,.022,24,SMC('#111',SM.PLASTIC));
+      hdCyl(mb,V3.add(B,[.045,.055,.012]),V3.add(B,[.045,.055,.014]),.019,.019,24,SMC('#e8e6df',SM.PLASTIC));
+      hdTube(mb,suvPath([V3.add(B,[.06,0,0]),[X(4.12),y-.03,z],[X(4.3),cy(4.3,-.46)+.02,-.46],[X(4.3),cy(4.3,-.46)-.03,-.46]],4,1),.005,8,SMC('#7d7f83',SM.SATIN),false,true);
+      hdRBox(mb,[X(4.41),cy(4.41,z)+.004,z],[.26,.004,.07],.003,SMC('#2a2b2e',SM.ENGINE),2);
+      for(const u of [4.24,4.58]){const ring=[];for(let k=0;k<=24;k++){const a=k/24*TAU;ring.push([X(u),y+Math.sin(a)*(r+.004),z+Math.cos(a)*(r+.004)]);}hdTube(mb,ring,.006,6,SMC('#2a2b2e',SM.ENGINE),true,false);
+        hdRBox(mb,[X(u),y+r+.012,z],[.012,.01,.014],.003,SMC('#2a2b2e',SM.ENGINE),1);}},40);}
   /* ---------- the B and C pillars' trims, from the window sill to the headliner ---------- */
   for(const s of [1,-1])for(const [pu,ln,w] of G.pillars)hdPart(out,mb=>{const rows=[],y0=D.belt(pu)+.01,y1=K.topY(pu,.6)-.07;
     for(let k=0;k<=10;k++){const t=k/10,y=y0+(y1-y0)*t,u=pu+ln*t,row=[];for(const [du,dz] of [[-w-.03,.0],[-w-.02,.02],[w+.02,.02],[w+.03,0]])row.push([X(u+du),y,s*(K.sideZ(u+du,Math.min(y,D.Hr-.05))-.03-dz)]);rows.push(row);}

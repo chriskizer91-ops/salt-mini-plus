@@ -1,0 +1,33 @@
+{
+ "car": "sleeper",
+ "studio": {
+  "triangles": 603760,
+  "triangles_bay_up": 640066,
+  "by_piece": {
+   "body": 295765,
+   "hood": 13154,
+   "hide": 149,
+   "cabin": 53572,
+   "under": 3928,
+   "bay": 36306,
+   "wheel": 55678,
+   "brake": 3620
+  },
+  "build_ms": 6858
+ },
+ "studio2": {
+  "triangles": 892380,
+  "triangles_bay_up": 892380,
+  "by_piece": {
+   "body": 313328,
+   "hood": 14754,
+   "hide": 0,
+   "cabin": 84840,
+   "under": 167138,
+   "bay": 75128,
+   "wheel": 55678,
+   "brake": 3620
+  },
+  "build_ms": 8086
+ }
+}
