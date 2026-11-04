@@ -1,0 +1,37 @@
+{
+ "car": "race",
+ "game": {
+  "triangles": 49108,
+  "draws_game": 7,
+  "texture_mb": 0
+ },
+ "studio": {
+  "triangles": 481953,
+  "triangles_bay": 37330,
+  "by_piece": {
+   "body": 293879,
+   "lamp_head": 16446,
+   "lamp_tail": 8879,
+   "under": 3790,
+   "hide": 133,
+   "hood": 15002,
+   "bay": 37330,
+   "wheel_fr": 32336,
+   "brake_fr": 3620,
+   "wheel_fl": 32336,
+   "brake_fl": 3620,
+   "wheel_rr": 32336,
+   "brake_rr": 3620,
+   "wheel_rl": 32336,
+   "brake_rl": 3620
+  },
+  "draws_game": 13,
+  "draws_game_traffic": 11,
+  "draws_glb": 89,
+  "draws_glb_traffic": 87,
+  "texture_mb": 0,
+  "glb_mb": 15.5,
+  "data_mb": 11.3
+ },
+ "baked": null
+}
