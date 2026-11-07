@@ -18,6 +18,7 @@ This file is the plan. It's written so that a fresh Claude session (or this one)
 - **Runs on his phone** (Pixel 7a) and on the laptop (MSI Cyborg 15). It must **look as good as the Redtail and the SUV do in Salt & Sand today.**
 - **Two regions: sandy dunes and savanna.** Making new digital assets is fine.
 - **One self-contained HTML file**, like all his games. Being a single file is part of the appeal to him.
+- **Only the light models go in the game (his call).** Every vehicle, landmark and piece of gear is first made as a detailed model, then baked onto a light copy that still works the way the game needs (wheels turn, surfaces move). The game carries only the light copies, in play and in the Outfitter (the menu where you pick your vehicle and gear). The detailed models are kept in the repo, each beside its light copy, with a viewer page to look at them. Watch the file size too: a baked model is stored as data and pictures, while today's Studio cars are stored as the code that builds them. The plane added about 6 MB to the game file. Picture size is the main lever: 2048 for vehicles, 1024 for landmarks, 512 for small gear.
 
 ## Still to decide (ask him, one at a time, when it comes up)
 
