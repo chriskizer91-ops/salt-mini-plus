@@ -1,171 +1,169 @@
-# Beyond the Last Road
+# Beyond the Last Road (working title)
 
-*A story game by Christopher. You're a bush pilot with one plane and one truck, working where the last paved road ends: sand dunes on one side, savanna on the other. The plane goes where the truck can't, and the truck goes where the plane can't land.*
+*A story and exploration game by Christopher. You explore a huge wild country, mostly in an off-road truck, partly from a bush plane, and on foot wherever there's something to see up close: temples, ruins, canyons. The plane can fly over everything but can land only on a few dirt strips. The truck reaches what the plane can't, and your own feet reach what the truck can't.*
 
-This file is the plan. It's written so that a fresh Claude session (or this one) can pick the game up and build it with Christopher, step by step. Everything the game is built from is in this repo. Before changing anything, read **How to work with Christopher** at the bottom.
+This file is the plan. It's written so that a fresh Claude session (or this one) can pick the game up and build it with Christopher, step by step. Before changing anything, read **How to work with Christopher** at the bottom. Keep this file up to date as he decides things.
 
-## What he asked for (Nov 7 2026)
+## What he asked for (Nov 7 2026, in his words)
 
-> "I want to make a story that uses the mud and rock off road SUV and the bush plane… It can be called something other than Red Line or Red Tail, because I think Red Tail should stay my racing game with an airplane added… I want it to be able to run on my phone and also visually look as good as the current airplane and SUV in game look. We can have a sandy dune region. We can have a savanna region. We can make more digital assets for the game, whatever we need."
+> "I want to make a story that uses the mud and rock off road SUV and the bush plane… I want it to be able to run on my phone and also visually look as good as the current airplane and SUV in game look. We can have a sandy dune region. We can have a savanna region. We can make more digital assets for the game, whatever we need."
+
+> "I think the game should be mainly SUV exploration, and you get out and walk around a temple or something, and then … a significant portion of exploration is by plane … open world where you can fly, but you can't land … we fill in the end gaps of close-up exploring stuff on foot … a lot of travel between walking around spaces … a central little town hub."
 
 ## Decided (his picks, Nov 7 2026)
 
-- **Name: Beyond the Last Road.** "Redline" and "Redtail" stay with his racing game.
-- **Story: bush pilot jobs.** You run a one-plane, one-truck outfit: supply runs, rescues, wildlife counts. The story grows out of the jobs.
-- **How it plays: open map + story chain.** You roam both regions freely. The main story is a chain of missions, with side jobs in between.
-- **The plane gets a new name of its own** in the story. It's the same model (redtail-2) with its own name and paint. Its name isn't picked yet (see below).
-- **The truck is the SUV Rock & Mud** (the game's build id is `crawler`).
-- **Runs on his phone** (Pixel 7a) and on the laptop (MSI Cyborg 15). It must **look as good as the Redtail and the SUV do in Salt & Sand today.**
-- **Two regions: sandy dunes and savanna.** Making new digital assets is fine.
-- **One self-contained HTML file**, like all his games. Being a single file is part of the appeal to him.
-- **Only the light models go in the game (his call).** Every vehicle, landmark and piece of gear is first made as a detailed model, then baked onto a light copy that still works the way the game needs (wheels turn, surfaces move). The game carries only the light copies, in play and in the Outfitter (the menu where you pick your vehicle and gear). The detailed models are kept in the repo, each beside its light copy, with a viewer page to look at them. Watch the file size too: a baked model is stored as data and pictures, while today's Studio cars are stored as the code that builds them. The plane added about 6 MB to the game file. Picture size is the main lever: 2048 for vehicles, 1024 for landmarks, 512 for small gear.
+### The game
+
+- **Its name is not decided.** "Beyond the Last Road" is a working title only; he wants to brainstorm names. "Redline" and "Redtail" stay with his racing game.
+- **It's mainly exploration by truck.** You get out and walk around temples, ruins and other close-up places. A significant part of it is exploring by plane, though less than half. There should be a lot of travel between the places you walk around.
+- **Story:** bush pilot jobs (supply runs, rescues, counts) were his first pick. The story now has to sit alongside the exploration; brainstorm how.
+- **How it plays:** an open map plus a story chain: you roam freely, with the main story as a chain of missions and side jobs in between.
+- **A central little town hub.**
+- **Two regions to start: sandy dunes and savanna**, plus ruins, temples, canyons and mountains to explore. Making new digital assets is fine.
+- **Runs on his phone** (Pixel 7a) and on his laptop (MSI Cyborg 15). It must look as good as the Redtail and the SUV do in Salt & Sand today.
+- **One self-contained HTML file**, like all his games.
+
+### Getting around
+
+- **The truck is the SUV Rock & Mud** (the game's build id is `crawler`), with a new paint (a skin).
+- **The plane is the bush plane (redtail-2) in Wilderness Olive**: "the green bush plane". Its name in the story isn't picked yet.
+- **Both keep the racing game's real physics and its Digital Engine sound.** How the plane and the truck perform stays the racing game's.
+- **On foot: first person.** You see only your gloved hands and what you're holding, so no person has to be modelled. Gear, supplies and materials are modelled instead.
+- **The plane can fly over everything you can explore,** but it can touch down only on certain strips.
+- **The truck is already waiting at every strip you can land on.** When you land, a small model of the truck is there beside the runway. When you switch to it, the plane stays parked (or goes away).
+- **The strips are dirt** (it's a bush plane), except one paved runway. **One real paved road**; every other road is a dirt track.
+
+### The world
+
+- **Massive.** It should be significantly bigger than 16 km square: 25 miles square (40 km) or more. The engine already makes Road Not Found's world 40 miles square, in 128 m chunks round the camera at the detail each distance needs, with 512 m far tiles out to the horizon and a floating origin so nothing shakes far from the start.
+- **Not everywhere has to be somewhere you can go.** Much of the land is made to look right from the air or from a road, and is empty up close.
+- **A few layers of painted mountains** in the distance that you can never reach.
+- **Animals at a distance only, which is cheap to draw and true to life:** in real life animals run away before you get close. Add their sounds up close: birdsong, and rustling in the leaves as something runs off unseen.
+
+### Models: three of each (his rule)
+
+Each vehicle and asset is made detailed first and baked down. These figures are his targets.
+
+| Version | Triangles | Where it's used |
+| --- | --- | --- |
+| **Source** | as detailed as it comes (the Rock & Mud's Studio 2 is 790,531; redtail-1 is 241,278) | **Kept in the repo only**, with a viewer page to look at it. Not in the game. |
+| **Outfitter** | about 150,000, with the source baked onto it | **In the game's garage bay (the Outfitter)**, where you look at the vehicle and outfit it for a trip. |
+| **Play** | about 10,000, with the source baked onto it | **In the game, driving and flying.** |
+
+- **The Outfitter is part of the game,** a little technical: some engine modification, rigging, prepping and gearing up for a trip.
+- **Pictures:** the vehicles get the sharpest, because they're what you travel in (2048). Landmarks get 1024, small gear 512. Each picture is compressed according to how close you'll see it, and pictures are shared where they can be.
+- **File size:** a baked model is stored as its shape plus its pictures, so it takes more room in the file than today's Studio cars, which are stored as the code that builds them. The plane added about 6 MB to the game file.
+
+### Pictures for the models
+
+- Christopher makes the reference pictures in ChatGPT Pro from prompts Claude writes. There's no fixed number: 100 is a comfortable batch, and hundreds is possible.
+- Each object gets a reference sheet (side, front, top and three-quarter views), and every prompt shares one style line so the whole set matches.
+- Textures and the painted horizons are pictures of their own.
+
+### How it's being built (Nov 7 2026)
+
+- **Christopher is giving an API key for this work.** Fable 5.1 at its highest setting brainstorms the game, the name, the lore and the list of pictures. Opus 5.5 helpers build the 3D models from his pictures.
+- API helpers can't open files or run code, so the session runs the loop: a helper writes a model's code from a picture, then the session builds it, bakes it and renders it beside the picture, then sends the render back for fixes.
+- He turns the key off when the work is done. **Never write the key into the repo, the notes or any file that's kept.**
+- **He's making a new repo for this game.** Until it exists, this plan lives here.
 
 ## Still to decide (ask him, one at a time, when it comes up)
 
-- **The plane's name.** Some ideas from savanna birds: *Bateleur* (an eagle that rocks its wings as it glides), *Kestrel*, *Hornbill*, *Secretary Bird*. Or his own.
-- **The outfit's name** (painted on the hangar and the plane), and **who you are** (a name, or just "the pilot").
-- **The plane's paint in the story.** A new ChatGPT paint job made with `redtail/paint-template/`, or Wilderness Olive.
-- **Fuel for the plane:** yes (bush flying is about range) or no (simpler).
-- **Walking:** none to start is suggested. You switch between truck and plane when you're parked beside the other one. Walking means a person model and animation, and a person costs the phone a lot.
-- **People:** shown as a radio voice plus a portrait card (ChatGPT pictures) and short lines of text, rather than 3D people. Voices can come later.
-- **Where it is:** a made-up country is suggested, so the places and animals can be whatever fits.
+- **The game's name** (brainstorm), the **plane's name** (ideas so far: Bateleur, Kestrel, Hornbill), the **outfit's name**, and **who you are**.
+- **The truck's paint.**
+- **The story,** and how the bush pilot jobs sit alongside the exploration.
+- **Fuel** for the plane and the truck: yes or no.
+- **People:** a radio voice with a portrait card and short lines of text is suggested, rather than 3D people.
+- **Where the truck can go:** everywhere off-road inside driving areas, kept out of fly-over-only lands by cliffs, deep rivers or thick bush? Or roads and tracks only?
+- **Whether 10,000 triangles looks good enough in play.** See the look test below.
 
-## What it's built from (all in this repo)
+## What it's built from (in `chriskizer91-ops/salt-mini-plus`)
 
 | What | Where | Notes |
 | --- | --- | --- |
-| The game engine | `salt-and-sand/salt-and-sand.html` | Under Salt & Sand, the page carries all of Road Not Found: the renderer, the physics, the Digital Engine sound, the open-world generator with trees and grass, the career and money, and **people with jobs** (`PEOPLE`, `JOBS`, steps: talk, goto, deliver, chal, part, medals, speed). Its source was never saved, so **the page is the source**. See `salt-and-sand/README.md`. |
+| The game engine | `salt-and-sand/salt-and-sand.html` | Under Salt & Sand, the page carries all of Road Not Found: the renderer, the physics, the Digital Engine sound, the open world (40 miles square), the career and money, and **people with jobs** (`PEOPLE`, `JOBS`; steps: talk, goto, deliver, chal, part, medals, speed). Its source was never saved, so **the page is the source**. See `salt-and-sand/README.md`. |
 | The plane, flying | `redtail/game/` (`rt-game.js`, `rt-fly.js`, `rt_patch.py`) | Lift, stall, flaps, the prop's blast over the tail, the stick, tilt, the throttle lever, a cockpit camera, lights, the engine and prop sound, the PAINT button. Tested numbers are in `redtail/README.md`. |
-| The plane's model | `redtail/versions/redtail-2/` | 60k triangles with baked pictures. Its moving parts: prop, wheels, tailwheel, rudder, elevators, flaps, ailerons, and the cowl comes off. |
-| A paint job for the plane | `redtail/tools/livery.py` + `redtail/paint-template/` | His ChatGPT pictures → a paint for redtail-2. Two are done (Yellow & Black, Wilderness Olive). |
-| The truck | `models/suv-rockmud/`, `models/src/` | The Studio 2 Rock & Mud is 790,531 triangles: body 328,949, underside 147,774, cabin 84,840, engine bay 66,300, one wheel 34,490. The page builds it from code (`KIT.setAlt('2')`). The Studio 1 is 528,718 and the game's own is 61,432. |
-| The dunes | Salt & Sand's world, in the page | White dunes about 12 m tall, gentle on one side and steep on the other, with sand grip, sand dust and wind ripples. |
-| The cameras | Salt & Sand's cameras, in the page | Chase, Hood, Cockpit, Wheel cam, Tracking car, Roadside, Cinematic, the drones, Director, Jump cam. |
+| The plane's models | `redtail/versions/` | redtail-1 is the source (241k, in code); redtail-2 is a 60k bake. Moving parts: prop, wheels, tailwheel, rudder, elevators, flaps, ailerons; the cowl comes off. |
+| Wilderness Olive | `redtail/versions/redtail-2/paint/` | The story plane's paint, made from his ChatGPT pictures with `redtail/tools/livery.py`. |
+| The truck | `models/suv-rockmud/`, `models/src/` | Studio 2 Rock & Mud: 790,531 triangles (body 328,949, underside 147,774, cabin 84,840, engine bay 66,300, one wheel 34,490), built from code (`KIT.setAlt('2')`). |
+| The bake | `redtail/tools/` (`bake.py` and friends), `models/tools/bake.py` | How redtail-2 and the baked traffic cars were made. |
+| The dunes and the cameras | Salt & Sand, in the page | Dunes with sand grip, dust and ripples. The cameras: Chase, Hood, Cockpit, Wheel cam, Tracking car, Roadside, Cinematic, the drones, Director, Jump cam. |
 | A finished build to look at | `redtail/builds/salt-and-sand-redtail-2-flying-paints.html` | What "looks as good as now" means. |
 
-Not in any repo: Redline County's ground-clutter pack (grasses, bushes, trees). The `building-with-assets-` repo is a game-launcher app and doesn't hold it. If Christopher has the pack on his laptop, it could help the savanna. Otherwise the savanna's plants are made new.
+## The phone's budget
 
-## The big technical problem: the phone's budget
-
-Salt & Sand draws about **850,000 triangles a frame**, 808,000 of them the SUV's Studio 2, and Christopher judges that **about the most his phone can draw smoothly**. In a test, a frame with the Redtail took about two thirds of the time a frame with the SUV's Studio 2 did.
-
-This game needs more on screen than Salt & Sand: the truck, the plane parked or flying, a savanna with grass, trees and animals, buildings and airstrips. With the Rock & Mud at 790k, there's almost nothing left for the world. So:
-
-- **The plane is already light** (60k), because it was baked from a 241k model onto a simpler one.
-- **The truck needs the same treatment for this game:** the Studio 2 Rock & Mud cut down to a lighter copy, with its fine detail baked into pictures, the way redtail-2 was made from redtail-1. The aim is somewhere around 150,000 to 250,000 triangles. Note that in early Nov 2026 he judged an earlier bake (the game's own 51k mesh wearing the Studio surface) to look worse than the Studio models. This bake is different: it keeps the Studio 2 shape and cuts it down, as the plane was. Prove it on his phone before relying on it.
-- **Step 1 of the build order is a look test on his phone:**
-  - the Studio 2 Rock & Mud as it is (790k);
-  - its Studio 2 Drive (the engine bay taken out, about 724k);
-  - one or two baked copies.
-
-  Show them side by side with the triangle counts, in the same light and from the same cameras. He drives each on his phone and picks. Everything after that is sized from his pick.
-- **The world's share:**
-  - trees, rocks and animals drawn many at once with one draw for each kind (instancing, as the traffic is in the Salt Flats demo);
-  - grass mostly as a ground texture and colour, with real blades only close to the camera;
-  - a simpler tree far off than up close;
+- Salt & Sand draws about **850,000 triangles a frame**, 808,000 of them the SUV's Studio 2. Christopher judges that about the most his phone can draw smoothly.
+- With the play models at about 10,000 triangles each, almost all of the budget goes to the world.
+- **The look test comes first.** Bake the Rock & Mud at 10,000 triangles (and at 25,000 and 50,000, to compare) and show them beside its Studio 2, from the same cameras, on his phone: Chase, Wheel cam, Tracking car. Then he picks.
+- Why test: in the traffic test the 5,000-triangle baked Coupe was judged plenty good at traffic distance. But in early Nov 2026 he judged the game's own 51,000-triangle mesh wearing the Studio surface to look worse than the Studio models up close. Up close, the outline (round tyres, struts, the plane's wires) is what a low count shows first.
+- The world's share:
+  - trees, rocks and animals drawn many at once, one draw for each kind;
+  - grass mostly as a ground texture, with real blades only near the camera;
+  - a simpler copy of each thing far off;
   - only the near world casting shadows.
-- **The vehicle you're not in:** the plane parked is 60k. The truck parked far off can be a much simpler copy.
-- **Keep counting:** the page's F readout gives triangles and draws. The test browser has no graphics card, so only his phone can say how smooth it is.
+- The page's F readout gives triangles and draws. The test browser has no graphics card, so only his phone can say how smooth it is.
 
-## The world (a first draft to change with him)
+## The world (a draft to work out with him)
 
-- **Home base: the airstrip at the end of the last road.** The highway comes in from off the map and stops. There's a hangar, fuel drums, a workshop (the game's garage), a radio shack and a windsock. The story starts here.
-- **The Dune Sea, on one side:** Salt & Sand's dunes, bigger and wider. A dune camp with tents, an old well, a long-crashed plane half buried (a landmark from the air), and a salt pan flat enough to land on.
-- **The Savanna, on the other side:**
-  - grassland in greens and golds, flat-topped acacias, thorn bushes, termite mounds;
-  - rock outcrops (kopjes), a river with sandbanks, waterholes, and one giant baobab as a landmark;
-  - a ranger station, a village with a clinic, a safari lodge.
-- **Between them:** dirt tracks for the truck, and **five or six airstrips** of different difficulty: long and flat at base, short at the village, a high strip on top of a kopje, the salt pan in the dunes. Each has a windsock and markers.
-- **Size:** about 12 km by 8 km to start. At 75 mph cruise, the plane crosses 1 km in about 30 s, so a flight across the long side takes about 6 minutes (about 3½ at its top speed of 136 mph), and across the short side about 4. The world generator already makes land in 128 m chunks around the car, so a big map costs nothing until you're near.
+- **The town hub:** the start, the Outfitter (garage bay), the paved runway, and the end of the one paved road.
+- **Three kinds of place:**
 
-## Driving and flying together
+  | Kind | What it is |
+  | --- | --- |
+  | Walk | Temples, ruins, the town: full detail, explored on foot in first person. |
+  | Drive | Tracks, canyons, river crossings, dunes: built for the truck, with plenty of distance between the walk places. |
+  | Fly over | Most of the map: land, textures and trees drawn many at once. It looks right from the air and is empty up close. You can't land there because there's no strip (forest, rock, steep ground, water). |
 
-- The vehicle you're not in **stays where you left it**, drawn in the world.
-- Stop within about 20 m of the other one and a **SWITCH** button appears (a key on the laptop). The cameras and controls change over.
-- Long trips shouldn't strand you: by default, **the truck can be sent by radio to any airstrip** for a small fee and a short wait. Ask him.
-- The story's best moments **use both:**
-  - the plane spots something the truck then reaches;
-  - the truck brings something to a strip, and the plane carries it on.
+- **Dirt strips** beside the walk and drive places, each with the truck waiting and a windsock.
+- **Fly-throughs:** canyons, gorges, arches, valleys between peaks.
+- **Painted mountains in layers** round the edge.
+- **Regions:** the Dune Sea and the Savanna to start, and more to brainstorm.
+- **Size:** 40 km square or more. At 75 mph the plane crosses 1 km in about 30 s, so 40 km takes about 20 minutes at cruise. Something new should come into view every 30 to 60 seconds of flight.
 
-## The jobs and the story
+## The jobs and the story (to brainstorm)
 
-The page's job system already has people, a column of light where someone has work, an arrow to the next step, steps, payment and a career save. Bush-pilot jobs add steps:
+The page's job system already has people, a column of light where someone has work, an arrow to the next step, payment and a career save. New steps the game could add:
 
 | Step | What it asks |
 | --- | --- |
-| fly to / land at | Land on a strip and roll to a stop inside it. Bonus for a gentle touchdown. |
-| carry | Load at A, unload at B. The load weighs the plane down: longer take-off, slower climb. |
-| spot | Fly low and slow over a place, such as a herd or a lost truck, until it's counted or found. |
-| drop | Airdrop a package onto a marker, with bonus for how close it lands. |
-| drive to | Take the truck somewhere the plane can't land. |
-| against the clock | The existing deliver step, for medicine and medevacs. |
+| fly to / land at | Land on a strip and stop inside it, with a bonus for a gentle touchdown. |
+| carry | Load at A, unload at B. The load weighs the plane down. |
+| spot | Fly low and slow over a place until it's found. |
+| drop | Airdrop onto a marker. |
+| drive to | Take the truck where the plane can't land. |
+| explore | Walk a site on foot and find something. |
+| against the clock | The existing deliver step. |
 
-**Main story chain (a draft for him to rewrite; every name here is a working name):**
+An eight-mission draft for the bush pilot jobs was written earlier. It's kept in this file's history in git (`git log -p beyond-the-last-road/README.md`). The brainstorm will redo it with exploration in mind.
 
-1. **End of the Road.** You arrive in the truck where the highway stops. The retiring pilot hands over the plane and the outfit. First flight: round the strip and land.
-2. **First Run.** Fly medicine to the village clinic: a short dirt strip, your first real landing.
-3. **Two Ways There.** The ranger station needs fence wire, too heavy for the plane. Drive it across the savanna tracks, then fly home.
-4. **The Count.** Fly the ranger low and slow over the herds for the wildlife count.
-5. **Lost in the Dunes.** A dune camp's supply truck is overdue. Search from the air, find it, land on the salt pan, and get water to them in the truck.
-6. **Storm Season.** A dust storm is coming. Fly the last supplies out before it, and land with the sand blowing.
-7. **The High Strip.** A delivery to the kopje-top strip: short, uphill and gusty.
-8. **The River Rises.** Floods cut the tracks. Medevac from the village to base at night, on landing lights.
-
-After the chain, the map stays open with side jobs. Side jobs: cargo runs, photo flights for the lodge, fence checks by truck, fuel drops, airdrops, tourist flights (smooth flying earns tips), and the game's existing feats.
-
-**Money buys:**
-- the truck's parts (the game's garage already has them);
-- plane upgrades (bigger tires for rough strips, a cargo pod, long-range tanks, a stronger engine);
-- paint jobs (his ChatGPT pictures).
-
-## Assets to make
-
-| Asset | How | Notes |
-| --- | --- | --- |
-| The baked Rock & Mud | `models/tools/bake.py`, the redtail-2 bake (`redtail/tools/`) | Step 1's look test. |
-| The plane's story name and paint | ChatGPT + `redtail/tools/livery.py` | A new paint is a paint option for redtail-2, not a new model version. |
-| Savanna ground and grass | code (shader) + ChatGPT texture pictures | Colour by region: dry gold, green near water. |
-| Acacia, thorn bush, baobab, termite mound, kopje rocks | code, the way the game builds its trees, with a near and a far version of each | Drawn many at once. |
-| Animals: zebra, antelope, giraffe, elephant, birds | code, low triangle counts, walking done in the shader, herds drawn many at once | Only near the camera. A big sight from the plane. |
-| Buildings: hangar, radio shack, fuel drums, windsock, tents, huts, clinic, lodge, ranger station | code | A few draws each. |
-| Airstrips | code: dirt strips, markers, windsock | Their own surface for the tyres. |
-| Portraits of the people | ChatGPT pictures | For the radio card. |
-| Sounds | the game's audio | Wind, radio crackle, animal calls. |
-| Weather | the game's sky, fog and times of day | A dust storm: fog, a sky tint and wind on the plane. |
-
-## Build order
+## Build order (to adjust after the brainstorm)
 
 Each step ends with something Christopher can open on his phone, plus screenshots and simple numbers.
 
-0. **The fork.** `beyond-the-last-road.html` = Salt & Sand + the plane + this game's own patches:
-   - a new title and **new save keys**, so it never touches Salt & Sand's saves;
-   - the Rock & Mud as the only truck and the plane under its new name;
-   - it starts at home base.
-
-   Fix the plane's three known faults on the way: the car lights and gear on the HUD, the bay showing the car, the chase camera staying level.
-1. **The look test** (the phone's budget, above). He picks the truck's version.
-2. **Switching** between the truck and the plane.
-3. **The map:** home base, the Dune Sea, the Savanna, the tracks and the airstrips, with stand-in buildings.
-4. **The savanna's look:** grass, trees, rocks, the river, the waterholes, the baobab. Check the phone's budget again.
-5. **Jobs:** the radio, the job steps above, money, a save of its own.
-6. **The story chain:** the eight missions, their lines, the portraits.
-7. **Life:** herds, birds, the dust storm, times of day.
-8. **Upgrades and paints.**
-9. **Polish:** the opening, the menus, the sounds, the ending.
+0. **The fork.** A new page made from Salt & Sand + the plane + this game's own patches:
+   - new save keys;
+   - the Rock & Mud and the plane in Wilderness Olive;
+   - fix the plane's known faults: the car lights and gear on the HUD, the bay showing the car, the chase camera staying level.
+1. **The look test:** the Rock & Mud at 10k, 25k and 50k beside its Studio 2. He picks the play model.
+2. **The brainstorm and the picture list** (with the API key); he makes the pictures.
+3. **The town hub and the Outfitter** (the 150k models).
+4. **Landing and the waiting truck; getting out on foot.**
+5. **The world's layout:** regions, the paved road, the tracks, the strips, the painted mountains.
+6. **The first walk place** (a temple) and the first fly-through (a canyon).
+7. **Assets from his pictures,** built and baked by the helpers.
+8. **Jobs and the story.**
+9. **Life:** distant herds, birds, sounds, weather, times of day.
+10. **Polish.**
 
 ## How to work with Christopher
 
 - **He can't code.** He builds everything through Claude. Explain in plain words, and **prove every step with screenshots and simple numbers.**
-- **Uncluttered phone screens.** He dislikes a crowded UI. On the phone, every button has to earn its place.
+- **Uncluttered phone screens.** On the phone, every button has to earn its place.
 - **His devices:** a Pixel 7a phone and an MSI Cyborg 15 laptop (RTX 5060), with Edge on the laptop. Frame rates, tilt and sound can only be judged there.
-- **Never overwrite:**
-  - a new build gets a new file name, and older builds are kept;
-  - every version of a model is kept, and a change to a model is a new version (his rule for the plane, which holds here too).
-- **Change the page with exact text swaps** that must each match once, like `salt-and-sand/ice-and-snow-freeze.py` and `redtail/game/rt_patch.py`. A changed upstream page then fails loudly. Put this game's own code in its own `.js` files that the build script puts into the page.
-- **Where things go:** `beyond-the-last-road/` holds `src/` (this game's code), `build.sh`, `builds/` (the pages), `docs/` (pictures) and this README. Keep this README's Decided list up to date as he decides things.
+- **Never overwrite:** a new build gets a new file name, and every version of a model is kept.
+- **Change the page with exact text swaps** that must each match once, like `salt-and-sand/ice-and-snow-freeze.py` and `redtail/game/rt_patch.py`, so a changed upstream page fails loudly. This game's own code goes in its own `.js` files that the build script puts into the page.
 - **Testing:**
   - Playwright with headless Chrome (`redtail/game/rt-run.py` is a working harness);
   - run one browser at a time;
-  - the test browser has no graphics card, so frame rates mean nothing there, but triangle counts, draws, speeds and distances do.
-- **His other tools:** ChatGPT Pro for pictures (reference sheets, paint jobs, textures, portraits). He makes them from prompts Claude writes.
-- **Notes:** the Salt Flats Plus project's `claude/salt-flats-notes.md` holds the decisions for everything in this repo. Add this game's decisions there too.
+  - in the test browser, triangle counts, draws, speeds and distances mean something, frame rates don't.
+- **Notes:** the Salt Flats Plus project's `claude/salt-flats-notes.md` and `claude/beyond-the-last-road-plan.md`.
