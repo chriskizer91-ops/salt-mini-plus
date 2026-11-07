@@ -1,0 +1,4 @@
+node_modules/
+work/
+game/rt2-data.js
+__pycache__/

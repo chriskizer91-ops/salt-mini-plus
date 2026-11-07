@@ -5,6 +5,12 @@ Salt Mini Plus is Redline County's physics and logic on a salt flat with a long 
 game, the **Salt Flats demo** (`game/`, see `game/README.md`): the salt flat and its road, the stock Coupe as Studio 2
 Drive on the road and the full Studio 2 in the dyno bay, and light traffic of 5k Coupes.
 
+Also in this repo:
+
+- **`salt-and-sand/`**: Salt & Sand (one Studio 2 car, the salt flats and white dunes) and Ice & Snow (the same game frozen). Salt & Sand's source was never saved, so the page itself is the source.
+- **`redtail/`**: the Redtail bush plane. Every version of the model, its paint jobs, the code that flies it in the games, and the builds with it in Salt & Sand and Ice & Snow.
+- **`beyond-the-last-road/`**: the plan for Christopher's story game: a bush pilot with the SUV Rock & Mud and the plane, across dunes and savanna, on his phone.
+
 Each car comes three ways:
 
 - **Game's own**: the car exactly as Redline County: Wide Open 2: Road Not Found + Traffic builds it.
